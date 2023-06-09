@@ -15,21 +15,13 @@ import {
 } from "@mui/material";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
-// import { initialValues } from "./utils/initialValues";
+import { initialValues } from "./utils/initialValues";
 
 const FormProduct = ({ producto }) => {
   const [marcas, setMarcas] = useState([]);
   const [modelos, setModelos] = useState([]);
   const { user } = useUserContext();
   const navigate = useNavigate();
-
-  const initialValues = {
-    nombre: producto ? producto.nombre : "",
-    cantidad: producto ? producto.cantidad : "",
-    precio: producto ? producto.precio : "",
-    marca: producto ? producto.marcas_id : "",
-    modelos_id: producto ? producto.modelos_id : "",
-  };
 
   const {
     isSubmitting,
@@ -41,62 +33,42 @@ const FormProduct = ({ producto }) => {
     handleBlur,
   } = useFormik({
     enableReinitialize: true,
-    initialValues,
+    initialValues: producto ? producto : initialValues,
     validationSchema: FormProductSchema,
     onSubmit: async function (values, actions) {
       const token = user.token;
-      if (producto) {
-        try {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}componente/${producto.id}`,
-            {
-              method: "PUT",
-              body: JSON.stringify(values),
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
-              },
-            }
-          );
+      const url = producto
+        ? `${import.meta.env.VITE_API_URL}componente/${producto.id}`
+        : `${import.meta.env.VITE_API_URL}componente/`;
 
-          const data = await response.json();
-          if (!response.ok) {
-            alert(data);
-            throw new Error(data.error);
-          }
-          alert("producto Actualizado");
-          actions.setSubmitting(false);
+      try {
+        const response = await fetch(url, {
+          method: producto ? "PUT" : "POST",
+          body: JSON.stringify(values),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error);
+        }
+
+        if (producto) {
+          alert("Producto actualizado");
           actions.resetForm();
           navigate("/home/products");
-        } catch (error) {
-          alert(error.message);
-        }
-      } else {
-        try {
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}componente/`,
-            {
-              method: "POST",
-              body: JSON.stringify(values),
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          const data = await response.json();
-          if (!response.ok) {
-            alert(data);
-            throw new Error(data.error);
-          }
-          alert("producto guardado");
-          actions.setSubmitting(false);
+        } else {
+          alert("Producto guardado");
           actions.resetForm();
-        } catch (error) {
-          alert(error.message);
         }
+      } catch (error) {
+        alert(error.message);
       }
+
+      actions.setSubmitting(false);
     },
   });
 
@@ -116,10 +88,7 @@ const FormProduct = ({ producto }) => {
         console.error("Error al obtener las marcas:", error);
       }
     };
-    fetchMarcas();
-  }, []);
 
-  useEffect(() => {
     const fetchModelos = async () => {
       try {
         const response = await fetch(
@@ -138,10 +107,17 @@ const FormProduct = ({ producto }) => {
         console.error("Error al obtener los Modelos:", error);
       }
     };
+
+    fetchMarcas();
+
     if (values.marca !== "") {
       fetchModelos();
     }
-  }, [values.marca]);
+  }, [user.token, values.marca]);
+
+  const getSelectedValue = (array, value, property) => {
+    return array.find((item) => item.id === value)?.[property] || "";
+  };
 
   return (
     <Paper
@@ -190,7 +166,6 @@ const FormProduct = ({ producto }) => {
           sx={{ mr: 2 }}
         />
 
-        {/* <Box sx={{ display: "flex", mb: 2 }}> */}
         <FormControl
           size="small"
           error={touched.marca && Boolean(errors.marca)}
@@ -207,7 +182,7 @@ const FormProduct = ({ producto }) => {
             labelId="marca_label"
             name="marca"
             label="Marca del dispositivo"
-            value={marcas.find((marca) => marca.id === values.marca)?.id || ""}
+            value={getSelectedValue(marcas, values.marca, "id")}
             onChange={handleChange}
             onBlur={handleBlur}
           >
@@ -240,11 +215,7 @@ const FormProduct = ({ producto }) => {
             label="Modelo del dispositivo"
             labelId="modelos_id_label"
             name="modelos_id"
-            // disabled={!values.marca}
-            value={
-              modelos.find((modelo) => modelo.id === values.modelos_id)?.id ||
-              ""
-            }
+            value={getSelectedValue(modelos, values.modelos_id, "id")}
             onChange={handleChange}
             onBlur={handleBlur}
           >
@@ -259,7 +230,6 @@ const FormProduct = ({ producto }) => {
             <FormHelperText>{errors.modelos_id}</FormHelperText>
           )}
         </FormControl>
-        {/* </Box> */}
       </Box>
       <Box sx={{ display: "flex", mb: 2 }}>
         <TextField
