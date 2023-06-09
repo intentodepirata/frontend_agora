@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="1200px" height="800px" viewBox="0 0 1200 800" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <rect width="1200" height="800" id="artboard_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#artboard_1" clip-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Pixelbook" clip-path="url(#clip_1)">
+    <use xlink:href="#artboard_1" stroke="none" fill="#FFFFFF" fill-opacity="0" />
+    <path d="M0.000828459 0L1244 0L1244 303C1244 303 1032.87 239.41 722.002 280.863C411.137 322.315 309.047 312.489 195.497 280.861C81.9478 249.234 0 207.497 0 207.497L0.000828459 0Z" transform="matrix(-1 -8.742278E-08 8.742278E-08 -1 1217.9987 799.9984)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>
