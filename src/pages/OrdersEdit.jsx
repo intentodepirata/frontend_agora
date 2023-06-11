@@ -1,57 +1,60 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import React from "react";
+import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Link } from "react-router-dom";
+import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 const OrdersEdit = () => {
+  const [fetchData, setFetchData] = useState(false);
+
+  const handleButtonClick = () => {
+    setFetchData(true);
+  };
   return (
     <Box
+      component="section"
       sx={{
         display: "flex",
-        alignItems: "center",
+        flexDirection: "column",
         justifyContent: "space-between",
-        p: 2,
       }}
     >
-      <Box>
-        <IconButton aria-label="Back">
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography
-          component="h1"
-          variant="h6"
-          color="initial"
-          sx={{ ml: 2, p: 2 }}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          p: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <IconButton component={Link} to="/home" aria-label="Back">
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography
+            component="h1"
+            variant="h6"
+            color="initial"
+            sx={{ ml: 2, p: 2 }}
+          >
+            Editar Orden
+          </Typography>
+        </Box>
+        <Button
+          onClick={handleButtonClick}
+          variant="contained"
+          color="primary"
+          sx={{ textTransform: "none", fontSize: "16px" }}
         >
-          Orden de trabajo
-        </Typography>
+          Guardar Orden
+        </Button>
       </Box>
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ textTransform: "none", fontSize: "16px" }}
-      >
-        Guardar
-      </Button>
-      <Button
-        variant="contained"
-        color="succes"
-        sx={{ textTransform: "none", fontSize: "16px" }}
-      >
-        Imprimir
-      </Button>
-      <Button
-        variant="contained"
-        color="warning"
-        sx={{ textTransform: "none", fontSize: "16px" }}
-      >
-        editar
-      </Button>
-      <Button
-        variant="contained"
-        color="error"
-        sx={{ textTransform: "none", fontSize: "16px" }}
-      >
-        Eliminar
-      </Button>
+
+      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
+        <FormOperacionesTecnicas
+          fetchData={fetchData}
+          setFetchData={setFetchData}
+        />
+      </Box>
     </Box>
   );
 };

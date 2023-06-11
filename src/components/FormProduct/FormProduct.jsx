@@ -149,6 +149,7 @@ const FormProduct = ({ producto }) => {
         >
           Rellene todos los campos para agregar un producto
         </Typography>
+
         <TextField
           fullWidth
           size="small"
@@ -157,7 +158,6 @@ const FormProduct = ({ producto }) => {
           InputLabelProps={{
             shrink: producto?.nombre && true,
           }}
-          defaultValue={initialValues.nombre}
           value={values.nombre}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -241,7 +241,6 @@ const FormProduct = ({ producto }) => {
           InputLabelProps={{
             shrink: producto?.cantidad && true,
           }}
-          defaultValue={initialValues.cantidad}
           value={values.cantidad}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -249,6 +248,7 @@ const FormProduct = ({ producto }) => {
           helperText={touched.cantidad && errors.cantidad}
           sx={{ width: "50%", mr: 2 }}
         />
+
         <TextField
           id="precio"
           size="small"
@@ -258,7 +258,6 @@ const FormProduct = ({ producto }) => {
           InputLabelProps={{
             shrink: producto?.precio && true,
           }}
-          defaultValue={initialValues.precio}
           value={values.precio}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -279,6 +278,8 @@ const FormProduct = ({ producto }) => {
           {isSubmitting ? "Guardando" : "Guardar Producto"}
         </Button>
       </Box>
+      {/* <pre>{JSON.stringify(producto, null, 2)}</pre>
+      <pre>{JSON.stringify(values, null, 2)}</pre> */}
     </Paper>
   );
 };

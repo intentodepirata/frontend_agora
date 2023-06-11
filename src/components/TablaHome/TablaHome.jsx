@@ -3,6 +3,7 @@ import { Box, Button, Stack } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const columns = [
   { field: "id", headerName: "OT", width: 80 },
@@ -28,6 +29,7 @@ const columns = [
 
 export default function TablaHome({ rows }) {
   const [selectionModel, setSelectionModel] = useState(null);
+  const navigate = useNavigate();
 
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);
@@ -35,6 +37,7 @@ export default function TablaHome({ rows }) {
 
   function handleEditar(id) {
     console.log("editando", id[0]);
+    navigate("/home/orders/edit/" + id[0]);
   }
   function handleEliminar(id) {
     console.log("eliminando", id[0]);

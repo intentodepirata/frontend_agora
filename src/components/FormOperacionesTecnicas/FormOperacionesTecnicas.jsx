@@ -14,18 +14,129 @@ import TablaReparacion from "../TablaReparacion/TablaReparacion";
 import { nombreAverias } from "./utils/nombreAverias";
 import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
+import { useParams } from "react-router-dom";
 
-const FormOperacionesTecnicas = ({ cliente_id, dispositivo_id }) => {
+const FormOperacionesTecnicas = ({
+  cliente_id,
+  dispositivo_id,
+  fetchData,
+  setFetchData,
+}) => {
+  const { id } = useParams();
   const [averia, setAveria] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [observaciones, setObservaciones] = useState("");
   const [estado_id, setEstado_id] = useState("");
   const [checklist_id, setChecklist_id] = useState(undefined);
+  const [checklist, setChecklist] = useState(null);
   const [estados, setEstados] = useState([]);
   const [tipoGarantia, setTipoGarantia] = useState("");
   const [ot, setOt] = useState(initialValues);
   const [numeroOt, setNumeroOt] = useState(null);
+  const [updatedDispositivo_id, setUpdatedDispositivo_id] = useState(null);
+  const [updateCliente_id, setUpdateCliente_id] = useState(null);
+  const [ots_id, setOts_id] = useState(id || null);
   const { user } = useUserContext();
+  const fetchOt = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      if (response.ok) {
+        const otData = await response.json();
+        setUpdateCliente_id(otData.cliente_id);
+        setAveria(otData.averia);
+        setDescripcion(otData.descripcion);
+        setObservaciones(otData.observaciones);
+        setEstado_id(otData.estado_id);
+        setChecklist_id(otData.checklist_id);
+        setTipoGarantia(otData.tipoGarantia);
+        setUpdatedDispositivo_id(otData.dispositivo_id);
+      } else {
+        console.error("Error al obtener los datos de la OT:", response.status);
+      }
+    } catch (error) {
+      console.error("Error al obtener los datos de la OT:", error);
+    }
+  };
+  const fetchChecklist = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}checklist/${checklist_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        console.log("Error al obtener el checklist:", response.status);
+        return;
+      }
+
+      setChecklist(data);
+    } catch (error) {
+      console.error("Error al obtener los estados:", error);
+    }
+  };
+  const crearOt = async () => {
+    try {
+      const token = user.token;
+
+      const ot = {
+        averia,
+        descripcion,
+        observaciones,
+        tipoGarantia,
+        estado_id,
+        cliente_id: updateCliente_id ? updateCliente_id : cliente_id,
+        checklist_id,
+        dispositivo_id: updatedDispositivo_id
+          ? updatedDispositivo_id
+          : dispositivo_id,
+      };
+      // console.log(ot);
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
+        method: "POST",
+        body: JSON.stringify(ot),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
+      if (response.status === 201) {
+        alert("Datos Guardados Correctamente");
+        setOts_id(data);
+
+        setNumeroOt(data);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchOt();
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (checklist_id !== undefined) {
+      fetchChecklist();
+    }
+  }, [checklist_id]);
 
   // console.log(estadoId);
   useEffect(() => {
@@ -44,6 +155,7 @@ const FormOperacionesTecnicas = ({ cliente_id, dispositivo_id }) => {
         console.error("Error al obtener los estados:", error);
       }
     };
+
     fetchEstados();
   }, []);
 
@@ -58,42 +170,10 @@ const FormOperacionesTecnicas = ({ cliente_id, dispositivo_id }) => {
       dispositivo_id
     ) {
       console.log("hay ot");
-      const crearOt = async () => {
-        try {
-          const token = user.token;
 
-          const ot = {
-            averia,
-            descripcion,
-            observaciones,
-            tipoGarantia,
-            estado_id,
-            cliente_id,
-            checklist_id,
-            dispositivo_id,
-          };
-          console.log(ot);
-
-          const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
-            method: "POST",
-            body: JSON.stringify(ot),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const data = await response.json();
-          if (!response.ok) {
-            throw new Error(data.error);
-          }
-          if (response.status === 201) {
-            alert("Datos Guardados Correctamente");
-            setOt(data);
-            setNumeroOt(data);
-          }
-        } catch (error) {}
-      };
-      crearOt();
+      if (!id) {
+        crearOt();
+      }
     }
   }, [
     cliente_id,
@@ -105,6 +185,14 @@ const FormOperacionesTecnicas = ({ cliente_id, dispositivo_id }) => {
     observaciones,
     descripcion,
   ]);
+
+  useEffect(() => {
+    if (fetchData) {
+      crearOt();
+      alert("Datos Actualizados Correctamente");
+      setFetchData(false);
+    }
+  }, [fetchData]);
   const handleEstado = (event) => {
     setEstado_id(event.target.value);
   };
@@ -140,7 +228,7 @@ const FormOperacionesTecnicas = ({ cliente_id, dispositivo_id }) => {
         >
           <Box sx={{ display: "flex", alignItems: "end" }}>
             <Typography variant="h4" color="primary" fontWeight={"bold"}>
-              OT000{numeroOt}
+              OT000{id || numeroOt}
             </Typography>
             <Typography ml={2} variant="h6" color="primary">
               {estados &&
@@ -211,7 +299,11 @@ const FormOperacionesTecnicas = ({ cliente_id, dispositivo_id }) => {
         >
           Operaciones Servicio Tecnico
         </Typography>
-        <TablaReparacion />
+        <TablaReparacion
+          ots_id={ots_id}
+          dispositivo_id={dispositivo_id}
+          updatedDispositivo_id={updatedDispositivo_id}
+        />
       </Box>
       <Box sx={{ ml: 4 }}>
         <Paper elevation={4} sx={{ p: 2, mb: 4 }}>
@@ -280,8 +372,10 @@ const FormOperacionesTecnicas = ({ cliente_id, dispositivo_id }) => {
             </FormControl>
           </Box>
           <CheckListRevision
+            checklist={checklist}
             setChecklist_id={setChecklist_id}
             dispositivo_id={dispositivo_id}
+            updatedDispositivo_id={updatedDispositivo_id}
           />
         </Paper>
       </Box>

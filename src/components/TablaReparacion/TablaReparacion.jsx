@@ -11,38 +11,9 @@ import {
 } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-const columns = [
-  { field: "id", headerName: "ID", width: 90 },
-  {
-    field: "operacion",
-    headerName: "Operacion",
-    width: 200,
-  },
-  {
-    field: "componente",
-    headerName: "Componente",
-    width: 200,
-  },
-  {
-    field: "pdtStock",
-    headerName: "Pendiente de Stock",
-    width: 150,
-  },
-  {
-    field: "tiempo",
-    headerName: "Tiempo",
-    width: 150,
-  },
-
-  {
-    field: "precio",
-    headerName: "Precio",
-    width: 150,
-  },
-];
+import { useEffect, useState } from "react";
+import { columns } from "./utils/columnsValues";
+import { useUserContext } from "../../contexts/UserContext";
 
 const defaultOperationValue = {
   operacion: "",
@@ -52,47 +23,140 @@ const defaultOperationValue = {
   precio: "100",
 };
 
-const TablaReparacion = () => {
-  const [filaSeleccionada, setFilaSeleccionada] = useState(null);
+const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
   const [selectionModel, setSelectionModel] = useState(null);
-  const [lastId, setLastId] = useState(0);
-  const [iconosVisibles, setIconosVisibles] = useState(false);
+  const [componentes, setComponentes] = useState([]);
+  const [rows, setRows] = useState([]);
+  const [operacion, setOperacion] = useState("");
+  const [componentes_id, setComponentes_id] = useState("");
+  const [tiempo, setTiempo] = useState("");
+  const [actualizarTabla, setActualizarTabla] = useState(false);
 
-  const [operaciones, setOperaciones] = useState([]);
-  const [newOperation, setNewOperation] = useState(defaultOperationValue);
-
-  const handleSelectionModelChange = (newSelection) => {
-    setSelectionModel(newSelection);
-
-    if (newSelection.length > 0) {
-      setIconosVisibles(true);
-      setFilaSeleccionada(newSelection);
-    } else {
-      setIconosVisibles(false);
-      setFilaSeleccionada(null);
+  const { user } = useUserContext();
+  const fetchcomponentes = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}componente/modelo/${
+          dispositivo_id ? dispositivo_id : updatedDispositivo_id
+        }`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setComponentes(data);
+      } else {
+        console.error("Error al obtener los componentes:", response.status);
+      }
+    } catch (error) {
+      console.error("Error al obtener los estados:", error);
+    }
+  };
+  const fetchOperacionesByOt = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}operacion/${ots_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setRows(data);
+        setActualizarTabla(false);
+      } else {
+        console.error("Error al obtener las operaciones:", response.status);
+      }
+    } catch (error) {
+      console.error("Error al obtener las operaciones:", error);
     }
   };
 
+  const fetchOperaciones = async () => {
+    try {
+      const values = {
+        operacion,
+        componentes_id,
+        tiempo,
+        ots_id,
+      };
+
+      const url = `${import.meta.env.VITE_API_URL}operacion/`;
+      const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert("Datos Guardados Correctamente", data);
+        setActualizarTabla(true);
+      } else {
+        console.error("Error al guardar operacion:", response.status);
+      }
+    } catch (error) {
+      console.error("Error del servidor:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchOperacionesByOt();
+    fetchcomponentes();
+  }, [updatedDispositivo_id, dispositivo_id]);
+
+  useEffect(() => {
+    if (actualizarTabla) {
+      fetchOperacionesByOt();
+    }
+  }, [actualizarTabla]);
+
+  const handleSelectionModelChange = (newSelection) => {
+    setSelectionModel(newSelection);
+  };
+
   function handleEditar(id) {
-    console.log("editando", id);
+    console.log("editando", id[0]);
   }
   function handleEliminar(id) {
-    console.log("eliminando", id[0]);
-  }
+    const confirmacion = window.confirm(
+      "¿Estás seguro de que quieres eliminar este elemento?"
+    );
 
-  const handleNewOperation = (e) => {
-    setNewOperation((currentValue) => ({
-      ...currentValue,
-      [e.target.name]: e.target.value,
-      id: lastId + 1,
-    }));
-  };
+    if (confirmacion) {
+      fetch(`${import.meta.env.VITE_API_URL}operacion/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error al eliminar el elemento");
+          }
+
+          alert("Eliminado correctamente");
+          setActualizarTabla(true); // Obtener los datos actualizados
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    }
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
-    setOperaciones((currentValues) => [...currentValues, newOperation]);
-    setLastId(lastId + 1);
-    setNewOperation(defaultOperationValue);
+    fetchOperaciones();
   }
 
   return (
@@ -107,9 +171,9 @@ const TablaReparacion = () => {
           <Select
             name="operacion"
             size="small"
-            value={newOperation.operacion}
+            value={operacion}
             label="Agregar Operacion"
-            onChange={handleNewOperation}
+            onChange={(e) => setOperacion(e.target.value)}
           >
             <MenuItem value={"sustitucion"}>Sustitucion</MenuItem>
             <MenuItem value={"componente presupuestado"}>
@@ -124,13 +188,20 @@ const TablaReparacion = () => {
           <Select
             name="componente"
             size="small"
-            value={newOperation.componente}
+            value={componentes_id}
             label="Agregar Componente"
-            onChange={handleNewOperation}
+            onChange={(e) => setComponentes_id(e.target.value)}
           >
-            <MenuItem value={"Pantalla"}>Pantalla</MenuItem>
-            <MenuItem value={"Bateria"}>Bateria</MenuItem>
-            <MenuItem value={"Sub PBA"}>Sub PBA</MenuItem>
+            <MenuItem value={""}>
+              {componentes.length === 0
+                ? "No hay componentes en el inventario"
+                : "Seleccione un componente"}
+            </MenuItem>
+            {componentes.map((componente) => (
+              <MenuItem key={componente.id} value={componente.id}>
+                {componente.nombre}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <FormControl fullWidth>
@@ -138,9 +209,9 @@ const TablaReparacion = () => {
           <Select
             name="tiempo"
             size="small"
-            value={newOperation.tiempo}
+            value={tiempo}
             label="Coste operacion"
-            onChange={handleNewOperation}
+            onChange={(e) => setTiempo(e.target.value)}
           >
             <MenuItem value={0}>0</MenuItem>
             <MenuItem value={0.25}>0.25</MenuItem>
@@ -160,7 +231,7 @@ const TablaReparacion = () => {
       </Box>
       <Box sx={{ mt: 2, height: "375px", width: "100%", minWidth: "400px" }}>
         <DataGrid
-          rows={operaciones}
+          rows={rows}
           columns={columns}
           initialState={{
             pagination: {

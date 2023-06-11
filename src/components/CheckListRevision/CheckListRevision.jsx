@@ -4,12 +4,17 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import Switch from "@mui/material/Switch";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import { useUserContext } from "../../contexts/UserContext";
 
-export default function CheckListRevision({ setChecklist_id, dispositivo_id }) {
-  const [state, setState] = useState({
+export default function CheckListRevision({
+  checklist,
+  setChecklist_id,
+  dispositivo_id,
+  updatedDispositivo_id,
+}) {
+  const initialState = {
     encendido: false,
     cobertura: false,
     pantalla: false,
@@ -19,46 +24,60 @@ export default function CheckListRevision({ setChecklist_id, dispositivo_id }) {
     carga: false,
     microfono: false,
     huella: false,
-  });
+  };
+
+  const [state, setState] = useState(initialState);
+
   const { user } = useUserContext();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const postChecklist = async () => {
-      try {
-        const token = user.token;
-        const checklistWithDispositivoId = {
-          ...state,
-          dispositivo_id,
-        };
+  useEffect(() => {
+    if (checklist) {
+      const convertedChecklist = {};
+      //Cambiar el estado de todos los checkbox a boolean
+      for (const key in checklist) {
+        convertedChecklist[key] = Boolean(checklist[key]);
+      }
 
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}checklist/`,
-          {
-            method: "POST",
-            body: JSON.stringify(checklistWithDispositivoId),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error);
+      setState(convertedChecklist);
+    }
+  }, [checklist]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const token = user.token;
+      const checklistWithDispositivoId = {
+        ...state,
+        dispositivo_id: updatedDispositivo_id || dispositivo_id,
+      };
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}checklist/`,
+        {
+          method: "POST",
+          body: JSON.stringify(checklistWithDispositivoId),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-        alert("checklist guardado");
-        setChecklist_id(data);
-      } catch (error) {}
-    };
-    postChecklist();
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
+      alert("checklist guardado");
+      setChecklist_id(data);
+    } catch (error) {
+      // Manejo del error
+    }
   };
 
   const handleChange = (event) => {
-    setState({
-      ...state,
+    setState((prevState) => ({
+      ...prevState,
       [event.target.name]: event.target.checked,
-    });
+    }));
   };
 
   return (
@@ -115,7 +134,7 @@ export default function CheckListRevision({ setChecklist_id, dispositivo_id }) {
               name="camaras"
             />
           }
-          label="Camaras"
+          label="Cámaras"
         />
         <FormControlLabel
           control={
@@ -145,7 +164,7 @@ export default function CheckListRevision({ setChecklist_id, dispositivo_id }) {
               name="microfono"
             />
           }
-          label="Microfono"
+          label="Micrófono"
         />
         <FormControlLabel
           control={

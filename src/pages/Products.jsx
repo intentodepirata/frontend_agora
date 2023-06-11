@@ -1,5 +1,4 @@
 import { Box, Paper, Typography, Button } from "@mui/material";
-
 import TablaProducts from "../components/TablaProducts/TablaProducts";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
@@ -9,28 +8,30 @@ const Products = () => {
   const [rows, setRows] = useState([]);
   const { user } = useUserContext();
 
+  const fetchComponentes = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}componente/`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      setRows(data);
+    } catch (error) {
+      console.error("Error al obtener las ots:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchOts = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}componente/`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        setRows(data);
-      } catch (error) {
-        console.error("Error al obtener las ots:", error);
-      }
-    };
-    fetchOts();
+    fetchComponentes();
   }, []);
+
   return (
     <>
       <Box
@@ -56,7 +57,7 @@ const Products = () => {
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <TablaProducts rows={rows} />
+        <TablaProducts rows={rows} fetchComponentes={fetchComponentes} />
       </Box>
     </>
   );

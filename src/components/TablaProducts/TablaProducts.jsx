@@ -4,6 +4,7 @@ import { useState } from "react";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../contexts/UserContext";
 
 const columns = [
   { field: "id", headerName: "OT", width: 80 },
@@ -14,10 +15,10 @@ const columns = [
   { field: "existencias", headerName: "Existencias", width: 140 },
 ];
 
-export default function TablaProducts({ rows }) {
+export default function TablaProducts({ rows, fetchComponentes }) {
   const [product, setProduct] = useState("");
   const [selectionModel, setSelectionModel] = useState(null);
-
+  const { user } = useUserContext();
   const navigate = useNavigate();
 
   const handleSelectionModelChange = (newSelection) => {
@@ -28,12 +29,38 @@ export default function TablaProducts({ rows }) {
     console.log("editando", id[0]);
     navigate("/home/products/edit/" + id[0]);
   }
+
   function handleEliminar(id) {
-    console.log("eliminando", id[0]);
+    const confirmacion = window.confirm(
+      "¿Estás seguro de que quieres eliminar este elemento?"
+    );
+
+    if (confirmacion) {
+      fetch(`${import.meta.env.VITE_API_URL}componente/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error al eliminar el elemento");
+          }
+
+          alert("Elemento eliminado correctamente");
+          fetchComponentes(); // Obtener los datos actualizados
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    }
   }
+
   const handleProductSearch = (e) => {
     setProduct(e.target.value);
   };
+
   return (
     <Box sx={{ height: 600, width: "100%", maxWidth: "1400px" }}>
       <TextField
