@@ -9,6 +9,7 @@ const Home = () => {
   const [cargando, setCargando] = useState(false);
   const [opcionesFiltro, setOpcionesFiltro] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("");
+  const [totalFacturado, setTotalFacturado] = useState(0);
 
   const { user } = useUserContext();
 
@@ -47,12 +48,11 @@ const Home = () => {
     };
     fetchOts();
   }, []);
-
-  const fetchOtsDay = async () => {
+  const fetchOtsByTime = async (time) => {
     try {
       setCargando(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/time/dia`,
+        `${import.meta.env.VITE_API_URL}ot/time/${time}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -60,26 +60,8 @@ const Home = () => {
           },
         }
       );
-      const data = await response.json();
-
-      if (data.length === 0) {
-        alert("No hay ots en el día");
-        setCargando(false);
-
-        return;
-      }
-      setRows(data);
-
-      setCargando(false);
-    } catch (error) {
-      console.error("Error al obtener las ots:", error);
-    }
-  };
-  const fetchOtsWeek = async () => {
-    try {
-      setCargando(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/time/semana`,
+      const responseFacturado = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/total-price/${time}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -87,45 +69,18 @@ const Home = () => {
           },
         }
       );
+      const dataFacturado = await responseFacturado.json();
       const data = await response.json();
 
       if (data.length === 0) {
-        alert("No hay ots en esta semana");
-        setCargando(false);
-
-        return;
+        alert(`No hay ots en ${time}`);
       }
-      setRows(data);
 
+      setRows(data);
+      setTotalFacturado(dataFacturado);
       setCargando(false);
     } catch (error) {
-      console.error("Error al obtener las ots:", error);
-    }
-  };
-  const fetchOtsMonth = async () => {
-    try {
-      setCargando(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/time/mes`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      const data = await response.json();
-
-      if (data.length === 0) {
-        alert("No hay ots en este mes");
-        setCargando(false);
-        return;
-      }
-      setRows(data);
-
-      setCargando(false);
-    } catch (error) {
-      console.error("Error al obtener las ots:", error);
+      console.error(`Error al obtener las ots de ${time}:`, error);
     }
   };
 
@@ -133,11 +88,10 @@ const Home = () => {
     <>
       <MainWidget
         rows={rows}
-        fetchOtsDay={fetchOtsDay}
-        fetchOtsWeek={fetchOtsWeek}
-        fetchOtsMonth={fetchOtsMonth}
+        fetchOtsByTime={fetchOtsByTime}
         setFiltroEstado={setFiltroEstado}
         filtroEstado={filtroEstado}
+        totalFacturado={totalFacturado}
       />
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <TablaHome

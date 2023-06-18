@@ -23,6 +23,8 @@ import OrdersStatus from "./pages/OrdersStatus";
 import Suppliers from "./pages/Suppliers";
 import SuppliersCreate from "./pages/SuppliersCreate";
 import SuppliersEdit from "./pages/SuppliersEdit";
+import Services from "./pages/Services";
+import Stats from "./pages/Stats";
 const App = () => {
   return (
     <UserContextProvider>
@@ -55,6 +57,12 @@ const App = () => {
             <Route index element={<Suppliers />} />
             <Route path="create" element={<SuppliersCreate />} />
             <Route path="edit/:id" element={<SuppliersEdit />} />
+          </Route>
+          <Route path="services">
+            <Route index element={<Services />} />
+          </Route>
+          <Route path="stats">
+            <Route index element={<Stats />} />
           </Route>
         </Route>
         <Route path="print/:id" element={<OrdersPrint />} />

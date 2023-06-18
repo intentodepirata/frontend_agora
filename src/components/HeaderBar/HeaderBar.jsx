@@ -47,17 +47,17 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
             <MenuIcon sx={{ backgroundColor: "#F3F4F6" }} />
           </IconButton>
           <Typography
+            fontWeight={"bold"}
             color="primary.light"
             variant="h6"
             component="div"
             sx={{ mr: 2, maxWidth: 250, width: "100%" }}
           >
-            Reparaciones Lucatoni
+            Reparaciones Agora
           </Typography>
           <Box
             sx={{
               width: "100%",
-
               mx: "auto",
               maxWidth: "1308px",
             }}

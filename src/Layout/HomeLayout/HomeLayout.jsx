@@ -18,7 +18,10 @@ const HomeLayout = () => {
       <ListBar showDrawer={showDrawer} />
       <Box
         component="main"
-        sx={{ marginLeft: showDrawer ? "16rem" : "64px", mt: "64px" }}
+        sx={{
+          marginLeft: showDrawer ? "16rem" : "64px",
+          mt: "64px",
+        }}
       >
         <Outlet />
       </Box>

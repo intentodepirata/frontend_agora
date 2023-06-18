@@ -3,7 +3,16 @@ export const initialValues = {
     type: "pie",
   },
   title: {
-    text: "Estado de reparaciones",
+    text: "",
+  },
+  plotOptions: {
+    pie: {
+      innerSize: "45%",
+      dataLabels: {
+        enabled: true,
+        format: "<b>{point.name}</b>: {point.y}",
+      },
+    },
   },
   credits: {
     enabled: false,
@@ -14,15 +23,17 @@ export const initialValues = {
 
   series: [
     {
+      name: "Porcentaje",
+      colorByPoint: true,
       data: [],
     },
   ],
 };
 
 const obtenerColorEstado = (estado) => {
-  // Define  colores personalizados según los estados de reparaciones
+  // Define colores personalizados según los estados de reparaciones
   if (estado === "En reparacion") {
-    return "#00E272";
+    return "#0150F5";
   } else if (estado === "Por entregar") {
     return "#2CAFFE";
   } else if (estado === "Pendiente de repuesto") {
@@ -32,7 +43,7 @@ const obtenerColorEstado = (estado) => {
   } else if (estado === "Recepcionado") {
     return "#2CAFFE";
   } else if (estado === "Reparacion Finalizada") {
-    return "#0150F5";
+    return "#00E272";
   }
 };
 
@@ -43,6 +54,28 @@ export const formattedDate = today.toLocaleDateString("es-ES", {
   year: "numeric",
 });
 
+// export const updateHighcharts = (rows) => {
+//   const estados = {};
+//   rows.forEach((reparacion) => {
+//     if (reparacion.estado in estados) {
+//       estados[reparacion.estado]++;
+//     } else {
+//       estados[reparacion.estado] = 1;
+//     }
+//   });
+
+//   // Calcular el porcentaje de cada estado
+//   const totalReparaciones = rows.length;
+//   const data = Object.keys(estados).map((estado) => {
+//     const porcentaje = (estados[estado] / totalReparaciones) * 100;
+//     return {
+//       name: estado,
+//       y: porcentaje,
+//       color: obtenerColorEstado(estado),
+//     };
+//   });
+//   return data;
+// };
 export const updateHighcharts = (rows) => {
   const estados = {};
   rows.forEach((reparacion) => {
@@ -53,19 +86,16 @@ export const updateHighcharts = (rows) => {
     }
   });
 
-  // Calcular el porcentaje de cada estado
-  const totalReparaciones = rows.length;
-  const data = Object.keys(estados).map((estado) => {
-    const porcentaje = (estados[estado] / totalReparaciones) * 100;
+  const data = Object.entries(estados).map(([estado, cantidad]) => {
     return {
       name: estado,
-      y: porcentaje,
+      y: cantidad,
       color: obtenerColorEstado(estado),
     };
   });
+
   return data;
 };
-
 export const getTotalByEstado = (estado, data) => {
   const filteredData = data.filter((item) => item.estado === estado);
   return filteredData.length;

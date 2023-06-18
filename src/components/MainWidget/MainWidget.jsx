@@ -14,29 +14,34 @@ import {
 } from "./utils/utils";
 const MainWidget = ({
   rows,
-  fetchOtsDay,
-  fetchOtsWeek,
-  fetchOtsMonth,
+  fetchOtsByTime,
   setFiltroEstado,
   filtroEstado,
+  totalFacturado,
 }) => {
   const [options, setOptions] = useState(initialValues);
   const [selectedButton, setSelectedButton] = useState(3);
+  const [chartKey, setChartKey] = useState(0);
 
   const { user } = useUserContext();
 
   useEffect(() => {
     // Obtener el estado y contar el número de reparaciones en cada estado
     const data = updateHighcharts(rows);
+
     // Actualizar la serie de la gráfica con los nuevos datos
     setOptions((prevOptions) => ({
       ...prevOptions,
       series: [{ data }],
     }));
+
+    // Incrementar la clave para forzar el re-renderizado del componente
+    setChartKey((prevKey) => prevKey + 1);
   }, [rows]);
 
-  const handleButtonClick = (buttonId) => {
+  const handleButtonClick = (buttonId, time) => {
     setSelectedButton(buttonId);
+    fetchOtsByTime(time);
   };
 
   const handleFiltrarClick = (estado) => {
@@ -55,7 +60,6 @@ const MainWidget = ({
         sx={{
           py: 2,
           display: "flex",
-
           flexDirection: "column",
         }}
       >
@@ -182,7 +186,11 @@ const MainWidget = ({
             }}
           >
             <Box sx={{ pt: 2, maxWidth: "600px", width: "50%" }}>
-              <HighchartsReact highcharts={Highcharts} options={options} />
+              <HighchartsReact
+                key={chartKey}
+                highcharts={Highcharts}
+                options={options}
+              />
             </Box>
             <Box
               sx={{
@@ -204,7 +212,7 @@ const MainWidget = ({
                     Facturado
                   </Typography>
                   <Typography variant="h6" color="initial">
-                    0.00 €
+                    {totalFacturado}€
                   </Typography>
                 </Box>
                 <Box textAlign={"center"}>
@@ -237,8 +245,7 @@ const MainWidget = ({
                     color: selectedButton === 1 ? "white" : "primary",
                   }}
                   onClick={() => {
-                    fetchOtsDay();
-                    handleButtonClick(1);
+                    handleButtonClick(1, "dia");
                   }}
                 >
                   Hoy
@@ -256,8 +263,7 @@ const MainWidget = ({
                     px: 3,
                   }}
                   onClick={() => {
-                    fetchOtsWeek();
-                    handleButtonClick(2);
+                    handleButtonClick(2, "semana");
                   }}
                 >
                   Semana
@@ -274,7 +280,7 @@ const MainWidget = ({
                     color: selectedButton === 3 ? "white" : "primary",
                   }}
                   onClick={() => {
-                    fetchOtsMonth(), handleButtonClick(3);
+                    handleButtonClick(3, "mes");
                   }}
                 >
                   Mes
