@@ -5,13 +5,15 @@ import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { Link } from "react-router-dom";
 
-const Clients = () => {
+const Clientes = () => {
   const [rows, setRows] = useState([]);
+  const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
 
   useEffect(() => {
     const fetchClientes = async () => {
       try {
+        setCargando(true);
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}cliente/`,
           {
@@ -23,7 +25,7 @@ const Clients = () => {
         );
 
         const data = await response.json();
-
+        setCargando(false);
         setRows(data);
       } catch (error) {
         console.error("Error al obtener las ots:", error);
@@ -49,16 +51,16 @@ const Clients = () => {
           color="primary"
           sx={{ textTransform: "none", fontSize: "16px" }}
           component={Link}
-          to="/home/clients/create"
+          to="/home/clientes/create"
         >
           Crear cliente
         </Button>
       </Box>
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <TablaClients rows={rows} />
+        <TablaClients rows={rows} cargando={cargando} />
       </Box>
     </>
   );
 };
 
-export default Clients;
+export default Clientes;

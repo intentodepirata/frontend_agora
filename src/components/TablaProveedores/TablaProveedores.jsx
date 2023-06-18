@@ -1,16 +1,16 @@
+import { Box, Button, LinearProgress, Stack } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
-import { useState } from "react";
+import { columns } from "./utils/columnas";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../../contexts/UserContext";
-import { customLocaleText } from "../../traductions/customGridLocaleText";
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
-import { columns } from "./utils/columnas";
+import { customLocaleText } from "../../traductions/customGridLocaleText";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useUserContext } from "../../contexts/UserContext";
 
-export default function TablaProducts({ rows, fetchComponentes, cargando }) {
+export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
 
   const { user } = useUserContext();
@@ -22,7 +22,7 @@ export default function TablaProducts({ rows, fetchComponentes, cargando }) {
 
   function handleEditar(id) {
     console.log("editando", id[0]);
-    navigate("/home/products/edit/" + id[0]);
+    navigate("/home/suppliers/edit/" + id[0]);
   }
 
   async function handleEliminar(id) {
@@ -33,7 +33,7 @@ export default function TablaProducts({ rows, fetchComponentes, cargando }) {
     if (confirmacion) {
       try {
         const response = await fetch(
-          import.meta.env.VITE_API_URL + "componente/" + id,
+          import.meta.env.VITE_API_URL + "proveedores/" + id,
           {
             method: "DELETE",
             headers: {
@@ -47,16 +47,15 @@ export default function TablaProducts({ rows, fetchComponentes, cargando }) {
           throw new Error("Error al eliminar el elemento");
         }
 
-        alert("Elemento eliminado correctamente");
-        fetchComponentes(); // Obtener los datos actualizados
+        alert("Proveedor eliminado correctamente");
+        fetchProveedores(); // Obtener los datos actualizados
       } catch (error) {
         alert(error.message);
       }
     }
   }
-
   return (
-    <Box sx={{ height: 740, width: "100%", maxWidth: "800px" }}>
+    <Box sx={{ height: 740, width: "100%", maxWidth: "1400px" }}>
       <DataGrid
         sx={{
           "& .css-mf4goe-MuiDataGrid-root": {

@@ -6,11 +6,13 @@ import { useUserContext } from "../contexts/UserContext";
 
 const Orders = () => {
   const [rows, setRows] = useState([]);
+  const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
 
   useEffect(() => {
     const fetchOts = async () => {
       try {
+        setCargando(true);
         const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
           headers: {
             "Content-Type": "application/json",
@@ -21,6 +23,7 @@ const Orders = () => {
         const data = await response.json();
 
         setRows(data);
+        setCargando(false);
       } catch (error) {
         console.error("Error al obtener las ots:", error);
       }
@@ -51,7 +54,7 @@ const Orders = () => {
         </Button>
       </Box>
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <TablaOrders rows={rows} />
+        <TablaOrders rows={rows} cargando={cargando} />
       </Box>
     </>
   );

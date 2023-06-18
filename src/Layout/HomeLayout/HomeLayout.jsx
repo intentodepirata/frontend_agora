@@ -4,6 +4,7 @@ import HeaderBar from "../../components/HeaderBar/HeaderBar";
 import { useState } from "react";
 import { Box } from "@mui/material";
 import useScrollUp from "../../hooks/useScrollUp";
+import Footer from "../../components/Footer/Footer";
 
 const HomeLayout = () => {
   useScrollUp();
@@ -20,6 +21,12 @@ const HomeLayout = () => {
         sx={{ marginLeft: showDrawer ? "16rem" : "64px", mt: "64px" }}
       >
         <Outlet />
+      </Box>
+      <Box
+        component={"footer"}
+        sx={{ marginLeft: showDrawer ? "16rem" : "64px", mt: "64px" }}
+      >
+        <Footer />
       </Box>
     </>
   );

@@ -1,10 +1,37 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useUserContext } from "../contexts/UserContext";
 import FormClientes from "../components/FormClientes/FormClientes";
 
-const ClientsCreate = () => {
+const ClientesEdit = () => {
+  const [cliente, setCliente] = useState({});
+  const { id } = useParams();
+
+  const { user } = useUserContext();
+  useEffect(() => {
+    const fetchCliente = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}cliente/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
+
+        const [data] = await response.json();
+        setCliente(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error al obtener los Clientes:", error);
+      }
+    };
+    fetchCliente();
+  }, [id]);
   return (
     <Box
       component="section"
@@ -32,7 +59,7 @@ const ClientsCreate = () => {
             color="initial"
             sx={{ ml: 2, p: 2 }}
           >
-            Agregar Cliente
+            Editar Cliente
           </Typography>
         </Box>
         <Button
@@ -40,15 +67,15 @@ const ClientsCreate = () => {
           color="primary"
           sx={{ textTransform: "none", fontSize: "16px" }}
         >
-          Guardar cliente
+          Guardar Cliente
         </Button>
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormClientes />
+        <FormClientes cliente={cliente} />
       </Box>
     </Box>
   );
 };
 
-export default ClientsCreate;
+export default ClientesEdit;

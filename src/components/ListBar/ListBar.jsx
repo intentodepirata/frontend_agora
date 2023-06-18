@@ -88,7 +88,7 @@ export default function ListBar({ showDrawer }) {
           selected={selectedIndex === 3}
           onClick={(event) => {
             handleListItemClick(event, 3);
-            navigate("/home/clients");
+            navigate("/home/clientes");
           }}
         >
           <ListItemIcon>

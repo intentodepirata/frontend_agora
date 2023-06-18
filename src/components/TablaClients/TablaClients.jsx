@@ -1,48 +1,42 @@
 import { DataGrid } from "@mui/x-data-grid";
-import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, LinearProgress, Stack } from "@mui/material";
+import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
+import { customLocaleText } from "../../traductions/customGridLocaleText";
+import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
+import { useNavigate } from "react-router-dom";
+import { columns } from "./utils/columnas";
 
-const columns = [
-  { field: "id", headerName: "ID", width: 100 },
-  { field: "nombre", headerName: "Nombre completo", width: 180 },
-  { field: "dni", headerName: "DNI", width: 100 },
-  { field: "email", headerName: "Email", width: 280 },
-  { field: "telefono", headerName: "Telefono", width: 180 },
-  { field: "totalOts", headerName: "Total de Reparaciones", width: 180 },
-  { field: "fechaUltimaOt", headerName: "fecha ultima Reparacion", width: 180 },
-];
-
-export default function TablaClients({ rows }) {
-  const [cliente, setCliente] = useState("");
+export default function TablaClients({ rows, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
+  const navigate = useNavigate();
 
-  const handleClienteSearch = (e) => {
-    setCliente(e.target.value);
-  };
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);
   };
 
   function handleEditar(id) {
     console.log("editando", id[0]);
+    navigate("/home/clientes/edit/" + id[0]);
   }
   function handleEliminar(id) {
     console.log("eliminando", id[0]);
   }
   return (
-    <Box sx={{ height: 600, width: "100%", maxWidth: "1400px" }}>
-      <TextField
-        sx={{ mb: 2 }}
-        size="small"
-        fullWidth
-        label="Buscar por nombre, apellido o telefono"
-        value={cliente}
-        onChange={handleClienteSearch}
-      />
+    <Box sx={{ height: 740, width: "auto", maxWidth: "1400px" }}>
       <DataGrid
+        sx={{
+          "& .css-mf4goe-MuiDataGrid-root": {
+            fontWeight: 700,
+            color: "grey",
+          },
+          "& .MuiDataGrid-cell:hover": {
+            color: "primary.main",
+          },
+          height: 720,
+        }}
         rows={rows}
         columns={columns}
         initialState={{
@@ -54,6 +48,19 @@ export default function TablaClients({ rows }) {
         }}
         pageSizeOptions={[10]}
         onRowSelectionModelChange={handleSelectionModelChange}
+        slots={{
+          toolbar: CustomGridToolbar,
+          loadingOverlay: LinearProgress,
+          footer: CustomGridFooter,
+        }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+            quickFilterProps: { debounceMs: 500 },
+          },
+        }}
+        loading={Boolean(cargando)}
+        localeText={customLocaleText}
       />
       <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
         <Button

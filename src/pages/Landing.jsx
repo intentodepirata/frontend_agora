@@ -7,7 +7,7 @@ import useScrollUp from "../hooks/useScrollUp";
 const Landing = () => {
   useScrollUp();
   return (
-    <Box component="main" sx={{ margin: "0 auto", maxWidth: "1200px", p: 2 }}>
+    <Box component="main" sx={{ margin: "0 auto", maxWidth: "1440px", p: 2 }}>
       <ComenzarGratis />
       <Caracteristicas />
       <Planes />

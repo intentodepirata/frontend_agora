@@ -1,19 +1,19 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
-import TablaProducts from "../components/TablaProducts/TablaProducts";
+import { Box, Button, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
-import { useEffect, useState } from "react";
+import TablaProveedores from "../components/TablaProveedores/TablaProveedores";
 
-const Products = () => {
+export default function Suppliers() {
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
 
-  const fetchComponentes = async () => {
+  const fetchProveedores = async () => {
     try {
       setCargando(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}componente/`,
+        `${import.meta.env.VITE_API_URL}proveedores/`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -26,14 +26,12 @@ const Products = () => {
       setCargando(false);
       setRows(data);
     } catch (error) {
-      console.error("Error al obtener las ots:", error);
+      console.error("Error al obtener los proveedores:", error);
     }
   };
-
   useEffect(() => {
-    fetchComponentes();
+    fetchProveedores();
   }, []);
-
   return (
     <>
       <Box
@@ -45,28 +43,25 @@ const Products = () => {
         }}
       >
         <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
-          Inventario
+          Proveedores
         </Typography>
         <Button
           variant="contained"
           color="primary"
           sx={{ textTransform: "none", fontSize: "16px" }}
           component={Link}
-          to="/home/products/create"
+          to="/home/suppliers/create"
         >
-          Agregar producto
+          Agregar proveedor
         </Button>
       </Box>
-
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <TablaProducts
+        <TablaProveedores
           rows={rows}
-          fetchComponentes={fetchComponentes}
           cargando={cargando}
+          fetchProveedores={fetchProveedores}
         />
       </Box>
     </>
   );
-};
-
-export default Products;
+}

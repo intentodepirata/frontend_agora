@@ -4,10 +4,14 @@ import { initialValues } from "./utils/initialValues";
 import { FormClientesSchema } from "./FormClientesSchema";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
+import { useNavigate, useParams } from "react-router-dom";
 
-const FormClientes = ({ setCliente_id }) => {
+const FormClientes = ({ setCliente_id, cliente }) => {
   const { user } = useUserContext();
   const [guardado, setGuardado] = useState(false);
+  const urlCompleta = window.location.href;
+
+  const navigate = useNavigate();
   const {
     isSubmitting,
     values,
@@ -17,36 +21,47 @@ const FormClientes = ({ setCliente_id }) => {
     handleSubmit,
     handleBlur,
   } = useFormik({
-    initialValues,
+    enableReinitialize: true,
+    initialValues: cliente ? cliente : initialValues,
     validationSchema: FormClientesSchema,
     onSubmit: async function (values, actions) {
       try {
         const token = user.token;
+        const url = cliente
+          ? `${import.meta.env.VITE_API_URL}cliente/${cliente.id}`
+          : `${import.meta.env.VITE_API_URL}cliente/`;
 
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}cliente/`,
-          {
-            method: "POST",
-            body: JSON.stringify(values),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(url, {
+          method: cliente ? "PUT" : "POST",
+          body: JSON.stringify(values),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
 
         if (!response.ok) {
           throw new Error(data.error);
         }
-        console.log(data);
-        alert("cliente guardado");
-        setCliente_id(data);
-        setGuardado(true);
+
+        if (cliente) {
+          alert("Cliente actualizado");
+          actions.resetForm();
+          navigate("/home/clientes");
+        } else {
+          console.log(data);
+          alert("cliente guardado");
+          setGuardado(true);
+
+          urlCompleta === `${import.meta.env.VITE_URL}home/clientes/create` &&
+            navigate("/home/clientes");
+          setCliente_id(data);
+        }
       } catch (error) {
-        alert(error.message);
-        actions.setSubmitting(false);
+        // alert(error.message);
       }
+      actions.setSubmitting(false);
     },
   });
   return (
@@ -64,18 +79,22 @@ const FormClientes = ({ setCliente_id }) => {
         }}
       >
         <Typography
-          sx={{ textAlign: "center", mb: 1 }}
+          sx={{ textAlign: "left", mb: 1 }}
           fontWeight={"bold"}
           variant="h6"
           color={guardado ? "primary" : "grey"}
         >
           Datos Cliente
         </Typography>
+        <Typography variant="body1" color="grey" mb={2}>
+          Rellene todos los campos para agregar un cliente
+        </Typography>
         <Box sx={{ display: "flex", mb: 2 }}>
           <TextField
             size="small"
             name="dni"
             label="DNI"
+            InputLabelProps={{ shrink: cliente?.dni && true }}
             disabled={guardado}
             value={values.dni}
             onChange={handleChange}
@@ -88,6 +107,7 @@ const FormClientes = ({ setCliente_id }) => {
             size="small"
             label="Nombre completo"
             name="nombre"
+            InputLabelProps={{ shrink: cliente?.nombre && true }}
             disabled={guardado}
             value={values.nombre}
             onChange={handleChange}
@@ -102,6 +122,7 @@ const FormClientes = ({ setCliente_id }) => {
             size="small"
             name="email"
             label="Correo electronico"
+            InputLabelProps={{ shrink: cliente?.email && true }}
             disabled={guardado}
             value={values.email}
             onChange={handleChange}
@@ -114,6 +135,7 @@ const FormClientes = ({ setCliente_id }) => {
             size="small"
             name="telefono"
             label="Telefono de contacto"
+            InputLabelProps={{ shrink: cliente?.telefono && true }}
             disabled={guardado}
             value={values.telefono}
             onChange={handleChange}
@@ -128,6 +150,7 @@ const FormClientes = ({ setCliente_id }) => {
             size="small"
             name="direccion"
             label="Direccion completa"
+            InputLabelProps={{ shrink: cliente?.direccion && true }}
             disabled={guardado}
             value={values.direccion}
             onChange={handleChange}

@@ -1,33 +1,15 @@
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, LinearProgress, Stack } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PrintIcon from "@mui/icons-material/Print";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { columns } from "./utils/columns";
+import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
+import { customLocaleText } from "../../traductions/customGridLocaleText";
 
-const columns = [
-  { field: "id", headerName: "OT", width: 80 },
-  { field: "marca", headerName: "Marca", width: 80 },
-  { field: "modelo", headerName: "Modelo", width: 180 },
-  { field: "cliente", headerName: "Cliente", width: 200 },
-  { field: "telefono", headerName: "Telefono", width: 100 },
-  { field: "dni", headerName: "DNI", width: 100 },
-  { field: "estado", headerName: "Estado", width: 170 },
-  { field: "tipoGarantia", headerName: "Tipo de Garantia", width: 140 },
-
-  {
-    field: "fechaEntrada",
-    headerName: "Fecha de entrada",
-    width: 135,
-  },
-  {
-    field: "fechaModificacion",
-    headerName: "Fecha modificacion",
-    width: 135,
-  },
-];
-
-export default function TablaHome({ rows }) {
+export default function TablaHome({ rows, cargando, opcionesFiltro }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const navigate = useNavigate();
 
@@ -35,6 +17,11 @@ export default function TablaHome({ rows }) {
     setSelectionModel(newSelection);
   };
 
+  function handlePrint(id) {
+    console.log("imprimiendo", id[0]);
+    // navigate("/print/" + id[0]);
+    window.open(`/print/${id}`, "_blank");
+  }
   function handleEditar(id) {
     console.log("editando", id[0]);
     navigate("/home/orders/edit/" + id[0]);
@@ -43,9 +30,19 @@ export default function TablaHome({ rows }) {
     console.log("eliminando", id[0]);
   }
   return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
+    <Box sx={{ width: "100%", maxWidth: "1400px" }}>
       <DataGrid
-        sx={{ height: 600, width: "100%", maxWidth: "1400px", mb: 2 }}
+        sx={{
+          "& .css-t89xny-MuiDataGrid-columnHeaderTitle": {
+            fontWeight: 700,
+            color: "grey",
+          },
+          "& .MuiDataGrid-cell:hover": {
+            color: "primary.main",
+          },
+          height: 660,
+          mb: 2,
+        }}
         rows={rows}
         columns={columns}
         initialState={{
@@ -57,6 +54,13 @@ export default function TablaHome({ rows }) {
         }}
         pageSizeOptions={[10]}
         onRowSelectionModelChange={handleSelectionModelChange}
+        slots={{
+          footer: CustomGridFooter,
+          loadingOverlay: LinearProgress,
+        }}
+        loading={Boolean(cargando)}
+        localeText={customLocaleText}
+        filterModel={opcionesFiltro ? opcionesFiltro : undefined}
       />
 
       <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
@@ -74,6 +78,14 @@ export default function TablaHome({ rows }) {
           endIcon={<EditNoteIcon />}
         >
           Editar
+        </Button>
+        <Button
+          onClick={() => handlePrint(selectionModel)}
+          variant="contained"
+          endIcon={<PrintIcon />}
+          color="success"
+        >
+          Imprimir
         </Button>
       </Stack>
     </Box>

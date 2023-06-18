@@ -5,6 +5,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BuildIcon from "@mui/icons-material/Build";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 
 const Caracteristicas = () => {
@@ -72,20 +73,20 @@ const Caracteristicas = () => {
   return (
     <Box id="caracteristicas" component="section" sx={{ py: 8 }}>
       <Typography
-        variant="h4"
-        component="h2"
+        variant="h3"
+        component="h1"
         color="initial"
-        sx={{ fontWeight: "700", textAlign: "center", my: 4 }}
+        sx={{ fontWeight: "700", textAlign: "center", my: 5 }}
       >
-        Caracteristicas
+        Características
       </Typography>
-      <Box sx={{ display: "flex", p: 1 }}>
+      <Box sx={{ display: "flex", p: 1, mt: 10 }}>
         <Box sx={{ width: "50%" }}>
           <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr) " }}>
             <Button
               sx={{
                 m: 1,
-                p: 5,
+                px: 5,
                 textTransform: "none",
                 fontSize: "1.25rem",
                 display: "flex",
@@ -229,50 +230,52 @@ const Caracteristicas = () => {
           </Box>
         </Box>
         <Box sx={{ width: "50%" }}>
-          <Paper
-            sx={{ p: 4, m: 1, boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)" }}
-          >
+          <Paper sx={{ p: 4, m: 1 }} elevation={0}>
             {showOrdenes && (
               <Box>
                 <Typography
                   paddingBottom={2}
                   fontWeight="700"
-                  variant="body1"
-                  color="textPrimary"
+                  variant="h4"
+                  color="primary"
                 >
                   Ordenes de trabajo
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Administra tus ordenes de trabajo
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Administra tus ordenes de trabajo
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Notifica a tus clientes el estado de sus reparaciones
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} /> Notifica a
+                  tus clientes el estado de sus reparaciones
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Crea las ordenes a tu medida
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Crea las ordenes a tu medida
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Agrega fotos de las reparaciones
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Agrega fotos de las reparaciones
                 </Typography>
               </Box>
             )}
@@ -281,42 +284,46 @@ const Caracteristicas = () => {
                 <Typography
                   paddingBottom={2}
                   fontWeight="700"
-                  variant="body1"
-                  color="textPrimary"
+                  variant="h4"
+                  color="primary"
                 >
                   Inventario
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Administra tus inventarios de una manera sencilla
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Administra tus inventarios de una manera sencilla
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Se actualiza a la par de las órdenes
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Se actualiza a la par de las órdenes
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Inventario por cada centro de trabajo
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Inventario por cada centro de trabajo
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Programa la realizacion de tus inventarios
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Programa la realizacion de tus inventarios
                 </Typography>
               </Box>
             )}
@@ -325,42 +332,46 @@ const Caracteristicas = () => {
                 <Typography
                   paddingBottom={2}
                   fontWeight="700"
-                  variant="body1"
-                  color="textPrimary"
+                  variant="h4"
+                  color="primary"
                 >
                   Clientes
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Gestión de contactos.
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Gestión de contactos.
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Personaliza el metodo de contacto por cliente.
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />{" "}
+                  Personaliza el metodo de contacto por cliente.
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Historial de clientes
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Historial de clientes
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Fideliza a tus clientes ofreciendoles descuentos
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Fideliza a tus clientes ofreciendoles descuentos
                   personalizados
                 </Typography>
               </Box>
@@ -370,27 +381,29 @@ const Caracteristicas = () => {
                 <Typography
                   paddingBottom={2}
                   fontWeight="700"
-                  variant="body1"
-                  color="textPrimary"
+                  variant="h4"
+                  color="primary"
                 >
                   Proveedores
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Registra a tus proveedores, son una parte importante en el
-                  proceso de reparacion
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} /> Registra a
+                  tus proveedores, son una parte importante en el proceso de
+                  reparacion
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Guarda al instante un nuevo proveedor que encontraste
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Guarda al instante un nuevo proveedor que encontraste
                 </Typography>
               </Box>
             )}
@@ -399,35 +412,38 @@ const Caracteristicas = () => {
                 <Typography
                   paddingBottom={2}
                   fontWeight="700"
-                  variant="body1"
-                  color="textPrimary"
+                  variant="h4"
+                  color="primary"
                   sx={{ fontWeight: "bolder" }}
                 >
                   Servicios
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Lleva un registro de todas tus reparaciones
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Lleva un registro de todas tus reparaciones
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Agrega tus propios serivios
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Agrega tus propios serivios
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Multiples servicios para cada una de tus ordenes
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Multiples servicios para cada una de tus ordenes
                 </Typography>
               </Box>
             )}
@@ -436,35 +452,38 @@ const Caracteristicas = () => {
                 <Typography
                   paddingBottom={2}
                   fontWeight="700"
-                  variant="body1"
-                  color="textPrimary"
+                  variant="h4"
+                  color="primary"
                   sx={{ fontWeight: "bolder" }}
                 >
                   Finanzas
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Administra los resultados de tu negocio
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Administra los resultados de tu negocio
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Registra todos tus ingresos y gastos
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Registra todos tus ingresos y gastos
                 </Typography>
                 <Typography
                   marginBottom={1}
-                  marginLeft={1}
-                  variant="body2"
+                  variant="h6"
                   color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
                 >
-                  - Obten un reporte diario, semanal y mensual
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Obten un reporte diario, semanal y mensual
                 </Typography>
               </Box>
             )}

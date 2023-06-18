@@ -31,12 +31,14 @@ const FormOperacionesTecnicas = ({
   const [checklist, setChecklist] = useState(null);
   const [estados, setEstados] = useState([]);
   const [tipoGarantia, setTipoGarantia] = useState("");
+  const [precio, setPrecio] = useState(0);
   const [ot, setOt] = useState(initialValues);
   const [numeroOt, setNumeroOt] = useState(null);
   const [updatedDispositivo_id, setUpdatedDispositivo_id] = useState(null);
   const [updateCliente_id, setUpdateCliente_id] = useState(null);
   const [ots_id, setOts_id] = useState(id || null);
   const { user } = useUserContext();
+
   const fetchOt = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
@@ -55,6 +57,7 @@ const FormOperacionesTecnicas = ({
         setEstado_id(otData.estado_id);
         setChecklist_id(otData.checklist_id);
         setTipoGarantia(otData.tipoGarantia);
+        setPrecio(otData.precio);
         setUpdatedDispositivo_id(otData.dispositivo_id);
       } else {
         console.error("Error al obtener los datos de la OT:", response.status);
@@ -212,10 +215,7 @@ const FormOperacionesTecnicas = ({
   };
 
   return (
-    <Paper
-      elevation={4}
-      sx={{ p: 2, display: "flex", alignItems: "center", maxWidth: "1308px" }}
-    >
+    <Paper elevation={4} sx={{ p: 2, display: "flex", alignItems: "center" }}>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
         <Box
           sx={{
@@ -303,6 +303,7 @@ const FormOperacionesTecnicas = ({
           ots_id={ots_id}
           dispositivo_id={dispositivo_id}
           updatedDispositivo_id={updatedDispositivo_id}
+          setPrecio={setPrecio}
         />
       </Box>
       <Box sx={{ ml: 4 }}>
@@ -318,7 +319,7 @@ const FormOperacionesTecnicas = ({
               Total a Facturar
             </Typography>
             <Typography variant="h6" color="initial">
-              0 €
+              {precio} €
             </Typography>
           </Box>
         </Paper>

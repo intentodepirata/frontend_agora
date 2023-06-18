@@ -1,56 +1,54 @@
 import { Box, Typography, Button } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import Highcharts from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import { useUserContext } from "../../contexts/UserContext";
-const MainWidget = () => {
-  const options = {
-    chart: {
-      type: "pie",
-    },
-    title: {
-      text: "Estado de reparaciones",
-    },
-    credits: {
-      enabled: false,
-    },
-    accessibility: {
-      enabled: false,
-    },
+import {
+  formattedDate,
+  getTotalByEstado,
+  initialValues,
+  updateHighcharts,
+} from "./utils/utils";
+const MainWidget = ({
+  rows,
+  fetchOtsDay,
+  fetchOtsWeek,
+  fetchOtsMonth,
+  setFiltroEstado,
+  filtroEstado,
+}) => {
+  const [options, setOptions] = useState(initialValues);
+  const [selectedButton, setSelectedButton] = useState(3);
 
-    series: [
-      {
-        data: [
-          {
-            name: "En proceso",
-            y: 33.3,
-            color: "#0150F5",
-          },
-          {
-            name: "Por entregar",
-            y: 33.3,
-            color: "#2ecc71",
-          },
-          {
-            name: "En revisión",
-            y: 33.3,
-            color: "#f1c40f",
-          },
-        ],
-      },
-    ],
+  const { user } = useUserContext();
+
+  useEffect(() => {
+    // Obtener el estado y contar el número de reparaciones en cada estado
+    const data = updateHighcharts(rows);
+    // Actualizar la serie de la gráfica con los nuevos datos
+    setOptions((prevOptions) => ({
+      ...prevOptions,
+      series: [{ data }],
+    }));
+  }, [rows]);
+
+  const handleButtonClick = (buttonId) => {
+    setSelectedButton(buttonId);
   };
 
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "numeric",
-    year: "numeric",
-  });
-  const { user } = useUserContext();
+  const handleFiltrarClick = (estado) => {
+    if (filtroEstado === estado) {
+      // Si el botón ya está activo, desactivarlo
+      setFiltroEstado("");
+    } else {
+      // Si el botón no está activo, establecer el filtro correspondiente
+      setFiltroEstado(estado);
+    }
+  };
+  const isFiltroActivo = (estado) => filtroEstado === estado;
   return (
     <>
       <Box
@@ -80,6 +78,9 @@ const MainWidget = () => {
               sx={{
                 m: 1,
                 p: 4,
+                border: isFiltroActivo("Pendiente")
+                  ? "1px solid  #0150F5"
+                  : "disable",
                 width: "100%",
                 maxWidth: "300px",
                 textTransform: "none",
@@ -96,18 +97,24 @@ const MainWidget = () => {
               }}
               variant={"disable"}
               color="primary"
-              // onClick={handleOrdenesClick}
+              onClick={() => handleFiltrarClick("Pendiente")}
             >
               <PeopleAltIcon
                 color="primary"
                 sx={{ fontSize: "1.5rem", mr: 1 }}
               />
-              1 Por Asignar
+              {` ${getTotalByEstado(
+                "Pendiente de repuesto",
+                rows
+              )} Pdt. de repuesto`}
             </Button>
             <Button
               sx={{
                 m: 1,
                 p: 4,
+                border: isFiltroActivo("En reparacion")
+                  ? "1px solid  #0150F5"
+                  : "disable",
                 width: "100%",
                 maxWidth: "300px",
                 textTransform: "none",
@@ -124,18 +131,21 @@ const MainWidget = () => {
               }}
               variant={"disable"}
               color="primary"
-              // onClick={handleOrdenesClick}
+              onClick={() => handleFiltrarClick("En reparacion")}
             >
               <PendingActionsIcon
                 color="primary"
                 sx={{ fontSize: "1.5rem", mr: 1 }}
               />
-              1 En Proceso
+              {` ${getTotalByEstado("En reparacion", rows)} En reparacion`}
             </Button>
             <Button
               sx={{
                 m: 1,
                 p: 4,
+                border: isFiltroActivo("Finalizada")
+                  ? "1px solid  #0150F5"
+                  : "disable",
                 width: "100%",
                 maxWidth: "300px",
                 textTransform: "none",
@@ -152,13 +162,16 @@ const MainWidget = () => {
               }}
               variant={"disable"}
               color="primary"
-              // onClick={handleOrdenesClick}
+              onClick={() => handleFiltrarClick("Finalizada")}
             >
               <InventoryIcon
                 color="primary"
                 sx={{ fontSize: "1.5rem", mr: 1 }}
               />
-              1 Por Entregar
+              {` ${getTotalByEstado(
+                "Reparacion Finalizada",
+                rows
+              )}  Finalizada`}
             </Button>
           </Box>
           <Box
@@ -188,7 +201,7 @@ const MainWidget = () => {
               >
                 <Box textAlign={"center"}>
                   <Typography variant="h5" color="initial">
-                    Ventas
+                    Facturado
                   </Typography>
                   <Typography variant="h6" color="initial">
                     0.00 €
@@ -199,7 +212,7 @@ const MainWidget = () => {
                     Finalizadas
                   </Typography>
                   <Typography variant="h6" color="initial">
-                    1
+                    {` ${getTotalByEstado("Reparacion Finalizada", rows)}`}
                   </Typography>
                 </Box>
               </Box>
@@ -212,51 +225,56 @@ const MainWidget = () => {
                 }}
               >
                 <Button
-                  // onClick={handleShowMensual}
-                  variant={"contained"}
-                  color="primary"
+                  variant={selectedButton === 1 ? "contained" : "outlined"}
                   sx={{
                     borderRadius: "4px 0 0 4px",
+                    borderRight: 0,
                     textTransform: "none",
                     bg: "primary",
                     boxShadow: 0,
-                    border: "2px solid #0150F5",
                     py: 0.5,
                     px: 3,
+                    color: selectedButton === 1 ? "white" : "primary",
+                  }}
+                  onClick={() => {
+                    fetchOtsDay();
+                    handleButtonClick(1);
                   }}
                 >
                   Hoy
                 </Button>
                 <Button
-                  // onClick={handleShowAnual}
-                  variant={"outlined"}
-                  color="primary"
+                  variant={selectedButton === 2 ? "contained" : "outlined"}
                   sx={{
-                    color: "black",
                     borderRadius: "0",
+                    borderLeft: 0,
                     textTransform: "none",
                     bg: "primary",
                     boxShadow: 0,
-                    border: "2px solid #0150F5",
+                    color: selectedButton === 2 ? "white" : "primary",
                     py: 0.5,
                     px: 3,
+                  }}
+                  onClick={() => {
+                    fetchOtsWeek();
+                    handleButtonClick(2);
                   }}
                 >
                   Semana
                 </Button>
                 <Button
-                  // onClick={handleShowAnual}
-                  variant={"outlined"}
-                  color="primary"
+                  variant={selectedButton === 3 ? "contained" : "outlined"}
                   sx={{
-                    color: "black",
                     borderRadius: "0 4px 4px 0",
                     textTransform: "none",
                     bg: "primary",
                     boxShadow: 0,
-                    border: "2px solid #0150F5",
                     py: 0.5,
                     px: 3,
+                    color: selectedButton === 3 ? "white" : "primary",
+                  }}
+                  onClick={() => {
+                    fetchOtsMonth(), handleButtonClick(3);
                   }}
                 >
                   Mes

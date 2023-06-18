@@ -2,9 +2,10 @@ import { Box, Button, IconButton, Typography } from "@mui/material";
 import React from "react";
 import { Link } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import FormClientes from "../components/FormClientes/FormClientes";
+import FormProduct from "../components/FormProduct/FormProduct";
+import FormProveedores from "../components/FormProveedores/FormProveedores";
 
-const ClientsCreate = () => {
+const SuppliersCreate = () => {
   return (
     <Box
       component="section"
@@ -23,7 +24,7 @@ const ClientsCreate = () => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton component={Link} to="/home/clientes" aria-label="Back">
+          <IconButton component={Link} to="/home/suppliers" aria-label="Back">
             <ArrowBackIcon />
           </IconButton>
           <Typography
@@ -32,7 +33,7 @@ const ClientsCreate = () => {
             color="initial"
             sx={{ ml: 2, p: 2 }}
           >
-            Agregar Cliente
+            Agregar proveedor
           </Typography>
         </Box>
         <Button
@@ -40,15 +41,15 @@ const ClientsCreate = () => {
           color="primary"
           sx={{ textTransform: "none", fontSize: "16px" }}
         >
-          Guardar cliente
+          Guardar proveedor
         </Button>
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormClientes />
+        <FormProveedores />
       </Box>
     </Box>
   );
 };
 
-export default ClientsCreate;
+export default SuppliersCreate;

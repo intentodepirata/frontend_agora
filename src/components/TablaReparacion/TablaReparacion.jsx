@@ -4,26 +4,24 @@ import {
   Button,
   FormControl,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Select,
   Stack,
-  Typography,
 } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useEffect, useState } from "react";
 import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
+import CustomNoRowsOverlay from "../CustomNoRowsOverlay/CustomNoRowsOverlay";
 
-const defaultOperationValue = {
-  operacion: "",
-  componente: "",
-  pdtStock: "no",
-  tiempo: "",
-  precio: "100",
-};
-
-const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
+const TablaReparacion = ({
+  ots_id,
+  dispositivo_id,
+  updatedDispositivo_id,
+  setPrecio,
+}) => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [componentes, setComponentes] = useState([]);
   const [rows, setRows] = useState([]);
@@ -31,6 +29,7 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
   const [componentes_id, setComponentes_id] = useState("");
   const [tiempo, setTiempo] = useState("");
   const [actualizarTabla, setActualizarTabla] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
   const { user } = useUserContext();
   const fetchcomponentes = async () => {
@@ -58,6 +57,7 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
   };
   const fetchOperacionesByOt = async () => {
     try {
+      setCargando(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}operacion/${ots_id}`,
         {
@@ -70,12 +70,32 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
       const data = await response.json();
       if (response.ok) {
         setRows(data);
+        setCargando(false);
         setActualizarTabla(false);
       } else {
         console.error("Error al obtener las operaciones:", response.status);
       }
     } catch (error) {
       console.error("Error al obtener las operaciones:", error);
+    }
+  };
+
+  const fetchPrecio = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/price/${ots_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      setPrecio(data);
+    } catch (error) {
+      console.error("Error al obtener los estados:", error);
     }
   };
 
@@ -99,6 +119,9 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
       });
       const data = await response.json();
       if (response.ok) {
+        setOperacion("");
+        setComponentes_id("");
+        setTiempo("");
         alert("Datos Guardados Correctamente", data);
         setActualizarTabla(true);
       } else {
@@ -117,6 +140,7 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
   useEffect(() => {
     if (actualizarTabla) {
       fetchOperacionesByOt();
+      fetchPrecio();
     }
   }, [actualizarTabla]);
 
@@ -157,6 +181,7 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
   function handleSubmit(e) {
     e.preventDefault();
     fetchOperaciones();
+    fetchPrecio();
   }
 
   return (
@@ -231,9 +256,23 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
       </Box>
       <Box sx={{ mt: 2, height: "375px", width: "100%", minWidth: "400px" }}>
         <DataGrid
+          sx={{
+            "& .css-t89xny-MuiDataGrid-columnHeaderTitle": {
+              fontWeight: 700,
+              color: "grey",
+            },
+            "& .MuiDataGrid-cell:hover": {
+              color: "primary.main",
+            },
+          }}
           rows={rows}
           columns={columns}
           initialState={{
+            columns: {
+              columnVisibilityModel: {
+                id: false,
+              },
+            },
             pagination: {
               paginationModel: {
                 pageSize: 5,
@@ -242,6 +281,11 @@ const TablaReparacion = ({ ots_id, dispositivo_id, updatedDispositivo_id }) => {
           }}
           pageSizeOptions={[5]}
           onRowSelectionModelChange={handleSelectionModelChange}
+          slots={{
+            noRowsOverlay: CustomNoRowsOverlay,
+            loadingOverlay: LinearProgress,
+          }}
+          loading={Boolean(cargando)}
         />
       </Box>
 

@@ -12,10 +12,12 @@ const ComenzarGratis = () => {
             alignItems: "center",
             textAlign: "left",
             justifyContent: "space-between",
+            marginTop: 10,
           }}
         >
           <Box
             sx={{
+              width: "40%",
               display: "flex",
               alignItems: "flex-start",
               justifyContent: "center",
@@ -25,18 +27,18 @@ const ComenzarGratis = () => {
             <Typography
               fontWeight="700"
               component="h1"
-              variant="h3"
+              variant="h2"
               color="initial"
             >
               El mejor software
             </Typography>
-            <Typography component="h1" variant="h3" color="initial">
+            <Typography component="h1" variant="h2" color="initial">
               para administrar
             </Typography>
 
             <Typography
               component="h1"
-              variant="h3"
+              variant="h2"
               color="primary"
               fontWeight="700"
               sx={{ pb: 2 }}
@@ -50,7 +52,7 @@ const ComenzarGratis = () => {
             <Box
               sx={{
                 display: "flex",
-                alignItems: "flex-start",
+                alignItems: "center",
                 gap: 2,
               }}
             >
@@ -72,9 +74,11 @@ const ComenzarGratis = () => {
           <Box sx={{ width: "60%", py: 4 }}>
             <Box
               sx={{
-                mx: "auto",
-                width: "100%",
-                height: "auto",
+                width: "80%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                margin: "0 auto",
               }}
               component="img"
               src={imagenHero}

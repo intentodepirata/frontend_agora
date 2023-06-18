@@ -9,10 +9,10 @@ const Header = () => {
       <Box
         component="header"
         sx={{
-          maxWidth: "1200px",
+          maxWidth: "1440px",
           margin: "0 auto",
-          py: "20px",
-          px: 2,
+
+          p: 2,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -23,7 +23,7 @@ const Header = () => {
             component={"img"}
             src={logo}
             alt="Agora"
-            sx={{ width: "160px" }}
+            sx={{ width: "160px", borderRadius: "4px " }}
           />
         </Link>
 

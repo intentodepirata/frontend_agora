@@ -122,12 +122,15 @@ const FormDispositivo = ({ setDispositivo_id }) => {
       }}
     >
       <Typography
-        sx={{ textAlign: "center", mb: 1 }}
+        sx={{ textAlign: "left", mb: 1 }}
         fontWeight={"bold"}
         variant="h6"
         color={guardado ? "primary" : "grey"}
       >
         Datos Dispositivo
+      </Typography>
+      <Typography variant="body1" color="grey" mb={2}>
+        Rellene todos los campos para agregar un dispositivo
       </Typography>
       <Box sx={{ display: "flex", mb: 2 }}>
         <TextField

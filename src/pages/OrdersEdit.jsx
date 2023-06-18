@@ -1,14 +1,20 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Link } from "react-router-dom";
+import PrintIcon from "@mui/icons-material/Print";
+import { Link, useParams } from "react-router-dom";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 const OrdersEdit = () => {
   const [fetchData, setFetchData] = useState(false);
+  const { id } = useParams();
 
   const handleButtonClick = () => {
     setFetchData(true);
   };
+  function handlePrint() {
+    // navigate("/print/" + id[0]);
+    window.open(`/print/${id}`, "_blank");
+  }
   return (
     <Box
       component="section"
@@ -39,14 +45,29 @@ const OrdersEdit = () => {
             Editar Orden
           </Typography>
         </Box>
-        <Button
-          onClick={handleButtonClick}
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
+        <Stack
+          sx={{ my: 2, justifyContent: "end" }}
+          direction="row"
+          spacing={2}
         >
-          Guardar Orden
-        </Button>
+          <Button
+            onClick={() => handlePrint()}
+            variant="contained"
+            endIcon={<PrintIcon />}
+            color="success"
+            sx={{ textTransform: "none", fontSize: "16px" }}
+          >
+            Imprimir
+          </Button>
+          <Button
+            onClick={handleButtonClick}
+            variant="contained"
+            color="primary"
+            sx={{ textTransform: "none", fontSize: "16px" }}
+          >
+            Guardar Orden
+          </Button>
+        </Stack>
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
