@@ -1,6 +1,6 @@
 import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { columns } from "./utils/columnas";
+import { columnas } from "./utils/columnas";
 
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 
-export default function TablaGastos({ rows, fetchProveedores, cargando }) {
+export default function TablaTop5({ rows, fetchProveedores, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const { user } = useUserContext();
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export default function TablaGastos({ rows, fetchProveedores, cargando }) {
           height: 320,
         }}
         rows={rows}
-        columns={columns}
+        columns={columnas}
         initialState={{
           pagination: {
             paginationModel: {

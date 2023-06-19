@@ -3,6 +3,7 @@ import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
 import { useState } from "react";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
@@ -10,7 +11,12 @@ import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { columns } from "./utils/columnas";
 
-export default function TablaProducts({ rows, fetchComponentes, cargando }) {
+export default function TablaProducts({
+  rows,
+  fetchComponentes,
+  cargando,
+  agregarAlCarrito,
+}) {
   const [selectionModel, setSelectionModel] = useState(null);
 
   const { user } = useUserContext();
@@ -56,7 +62,7 @@ export default function TablaProducts({ rows, fetchComponentes, cargando }) {
   }
 
   return (
-    <Box sx={{ height: 740, width: "100%", maxWidth: "800px" }}>
+    <Box sx={{ height: 740, width: "100%", maxWidth: "1000px" }}>
       <DataGrid
         sx={{
           "& .css-mf4goe-MuiDataGrid-root": {
@@ -108,6 +114,14 @@ export default function TablaProducts({ rows, fetchComponentes, cargando }) {
           endIcon={<EditNoteIcon />}
         >
           Editar
+        </Button>
+        <Button
+          onClick={() => agregarAlCarrito(selectionModel)}
+          variant="contained"
+          endIcon={<ShoppingCartCheckoutIcon />}
+          color="warning"
+        >
+          Carrito
         </Button>
       </Stack>
     </Box>

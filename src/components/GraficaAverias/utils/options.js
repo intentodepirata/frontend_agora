@@ -66,7 +66,7 @@ export const options = {
     type: "bar",
   },
   title: {
-    text: "Top 5 modelos con más averías",
+    text: "Top 5 Modelos Más Reparados",
   },
   xAxis: {
     categories: categories,
