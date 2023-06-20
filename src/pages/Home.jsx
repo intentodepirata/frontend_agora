@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import TablaHome from "../components/TablaHome/TablaHome";
 import MainWidget from "../components/MainWidget/MainWidget";
 import { useUserContext } from "../contexts/UserContext";
+import { enqueueSnackbar } from "notistack";
 
 const Home = () => {
   const [rows, setRows] = useState([]);
@@ -47,6 +48,7 @@ const Home = () => {
       }
     };
     fetchOts();
+    fetchOtsByTime("mes");
   }, []);
   const fetchOtsByTime = async (time) => {
     try {
@@ -73,7 +75,9 @@ const Home = () => {
       const data = await response.json();
 
       if (data.length === 0) {
-        alert(`No hay ots en ${time}`);
+        enqueueSnackbar(`No hay ots en ${time}`, {
+          variant: "info",
+        });
       }
 
       setRows(data);

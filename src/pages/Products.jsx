@@ -11,6 +11,7 @@ const Products = () => {
   const [rowsCarrito, setRowsCarrito] = useState(
     JSON.parse(localStorage.getItem("carritoAgora")) || []
   );
+
   const { user } = useUserContext();
 
   useEffect(() => {
@@ -126,6 +127,7 @@ const Products = () => {
           cargando={cargando}
           handleCellEditStop={handleCellEditStop}
           handleDelete={handleDelete}
+          setRowsCarrito={setRowsCarrito}
         />
       </Box>
     </>

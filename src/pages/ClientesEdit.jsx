@@ -24,6 +24,7 @@ const ClientesEdit = () => {
         );
 
         const [data] = await response.json();
+
         setCliente(data);
         console.log(data);
       } catch (error) {

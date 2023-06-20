@@ -333,3 +333,6 @@ template {
 [hidden] {
   display: none;
 }
+.notification-container {
+  margin-top: 60px; /* Ajusta el espaciado vertical según tus necesidades */
+}

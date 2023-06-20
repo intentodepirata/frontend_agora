@@ -4,6 +4,7 @@ import TablaClients from "../components/TablaClients/TablaClients";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { Link } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 
 const Clientes = () => {
   const [rows, setRows] = useState([]);
@@ -25,6 +26,11 @@ const Clientes = () => {
         );
 
         const data = await response.json();
+        if (data.length === 0) {
+          enqueueSnackbar("No hay clientes registrados", {
+            variant: "info",
+          });
+        }
         setCargando(false);
         setRows(data);
       } catch (error) {

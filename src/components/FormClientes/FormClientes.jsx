@@ -5,6 +5,7 @@ import { FormClientesSchema } from "./FormClientesSchema";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate, useParams } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 
 const FormClientes = ({ setCliente_id, cliente }) => {
   const { user } = useUserContext();
@@ -46,12 +47,17 @@ const FormClientes = ({ setCliente_id, cliente }) => {
         }
 
         if (cliente) {
-          alert("Cliente actualizado");
+          // alert("Cliente actualizado");
+          enqueueSnackbar("Cliente actualizado", {
+            variant: "success",
+          });
           actions.resetForm();
           navigate("/home/clientes");
         } else {
           console.log(data);
-          alert("cliente guardado");
+          enqueueSnackbar("cliente guardado", {
+            variant: "info",
+          });
           setGuardado(true);
 
           urlCompleta === `${import.meta.env.VITE_URL}home/clientes/create` &&

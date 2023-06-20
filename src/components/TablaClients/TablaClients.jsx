@@ -18,7 +18,6 @@ export default function TablaClients({ rows, cargando }) {
   };
 
   function handleEditar(id) {
-    console.log("editando", id[0]);
     navigate("/home/clientes/edit/" + id[0]);
   }
   function handleEliminar(id) {

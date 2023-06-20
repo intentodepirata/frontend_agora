@@ -18,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormLoginSchema } from "./FormLoginSchema";
+import { useSnackbar } from "notistack";
 
 const FormLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +29,7 @@ const FormLogin = () => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const {
     isSubmitting,
     values,
@@ -51,12 +52,18 @@ const FormLogin = () => {
       );
       const data = await response.json();
       if (response.status !== 200) {
-        alert(data);
+        enqueueSnackbar(`${data}`, {
+          variant: "error",
+          // action: (key) => closeSnackbar(key),
+        });
       } else {
         login(data);
-        console.log(data);
+
         navigate("/home");
         actions.resetForm();
+        enqueueSnackbar(`Bienvenido ${data.nombre} ${data.apellidos}`, {
+          variant: "success",
+        });
       }
     },
   });

@@ -26,16 +26,12 @@ const MainWidget = ({
   const { user } = useUserContext();
 
   useEffect(() => {
-    // Obtener el estado y contar el número de reparaciones en cada estado
     const data = updateHighcharts(rows);
-
-    // Actualizar la serie de la gráfica con los nuevos datos
     setOptions((prevOptions) => ({
       ...prevOptions,
       series: [{ data }],
     }));
 
-    // Incrementar la clave para forzar el re-renderizado del componente
     setChartKey((prevKey) => prevKey + 1);
   }, [rows]);
 
@@ -46,10 +42,8 @@ const MainWidget = ({
 
   const handleFiltrarClick = (estado) => {
     if (filtroEstado === estado) {
-      // Si el botón ya está activo, desactivarlo
       setFiltroEstado("");
     } else {
-      // Si el botón no está activo, establecer el filtro correspondiente
       setFiltroEstado(estado);
     }
   };
@@ -82,9 +76,10 @@ const MainWidget = ({
               sx={{
                 m: 1,
                 p: 4,
+
                 border: isFiltroActivo("Pendiente")
-                  ? "1px solid  #0150F5"
-                  : "disable",
+                  ? "1px solid #0150F5"
+                  : "1px solid transparent",
                 width: "100%",
                 maxWidth: "300px",
                 textTransform: "none",
@@ -117,8 +112,8 @@ const MainWidget = ({
                 m: 1,
                 p: 4,
                 border: isFiltroActivo("En reparacion")
-                  ? "1px solid  #0150F5"
-                  : "disable",
+                  ? "1px solid #0150F5"
+                  : "1px solid transparent",
                 width: "100%",
                 maxWidth: "300px",
                 textTransform: "none",
@@ -148,8 +143,8 @@ const MainWidget = ({
                 m: 1,
                 p: 4,
                 border: isFiltroActivo("Finalizada")
-                  ? "1px solid  #0150F5"
-                  : "disable",
+                  ? "1px solid #0150F5"
+                  : "1px solid transparent",
                 width: "100%",
                 maxWidth: "300px",
                 textTransform: "none",

@@ -12,7 +12,7 @@ import {
   ListItem,
   LinearProgress,
 } from "@mui/material";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+
 import { columnas, style } from "./utils/columnas";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -22,14 +22,15 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import Carrito from "../Carrito/Carrito";
+import CustomNoRowsOverlay2 from "../CustomNoRowsOverlay2/CustomNoRowsOverlay2";
 
 export default function TablaCarrito({
   rowsCarrito,
-  fetchProveedores,
   cargando,
-
   handleCellEditStop,
   handleDelete,
+  setRowsCarrito,
 }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const { user } = useUserContext();
@@ -73,6 +74,7 @@ export default function TablaCarrito({
           toolbar: CustomGridToolbar,
           loadingOverlay: LinearProgress,
           footer: CustomGridFooter,
+          noRowsOverlay: CustomNoRowsOverlay2,
         }}
         slotProps={{
           toolbar: {
@@ -92,14 +94,11 @@ export default function TablaCarrito({
         >
           Eliminar
         </Button>
-        <Button
-          //   onClick={() => handleEliminar(selectionModel)}
-          color="success"
-          variant="contained"
-          endIcon={<LocalShippingIcon />}
-        >
-          Solicitar
-        </Button>
+        <Carrito
+          rowsCarrito={rowsCarrito}
+          user={user}
+          setRowsCarrito={setRowsCarrito}
+        />
       </Stack>
     </Box>
   );
