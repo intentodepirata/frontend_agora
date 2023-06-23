@@ -1,15 +1,32 @@
-import { PaidSharp } from "@mui/icons-material";
-import { Box, Paper, TextField, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Paper,
+  TextField,
+  Typography,
+  Button,
+  Stack,
+} from "@mui/material";
 import { MuiFileInput } from "mui-file-input";
+import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
 
-export default function FormNegocio() {
-  const [nombre, setNombre] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [pais, setPais] = useState("");
-  const [precio, setPrecio] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [logo, setLogo] = useState(null);
+export default function FormNegocio({
+  nombre,
+  setNombre,
+  telefono,
+  setTelefono,
+  pais,
+  setPais,
+  precio,
+  setPrecio,
+  direccion,
+  setDireccion,
+  logo,
+  setLogo,
+  subirImagen,
+  logoUrl,
+  borrarImagen,
+}) {
   return (
     <>
       <Paper elevation={1} sx={{ border: "1px solid #C4C4C4" }}>
@@ -90,16 +107,32 @@ export default function FormNegocio() {
               onChange={(imagen) => setLogo(imagen)}
               placeholder="Imagen Logo"
             />
-            <Button variant="outlined" color="error">
-              Eliminar Logo
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => subirImagen()}
+              >
+                Subir Logo
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => borrarImagen()}
+              >
+                Eliminar Logo
+              </Button>
+            </Stack>
           </Box>
           <Box
             mt={2}
             component={"img"}
-            src="/img/logo.png"
+            src={logoUrl}
             width={"60%"}
             p={10}
+            sx={{
+              mx: "auto",
+            }}
           />
         </Box>
       </Paper>
