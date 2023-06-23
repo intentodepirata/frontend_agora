@@ -10,6 +10,7 @@ import { customLocaleText } from "../../traductions/customGridLocaleText";
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { columns } from "./utils/columnas";
+import { enqueueSnackbar } from "notistack";
 
 export default function TablaProducts({
   rows,
@@ -53,10 +54,12 @@ export default function TablaProducts({
           throw new Error("Error al eliminar el elemento");
         }
 
-        alert("Elemento eliminado correctamente");
+        enqueueSnackbar("Elemento eliminado correctamente", {
+          variant: "success",
+        });
         fetchComponentes(); // Obtener los datos actualizados
       } catch (error) {
-        alert(error.message);
+        console.error(error.message);
       }
     }
   }

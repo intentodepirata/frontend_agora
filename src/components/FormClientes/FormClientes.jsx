@@ -47,16 +47,14 @@ const FormClientes = ({ setCliente_id, cliente }) => {
         }
 
         if (cliente) {
-          // alert("Cliente actualizado");
-          enqueueSnackbar("Cliente actualizado", {
-            variant: "success",
+          enqueueSnackbar("Cliente actualizado correctamente", {
+            variant: "info",
           });
           actions.resetForm();
           navigate("/home/clientes");
         } else {
-          console.log(data);
-          enqueueSnackbar("cliente guardado", {
-            variant: "info",
+          enqueueSnackbar("Cliente Guardado Correctamente", {
+            variant: "success",
           });
           setGuardado(true);
 
@@ -64,9 +62,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             navigate("/home/clientes");
           setCliente_id(data);
         }
-      } catch (error) {
-        // alert(error.message);
-      }
+      } catch (error) {}
       actions.setSubmitting(false);
     },
   });

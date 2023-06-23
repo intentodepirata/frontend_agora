@@ -62,6 +62,9 @@ const Clientes = () => {
           Crear cliente
         </Button>
       </Box>
+      <Typography textAlign={"center"} variant="h6" color="grey">
+        Listado de clientes
+      </Typography>
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <TablaClients rows={rows} cargando={cargando} />
       </Box>

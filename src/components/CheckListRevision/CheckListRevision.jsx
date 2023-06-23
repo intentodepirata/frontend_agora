@@ -7,6 +7,7 @@ import Switch from "@mui/material/Switch";
 import { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import { useUserContext } from "../../contexts/UserContext";
+import { enqueueSnackbar } from "notistack";
 
 export default function CheckListRevision({
   checklist,
@@ -66,7 +67,9 @@ export default function CheckListRevision({
       if (!response.ok) {
         throw new Error(data.error);
       }
-      alert("checklist guardado");
+      enqueueSnackbar("Checklist Guardado Correctamente", {
+        variant: "info",
+      });
       setChecklist_id(data);
     } catch (error) {
       // Manejo del error

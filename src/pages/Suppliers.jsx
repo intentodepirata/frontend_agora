@@ -26,7 +26,7 @@ export default function Suppliers() {
       setCargando(false);
       setRows(data);
     } catch (error) {
-      console.error("Error al obtener los proveedores:", error);
+      "Error al obtener los proveedores:", error;
     }
   };
   useEffect(() => {
@@ -55,6 +55,9 @@ export default function Suppliers() {
           Agregar proveedor
         </Button>
       </Box>
+      <Typography textAlign={"center"} variant="h6" color="grey">
+        Listado de proveedores
+      </Typography>
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <TablaProveedores
           rows={rows}

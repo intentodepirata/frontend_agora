@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
+import PrintIcon from "@mui/icons-material/Print";
 
 export default function TablaOrders({ rows, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
@@ -17,13 +18,16 @@ export default function TablaOrders({ rows, cargando }) {
     setSelectionModel(newSelection);
   };
 
+  function handlePrint(id) {
+    window.open(`/print/${id}`, "_blank");
+  }
   function handleEditar(id) {
-    console.log("editando", id[0]);
     navigate("/home/orders/edit/" + id[0]);
   }
   function handleEliminar(id) {
     console.log("eliminando", id[0]);
   }
+
   return (
     <Box sx={{ height: 740, width: "100%", maxWidth: "1400px" }}>
       <DataGrid
@@ -77,6 +81,14 @@ export default function TablaOrders({ rows, cargando }) {
           endIcon={<EditNoteIcon />}
         >
           Editar
+        </Button>
+        <Button
+          onClick={() => handlePrint(selectionModel)}
+          variant="contained"
+          endIcon={<PrintIcon />}
+          color="success"
+        >
+          Imprimir
         </Button>
       </Stack>
     </Box>

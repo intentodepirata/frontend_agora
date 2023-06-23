@@ -78,7 +78,7 @@ const ComenzarGratis = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                margin: "0 auto",
+                marginLeft: "200px",
               }}
               component="img"
               src={imagenHero}

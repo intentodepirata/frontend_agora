@@ -2,6 +2,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import ProveedoresModal from "../ProveedoresModal/ProveedoresModal";
+import { enqueueSnackbar } from "notistack";
 
 const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -57,7 +58,10 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     closeModal();
     window.open(enlace, "_blank");
     setRowsCarrito([]);
-    alert("Pedido Realizado");
+    enqueueSnackbar("Pedido Realizado por WhatsApp", {
+      variant: "success",
+      persist: true,
+    });
   };
   const solicitarPorEmail = (proveedor) => {
     const email = encodeURIComponent(proveedor.email);
@@ -68,7 +72,10 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     window.open(url, "_blank");
     setRowsCarrito([]);
     closeModal();
-    alert("Pedido Realizado");
+    enqueueSnackbar("Pedido Realizado por Email", {
+      variant: "success",
+      persist: true,
+    });
   };
   return (
     <>

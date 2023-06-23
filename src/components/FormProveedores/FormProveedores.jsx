@@ -4,6 +4,7 @@ import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { initialValues } from "./utils/initialValues";
 import { FormProveedoresSchema } from "./utils/FormProveedoresSchema";
+import { enqueueSnackbar } from "notistack";
 
 const FormProveedores = ({ proveedor }) => {
   const { user } = useUserContext();
@@ -43,16 +44,22 @@ const FormProveedores = ({ proveedor }) => {
         }
 
         if (proveedor) {
-          alert("proveedor actualizado");
+          enqueueSnackbar("Proveedor actualizado correctamente", {
+            variant: "success",
+          });
           actions.resetForm();
           navigate("/home/suppliers");
         } else {
-          alert("proveedor guardado");
+          enqueueSnackbar("Proveedor guardado correctamente", {
+            variant: "success",
+          });
           actions.resetForm();
           navigate("/home/suppliers");
         }
       } catch (error) {
-        alert(error.message);
+        enqueueSnackbar(error.message, {
+          variant: "error",
+        });
       }
 
       actions.setSubmitting(false);

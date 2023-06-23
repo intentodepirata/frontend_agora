@@ -17,6 +17,9 @@ export default function Services() {
           Servicios
         </Typography>
       </Box>
+      <Typography textAlign={"center"} variant="h6" color="grey">
+        Listado de servicios
+      </Typography>
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <TablaServicios rows={rows} />
       </Box>

@@ -15,12 +15,14 @@ import { nombreAverias } from "./utils/nombreAverias";
 import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
 import { useParams } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 
 const FormOperacionesTecnicas = ({
   cliente_id,
   dispositivo_id,
   fetchData,
   setFetchData,
+  setEstado,
 }) => {
   const { id } = useParams();
   const [averia, setAveria] = useState("");
@@ -32,7 +34,6 @@ const FormOperacionesTecnicas = ({
   const [estados, setEstados] = useState([]);
   const [tipoGarantia, setTipoGarantia] = useState("");
   const [precio, setPrecio] = useState(0);
-  const [ot, setOt] = useState(initialValues);
   const [numeroOt, setNumeroOt] = useState(null);
   const [updatedDispositivo_id, setUpdatedDispositivo_id] = useState(null);
   const [updateCliente_id, setUpdateCliente_id] = useState(null);
@@ -80,13 +81,13 @@ const FormOperacionesTecnicas = ({
 
       const data = await response.json();
       if (!response.ok) {
-        console.log("Error al obtener el checklist:", response.status);
+        console.error("Error al obtener el checklist:");
         return;
       }
 
       setChecklist(data);
     } catch (error) {
-      console.error("Error al obtener los estados:", error);
+      console.error("Error al obtener los estados:");
     }
   };
   const crearOt = async () => {
@@ -105,7 +106,6 @@ const FormOperacionesTecnicas = ({
           ? updatedDispositivo_id
           : dispositivo_id,
       };
-      // console.log(ot);
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
         method: "POST",
@@ -121,9 +121,10 @@ const FormOperacionesTecnicas = ({
         throw new Error(data.error);
       }
       if (response.status === 201) {
-        alert("Datos Guardados Correctamente");
+        enqueueSnackbar("Datos Guardados Correctamente", {
+          variant: "success",
+        });
         setOts_id(data);
-
         setNumeroOt(data);
       }
     } catch (error) {}
@@ -168,7 +169,6 @@ const FormOperacionesTecnicas = ({
       cliente_id &&
       estado_id &&
       descripcion &&
-      observaciones &&
       checklist_id &&
       dispositivo_id
     ) {
@@ -192,12 +192,15 @@ const FormOperacionesTecnicas = ({
   useEffect(() => {
     if (fetchData) {
       crearOt();
-      alert("Datos Actualizados Correctamente");
+      enqueueSnackbar("Datos Actualizados Correctamente", {
+        variant: "success",
+      });
       setFetchData(false);
     }
   }, [fetchData]);
   const handleEstado = (event) => {
     setEstado_id(event.target.value);
+    setEstado(event.target.value + 1);
   };
   const handleTipoGarantia = (event) => {
     setTipoGarantia(event.target.value);

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
 import TablaCarrito from "../components/TablaCarrito/TablaCarrito";
+import { enqueueSnackbar } from "notistack";
 
 const Products = () => {
   const [rows, setRows] = useState([]);
@@ -41,9 +42,15 @@ const Products = () => {
       setRowsCarrito(
         rowsCarrito.map((row) => (row.id === item ? actualizado : row))
       );
+      enqueueSnackbar("Producto actualizado en el carrito", {
+        variant: "info",
+      });
     } else {
       // Si el elemento no existe, agrégalo al carrito
       setRowsCarrito([...rowsCarrito, newItem]);
+      enqueueSnackbar("Producto agregado al carrito", {
+        variant: "success",
+      });
     }
   };
 
@@ -114,21 +121,30 @@ const Products = () => {
         </Button>
       </Box>
 
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center", gap: 4 }}>
-        <TablaProducts
-          rows={rows}
-          fetchComponentes={fetchComponentes}
-          cargando={cargando}
-          agregarAlCarrito={agregarAlCarrito}
-        />
-
-        <TablaCarrito
-          rowsCarrito={rowsCarrito}
-          cargando={cargando}
-          handleCellEditStop={handleCellEditStop}
-          handleDelete={handleDelete}
-          setRowsCarrito={setRowsCarrito}
-        />
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 4 }}>
+        <Box>
+          <Typography mb={2} textAlign={"center"} variant="h6" color="grey">
+            Stock local
+          </Typography>
+          <TablaProducts
+            rows={rows}
+            fetchComponentes={fetchComponentes}
+            cargando={cargando}
+            agregarAlCarrito={agregarAlCarrito}
+          />
+        </Box>
+        <Box>
+          <Typography mb={2} textAlign={"center"} variant="h6" color="grey">
+            Carrito
+          </Typography>
+          <TablaCarrito
+            rowsCarrito={rowsCarrito}
+            cargando={cargando}
+            handleCellEditStop={handleCellEditStop}
+            handleDelete={handleDelete}
+            setRowsCarrito={setRowsCarrito}
+          />
+        </Box>
       </Box>
     </>
   );

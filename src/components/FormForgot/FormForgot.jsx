@@ -1,8 +1,18 @@
-import { Box, Paper, Typography, TextField, Button } from "@mui/material";
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+  FormControl,
+  InputLabel,
+  OutlinedInput,
+  FormHelperText,
+} from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormForgotSchema } from "./FormForgotSchema";
+import { enqueueSnackbar } from "notistack";
 
 const FormForgot = () => {
   const navigate = useNavigate();
@@ -34,10 +44,17 @@ const FormForgot = () => {
           throw new Error(data.error);
         }
 
-        alert("Instrucciones enviadas, revise su bandeja de entrada");
+        enqueueSnackbar(
+          "Instrucciones enviadas, revise su bandeja de entrada",
+          {
+            variant: "success",
+          }
+        );
         actions.resetForm();
       } catch (error) {
-        alert("Error al restablecer su password: " + error.message);
+        enqueueSnackbar("Error al restablecer su password", {
+          variant: "error",
+        });
         actions.setSubmitting(false);
       }
     },
@@ -64,17 +81,40 @@ const FormForgot = () => {
           component="form"
           sx={{ display: "flex", flexDirection: "column" }}
         >
-          <TextField
-            label="Correo Electronico"
+          <FormControl
+            fullWidth
+            variant="outlined"
             size="small"
-            name="email"
-            value={values.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.email && Boolean(errors.email)}
-            helperText={touched.email && errors.email}
-            sx={{ mb: 4, bgcolor: "#F3F4F6" }}
-          />
+            sx={{
+              mb: touched.email && errors.email ? 1 : 4,
+              bgcolor: "#F3F4F6",
+            }}
+          >
+            <InputLabel
+              error={touched.email && Boolean(errors.email)}
+              htmlFor="email"
+            >
+              Correo electronico
+            </InputLabel>
+            <OutlinedInput
+              id="email"
+              name="email"
+              type="email"
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.email && Boolean(errors.email)}
+              label="Correo electronico"
+            />
+            {touched.email && errors.email && (
+              <FormHelperText
+                sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                error
+              >
+                {errors.email}
+              </FormHelperText>
+            )}
+          </FormControl>
 
           <Button
             disabled={isSubmitting}

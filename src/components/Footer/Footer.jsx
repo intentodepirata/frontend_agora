@@ -7,7 +7,8 @@ export default function Footer() {
       variant="body2"
       color="initial"
     >
-      Agora &copy;. Todos los derechos reservados {new Date().getFullYear()}{" "}
+      Ágora TechSolutions &copy;. Todos los derechos reservados{" "}
+      {new Date().getFullYear()}{" "}
     </Typography>
   );
 }

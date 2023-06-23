@@ -16,13 +16,11 @@ const OrdersCreate = () => {
 
   useEffect(() => {
     if (cliente_id) {
-      console.log(cliente_id);
       setEstado((currentStatus) => currentStatus + 1);
     }
   }, [cliente_id]);
   useEffect(() => {
     if (dispositivo_id) {
-      console.log(dispositivo_id);
       setEstado((currentStatus) => currentStatus + 1);
     }
   }, [dispositivo_id]);
@@ -91,6 +89,7 @@ const OrdersCreate = () => {
           <FormOperacionesTecnicas
             cliente_id={cliente_id}
             dispositivo_id={dispositivo_id}
+            setEstado={setEstado}
           />
         </Box>
       )}

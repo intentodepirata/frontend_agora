@@ -37,11 +37,8 @@ const Home = () => {
             Authorization: `Bearer ${user.token}`,
           },
         });
-
         const data = await response.json();
-
         setRows(data);
-
         setCargando(false);
       } catch (error) {
         console.error("Error al obtener las ots:", error);
@@ -75,7 +72,7 @@ const Home = () => {
       const data = await response.json();
 
       if (data.length === 0) {
-        enqueueSnackbar(`No hay ots en ${time}`, {
+        enqueueSnackbar(`No hay ots en la vista por ${time}`, {
           variant: "info",
         });
       }

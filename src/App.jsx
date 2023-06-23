@@ -25,6 +25,16 @@ import SuppliersCreate from "./pages/SuppliersCreate";
 import SuppliersEdit from "./pages/SuppliersEdit";
 import Services from "./pages/Services";
 import Stats from "./pages/Stats";
+import AdminLayout from "./Layout/AdminLayout/AdminLayout";
+import Admin from "./pages/Admin";
+import MisDatos from "./pagesAdmin/MisDatos";
+import Negocio from "./pagesAdmin/Negocio";
+import Suscripcion from "./pagesAdmin/Suscripcion";
+import Permisos from "./pagesAdmin/Permisos";
+import Centros from "./pagesAdmin/Centros";
+import Notificaciones from "./pagesAdmin/Notificaciones";
+import Plantillas from "./pagesAdmin/Plantillas";
+import Seguridad from "./pagesAdmin/Seguridad";
 const App = () => {
   return (
     <UserContextProvider>
@@ -66,8 +76,17 @@ const App = () => {
           </Route>
         </Route>
         <Route path="print/:id" element={<OrdersPrint />} />
-
         <Route path="order-status/:id" element={<OrdersStatus />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Negocio />} />
+          <Route path="suscripcion" element={<Suscripcion />} />
+          <Route path="permisos" element={<Permisos />} />
+          <Route path="centros" element={<Centros />} />
+          <Route path="notificaciones" element={<Notificaciones />} />
+          <Route path="plantillas" element={<Plantillas />} />
+          <Route path="mis-datos" element={<MisDatos />} />
+          <Route path="seguridad" element={<Seguridad />} />
+        </Route>
       </Routes>
     </UserContextProvider>
   );

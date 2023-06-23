@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { FormDispositivoSchema } from "./FormDispositivoSchema";
 import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
+import { enqueueSnackbar } from "notistack";
 
 const FormDispositivo = ({ setDispositivo_id }) => {
   const [imeiSearch, setImeiSearch] = useState("");
@@ -51,15 +52,16 @@ const FormDispositivo = ({ setDispositivo_id }) => {
 
         const data = await response.json();
         if (!response.ok) {
-          alert(data);
           throw new Error(data.error);
         }
-        alert("dispositivo guardado");
+        enqueueSnackbar("Dispositivo Guardado Correctamente", {
+          variant: "success",
+        });
         setDispositivo_id(data);
         setGuardado(true);
-      } catch (error) {
-        alert(error.message);
         actions.setSubmitting(false);
+      } catch (error) {
+        throw new Error(error.message);
       }
     },
   });
@@ -77,7 +79,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
         const data = await response.json();
         setMarcas(data);
       } catch (error) {
-        console.error("Error al obtener las marcas:", error);
+        console.error("Error al obtener las marcas:");
       }
     };
     fetchMarcas();
@@ -99,7 +101,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
         const data = await response.json();
         setModelos(data);
       } catch (error) {
-        console.error("Error al obtener los Modelos:", error);
+        console.error("Error al obtener los Modelos:");
       }
     };
 
@@ -242,23 +244,23 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           sx={{ width: "50%", mr: 2 }}
         />
 
-        <FormControl sx={{ width: "25%", mr: 2 }}>
-          <InputLabel htmlFor="fechaCompra" shrink={true}>
-            Fecha de compra
-          </InputLabel>
+        <TextField
+          sx={{ width: "25%", mr: 2 }}
+          id="fechaCompra"
+          labelId="fechaCompra_label"
+          size="small"
+          label="Fecha de compra"
+          name="fechaCompra"
+          type="date"
+          InputLabelProps={{ shrink: true }}
+          disabled={guardado}
+          value={values.fechaCompra}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          error={touched.fechaCompra && Boolean(errors.fechaCompra)}
+          helperText={touched.fechaCompra && errors.fechaCompra}
+        />
 
-          <TextField
-            size="small"
-            name="fechaCompra"
-            type="date"
-            disabled={guardado}
-            value={values.fechaCompra}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.fechaCompra && Boolean(errors.fechaCompra)}
-            helperText={touched.fechaCompra && errors.fechaCompra}
-          />
-        </FormControl>
         <Button
           disabled={isSubmitting}
           sx={{ width: "25%", textTransform: "none", height: "40px" }}

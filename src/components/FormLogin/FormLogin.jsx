@@ -42,6 +42,7 @@ const FormLogin = () => {
     initialValues,
     validationSchema: FormLoginSchema,
     onSubmit: async function (values, actions) {
+      actions.setSubmitting(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}user/login`,
         {
@@ -54,7 +55,6 @@ const FormLogin = () => {
       if (response.status !== 200) {
         enqueueSnackbar(`${data}`, {
           variant: "error",
-          // action: (key) => closeSnackbar(key),
         });
       } else {
         login(data);
@@ -65,6 +65,7 @@ const FormLogin = () => {
           variant: "success",
         });
       }
+      actions.setSubmitting(false);
     },
   });
 
@@ -89,23 +90,14 @@ const FormLogin = () => {
           component="form"
           sx={{ display: "flex", flexDirection: "column" }}
         >
-          {/* <TextField
-            name="email"
-            value={values.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.email && Boolean(errors.email)}
-            helperText={touched.email && errors.email}
-            size="small"
-            label="Correo electronico"
-            sx={{ mb: 4, bgcolor: "#F3F4F6" }}
-          /> */}
-
           <FormControl
             fullWidth
             variant="outlined"
             size="small"
-            sx={{ mb: 4, bgcolor: "#F3F4F6" }}
+            sx={{
+              mb: touched.email && errors.email ? 1 : 4,
+              bgcolor: "#F3F4F6",
+            }}
           >
             <InputLabel
               error={touched.email && Boolean(errors.email)}
@@ -133,7 +125,10 @@ const FormLogin = () => {
           </FormControl>
 
           <FormControl
-            sx={{ mb: 2, width: "100%", bgcolor: "#F3F4F6" }}
+            sx={{
+              mb: touched.password && errors.password ? 1 : 2,
+              bgcolor: "#F3F4F6",
+            }}
             variant="outlined"
           >
             <InputLabel

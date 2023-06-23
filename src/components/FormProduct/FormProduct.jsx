@@ -16,6 +16,7 @@ import {
 import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { initialValues } from "./utils/initialValues";
+import { enqueueSnackbar } from "notistack";
 
 const FormProduct = ({ producto }) => {
   const [marcas, setMarcas] = useState([]);
@@ -42,6 +43,7 @@ const FormProduct = ({ producto }) => {
         : `${import.meta.env.VITE_API_URL}componente/`;
 
       try {
+        actions.setSubmitting(true);
         const response = await fetch(url, {
           method: producto ? "PUT" : "POST",
           body: JSON.stringify(values),
@@ -57,18 +59,21 @@ const FormProduct = ({ producto }) => {
         }
 
         if (producto) {
-          alert("Producto actualizado");
+          enqueueSnackbar("Producto Actualizado Correctamente", {
+            variant: "success",
+          });
           actions.resetForm();
           navigate("/home/products");
         } else {
-          alert("Producto guardado");
+          enqueueSnackbar("Producto Guardado Correctamente", {
+            variant: "success",
+          });
           actions.resetForm();
         }
+        actions.setSubmitting(false);
       } catch (error) {
-        alert(error.message);
+        console.error(error.message);
       }
-
-      actions.setSubmitting(false);
     },
   });
 
@@ -85,7 +90,7 @@ const FormProduct = ({ producto }) => {
         const data = await response.json();
         setMarcas(data);
       } catch (error) {
-        console.error("Error al obtener las marcas:", error);
+        console.error("Error al obtener las marcas:");
       }
     };
 
@@ -104,7 +109,7 @@ const FormProduct = ({ producto }) => {
         const data = await response.json();
         setModelos(data);
       } catch (error) {
-        console.error("Error al obtener los Modelos:", error);
+        console.error("Error al obtener los Modelos:");
       }
     };
 

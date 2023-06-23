@@ -8,9 +8,9 @@ export const FormRegisterSchema = yup.object().shape({
     .string("Debe ser un string")
     .email("Por favor introduzca un email valido")
     .required("Requerido"),
-  nombre: yup.string("Debe ser un string").required("Requerido"),
-  apellidos: yup.string("Debe ser un string").required("Requerido"),
-  telefono: yup.number("Debe ser un numero").required("Requerido"),
+  nombre: yup.string("El nombre no es valido").required("Requerido"),
+  apellidos: yup.string("El apellido no es valido").required("Requerido"),
+  telefono: yup.number("").required("Requerido"),
   password: yup
     .string()
     .matches(passwordRules, {

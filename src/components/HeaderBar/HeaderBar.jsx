@@ -47,13 +47,13 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
             <MenuIcon sx={{ backgroundColor: "#F3F4F6" }} />
           </IconButton>
           <Typography
-            fontWeight={"bold"}
-            color="primary.light"
+            // fontWeight={"bold"}
+            color="grey.700"
             variant="h6"
             component="div"
             sx={{ mr: 2, maxWidth: 250, width: "100%" }}
           >
-            Reparaciones Agora
+            Ágora TechSolutions
           </Typography>
           <Box
             sx={{
@@ -122,7 +122,9 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>Administrar mi taller</MenuItem>
+            <MenuItem onClick={() => navigate("/admin")}>
+              Administrar mi taller
+            </MenuItem>
             <MenuItem onClick={handleLogout}>Cerrar sesion</MenuItem>
           </Menu>
         </Toolbar>

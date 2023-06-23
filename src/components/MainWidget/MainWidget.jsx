@@ -207,7 +207,7 @@ const MainWidget = ({
                     Facturado
                   </Typography>
                   <Typography variant="h6" color="initial">
-                    {totalFacturado}€
+                    {totalFacturado ? totalFacturado : 0}€
                   </Typography>
                 </Box>
                 <Box textAlign={"center"}>

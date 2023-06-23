@@ -13,7 +13,7 @@ import {
   MaterialDesignContent,
 } from "notistack";
 import styled from "@emotion/styled";
-
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const myRef = createRef();
@@ -74,7 +74,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               size="small"
               onClick={() => closeSnackbar(snackbarId)}
             >
-              <DeleteIcon fontSize="inherit" />
+              <HighlightOffIcon fontSize="inherit" />
             </IconButton>
           )}
         >

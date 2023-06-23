@@ -18,12 +18,9 @@ export default function TablaHome({ rows, cargando, opcionesFiltro }) {
   };
 
   function handlePrint(id) {
-    console.log("imprimiendo", id[0]);
-    // navigate("/print/" + id[0]);
     window.open(`/print/${id}`, "_blank");
   }
   function handleEditar(id) {
-    console.log("editando", id[0]);
     navigate("/home/orders/edit/" + id[0]);
   }
   function handleEliminar(id) {

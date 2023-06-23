@@ -22,8 +22,8 @@ const Header = () => {
           <Box
             component={"img"}
             src={logo}
-            alt="Agora"
-            sx={{ width: "160px", borderRadius: "4px " }}
+            alt="Agora Tech solutions"
+            sx={{ width: "160px" }}
           />
         </Link>
 

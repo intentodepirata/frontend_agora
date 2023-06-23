@@ -53,6 +53,9 @@ const Orders = () => {
           Crear orden
         </Button>
       </Box>
+      <Typography textAlign={"center"} variant="h6" color="grey">
+        Historial de reparaciones
+      </Typography>
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <TablaOrders rows={rows} cargando={cargando} />
       </Box>

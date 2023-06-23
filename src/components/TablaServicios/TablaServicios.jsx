@@ -7,23 +7,94 @@ import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import { enqueueSnackbar } from "notistack";
 
-export default function TablaServicios({ rows, fetchProveedores, cargando }) {
+export default function TablaServicios({ cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
+  const [servicioActualizado, setServicioActualizado] = useState(null);
   const [servicio, setServicio] = useState("");
+  const [precio, setPrecio] = useState("");
+  const [rows, setRows] = useState([]);
   const { user } = useUserContext();
   const navigate = useNavigate();
-
+  useEffect(() => {
+    fetchServicios();
+  }, []);
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);
   };
 
-  function handleEditar(id) {
-    console.log("editando", id[0]);
-    navigate("/home/services/edit/" + id[0]);
+  async function handleSubmit() {
+    if (servicio === "" || precio === "") {
+      enqueueSnackbar("Todos los campos son obligatorios", {
+        variant: "error",
+      });
+      return;
+    }
+    const url = servicioActualizado
+      ? `${import.meta.env.VITE_API_URL}servicios/${servicioActualizado}`
+      : `${import.meta.env.VITE_API_URL}servicios`;
+    const response = await fetch(url, {
+      method: servicioActualizado ? "PUT" : "POST",
+      body: JSON.stringify({ servicio, precio }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      enqueueSnackbar(data.error, { variant: "error" });
+      throw new Error(data.error);
+    }
+
+    enqueueSnackbar(
+      `Servicio ${
+        servicioActualizado ? "actualizado" : "creado"
+      } correctamente`,
+      { variant: "success" }
+    );
+    setPrecio("");
+    setServicio("");
+    fetchServicios();
+    setServicioActualizado(null);
+  }
+  async function fetchServicios() {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}servicios`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      enqueueSnackbar(data.error, { variant: "error" });
+      throw new Error(data.error);
+    }
+    setRows(data);
+  }
+  async function handleEditar([id]) {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}servicios/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      }
+    );
+    const [data] = await response.json();
+    if (!response.ok) {
+      enqueueSnackbar(data.error, { variant: "error" });
+      throw new Error(data.error);
+    }
+
+    setPrecio(data.precio);
+    setServicio(data.servicio);
+    setServicioActualizado(data.id);
   }
 
   async function handleEliminar(id) {
@@ -34,12 +105,12 @@ export default function TablaServicios({ rows, fetchProveedores, cargando }) {
     if (confirmacion) {
       try {
         const response = await fetch(
-          import.meta.env.VITE_API_URL + "servicios/" + id,
+          `${import.meta.env.VITE_API_URL}servicios/${id}`,
           {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
-              Authorization: "Bearer " + user.token,
+              Authorization: `Bearer ${user.token}`,
             },
           }
         );
@@ -48,10 +119,14 @@ export default function TablaServicios({ rows, fetchProveedores, cargando }) {
           throw new Error("Error al eliminar el elemento");
         }
 
-        alert("Servicio eliminado correctamente");
+        enqueueSnackbar("Servicio eliminado correctamente", {
+          variant: "success",
+        });
         fetchProveedores(); // Obtener los datos actualizados
       } catch (error) {
-        alert(error.message);
+        enqueueSnackbar(error.message, {
+          variant: "error",
+        });
       }
     }
   }
@@ -65,6 +140,14 @@ export default function TablaServicios({ rows, fetchProveedores, cargando }) {
           value={servicio}
           size="small"
           onChange={(e) => setServicio(e.target.value)}
+          mr={2}
+        />
+        <TextField
+          id="coste"
+          label="Precio"
+          value={precio}
+          size="small"
+          onChange={(e) => setPrecio(e.target.value)}
         />
         <Button
           onClick={() => handleEliminar(selectionModel)}
@@ -84,13 +167,13 @@ export default function TablaServicios({ rows, fetchProveedores, cargando }) {
           Editar
         </Button>
         <Button
-          onClick={() => handleEditar(selectionModel)}
+          onClick={() => handleSubmit()}
           variant="contained"
           startIcon={<AddBoxIcon />}
           color="success"
-          sx={{ minWidth: 120 }}
+          sx={{ minWidth: 140 }}
         >
-          Agregar
+          {servicioActualizado ? "Actualizar" : "Agregar"}
         </Button>
       </Stack>
       <DataGrid

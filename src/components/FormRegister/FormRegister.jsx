@@ -22,6 +22,7 @@ import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
 import { addUser } from "../../api/usuarios";
+import { enqueueSnackbar } from "notistack";
 
 const FormRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,6 +47,7 @@ const FormRegister = () => {
     validationSchema: FormRegisterSchema,
     onSubmit: async function (values, actions) {
       try {
+        actions.setSubmitting(true);
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}user/register`,
           {
@@ -57,16 +59,20 @@ const FormRegister = () => {
 
         if (!response.ok) {
           const data = await response.json();
+          enqueueSnackbar(data.error, { variant: "error" });
+          actions.resetForm();
+          actions.setSubmitting(false);
           throw new Error(data.error);
         }
 
-        alert(
-          "Usuario registrado exitosamente, se ha enviado un correo electronico de confirmacion a su cuenta de correo"
+        enqueueSnackbar(
+          "Usuario registrado con exito, revise su bandeja de entrada para confirmar su cuenta",
+          { variant: "success", persist: true }
         );
         actions.resetForm();
-      } catch (error) {
-        alert("Error al registrar usuario: " + error.message);
         actions.setSubmitting(false);
+      } catch (error) {
+        console.error(error.message);
       }
     },
   });
@@ -92,54 +98,149 @@ const FormRegister = () => {
           component="form"
           sx={{ display: "flex", flexDirection: "column" }}
         >
-          <TextField
-            label="Nombre"
-            size="small"
-            name="nombre"
-            value={values.nombre}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.nombre && Boolean(errors.nombre)}
-            helperText={touched.nombre && errors.nombre}
-            sx={{ mb: 4, bgcolor: "#F3F4F6" }}
-          />
-          <TextField
-            label="Apellidos"
-            size="small"
-            name="apellidos"
-            value={values.apellidos}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.apellidos && Boolean(errors.apellidos)}
-            helperText={touched.apellidos && errors.apellidos}
-            sx={{ mb: 4, bgcolor: "#F3F4F6" }}
-          />
-
-          <TextField
-            name="telefono"
-            size="small"
-            type="number"
-            value={values.telefono}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.telefono && Boolean(errors.telefono)}
-            helperText={touched.telefono && errors.telefono}
-            label="Telefono"
-            sx={{ mb: 4, bgcolor: "#F3F4F6" }}
-          />
-          <TextField
-            name="email"
-            value={values.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            error={touched.email && Boolean(errors.email)}
-            helperText={touched.email && errors.email}
-            size="small"
-            label="Correo electronico"
-            sx={{ mb: 4, bgcolor: "#F3F4F6" }}
-          />
           <FormControl
-            sx={{ mb: 2, width: "100%", bgcolor: "#F3F4F6" }}
+            fullWidth
+            variant="outlined"
+            size="small"
+            sx={{
+              mb: touched.nombre && errors.nombre ? 1 : 4,
+              bgcolor: "#F3F4F6",
+            }}
+          >
+            <InputLabel
+              error={touched.nombre && Boolean(errors.nombre)}
+              htmlFor="nombre"
+            >
+              Nombre
+            </InputLabel>
+            <OutlinedInput
+              id="nombre"
+              name="nombre"
+              value={values.nombre}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.nombre && Boolean(errors.nombre)}
+              label="Nombre"
+            />
+            {touched.nombre && errors.nombre && (
+              <FormHelperText
+                sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                error
+              >
+                {errors.nombre}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl
+            fullWidth
+            variant="outlined"
+            size="small"
+            sx={{
+              mb: touched.apellidos && errors.apellidos ? 1 : 4,
+              bgcolor: "#F3F4F6",
+            }}
+          >
+            <InputLabel
+              error={touched.apellidos && Boolean(errors.apellidos)}
+              htmlFor="apellidos"
+            >
+              Apellidos
+            </InputLabel>
+            <OutlinedInput
+              id="apellidos"
+              name="apellidos"
+              value={values.apellidos}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.apellidos && Boolean(errors.apellidos)}
+              label="Apellidos"
+            />
+            {touched.apellidos && errors.apellidos && (
+              <FormHelperText
+                sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                error
+              >
+                {errors.apellidos}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl
+            fullWidth
+            variant="outlined"
+            size="small"
+            sx={{
+              mb: touched.telefono && errors.telefono ? 1 : 4,
+              bgcolor: "#F3F4F6",
+            }}
+          >
+            <InputLabel
+              error={touched.telefono && Boolean(errors.telefono)}
+              htmlFor="telefono"
+            >
+              Telefono
+            </InputLabel>
+            <OutlinedInput
+              id="telefono"
+              name="telefono"
+              type="tel"
+              value={values.telefono}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.telefono && Boolean(errors.telefono)}
+              label="Telefono"
+            />
+            {touched.telefono && errors.telefono && (
+              <FormHelperText
+                sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                error
+              >
+                {errors.telefono}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl
+            fullWidth
+            variant="outlined"
+            size="small"
+            sx={{
+              mb: touched.email && errors.email ? 1 : 4,
+              bgcolor: "#F3F4F6",
+            }}
+          >
+            <InputLabel
+              error={touched.email && Boolean(errors.email)}
+              htmlFor="email"
+            >
+              Correo electronico
+            </InputLabel>
+            <OutlinedInput
+              id="email"
+              name="email"
+              type="email"
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.email && Boolean(errors.email)}
+              label="Correo electronico"
+            />
+            {touched.email && errors.email && (
+              <FormHelperText
+                sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                error
+              >
+                {errors.email}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl
+            sx={{
+              mb: touched.password && errors.password ? -0.9 : 4,
+              bgcolor: "#F3F4F6",
+            }}
             variant="outlined"
           >
             <InputLabel

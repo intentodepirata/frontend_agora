@@ -9,6 +9,7 @@ import { customLocaleText } from "../../traductions/customGridLocaleText";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
+import { enqueueSnackbar } from "notistack";
 
 export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
@@ -21,7 +22,6 @@ export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
   };
 
   function handleEditar(id) {
-    console.log("editando", id[0]);
     navigate("/home/suppliers/edit/" + id[0]);
   }
 
@@ -33,7 +33,7 @@ export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
     if (confirmacion) {
       try {
         const response = await fetch(
-          import.meta.env.VITE_API_URL + "proveedores/" + id,
+          `${import.meta.env.VITE_API_URL}proveedores/${id}`,
           {
             method: "DELETE",
             headers: {
@@ -47,10 +47,12 @@ export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
           throw new Error("Error al eliminar el elemento");
         }
 
-        alert("Proveedor eliminado correctamente");
-        fetchProveedores(); // Obtener los datos actualizados
+        enqueueSnackbar("Proveedor eliminado correctamente", {
+          variant: "success",
+        });
+        fetchProveedores();
       } catch (error) {
-        alert(error.message);
+        console.error(error.message);
       }
     }
   }
