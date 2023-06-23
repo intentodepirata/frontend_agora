@@ -4,10 +4,12 @@ import { Link, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormProduct from "../components/FormProduct/FormProduct";
 import { useUserContext } from "../contexts/UserContext";
+import useScrollUp from "../hooks/useScrollUp";
 
 const ProductsEdit = () => {
   const [producto, setProducto] = useState({});
   const { id } = useParams();
+  useScrollUp();
 
   const { user } = useUserContext();
   useEffect(() => {

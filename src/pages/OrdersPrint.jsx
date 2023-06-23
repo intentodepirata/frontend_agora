@@ -3,12 +3,14 @@ import { Link, useParams } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import QRCode from "qrcode.react";
+import useScrollUp from "../hooks/useScrollUp";
 
 export default function OrdersPrint() {
   const [order, setOrder] = useState(null);
   const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
   const { id } = useParams();
+  useScrollUp();
 
   const operaciones = [
     {

@@ -1,7 +1,9 @@
 import { Box, Typography } from "@mui/material";
 import TablaServicios from "../components/TablaServicios/TablaServicios";
+import useScrollUp from "../hooks/useScrollUp";
 
 export default function Services() {
+  useScrollUp();
   const rows = [];
   return (
     <>

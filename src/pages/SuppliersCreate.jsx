@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormProduct from "../components/FormProduct/FormProduct";
 import FormProveedores from "../components/FormProveedores/FormProveedores";
+import useScrollUp from "../hooks/useScrollUp";
 
 const SuppliersCreate = () => {
+  useScrollUp();
   return (
     <Box
       component="section"

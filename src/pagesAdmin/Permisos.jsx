@@ -1,10 +1,11 @@
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
 import FormInvitar from "../components/FormInvitar/FormInvitar";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Permisos = () => {
   const { user } = useUserContext();
-
+  useScrollUp();
   return (
     <>
       <Box
@@ -12,10 +13,11 @@ const Permisos = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          p: 2,
+          py: 2,
+          my: 2,
         }}
       >
-        <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
+        <Typography component="h1" variant="h6" color="initial">
           Usuarios y permisos
         </Typography>
         <Button
@@ -26,12 +28,11 @@ const Permisos = () => {
           Guardar
         </Button>
       </Box>
-      <Typography textAlign={"center"} variant="h6" color="grey">
+      {/* <Typography textAlign={"center"} variant="h6" color="grey">
         Formulario de usuarios y permisos
-      </Typography>
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormInvitar />
-      </Box>
+      </Typography> */}
+
+      <FormInvitar />
     </>
   );
 };

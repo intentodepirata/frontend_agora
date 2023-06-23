@@ -8,12 +8,13 @@ import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormO
 import SearchCliente from "../components/SearchCliente/SearchCliente";
 import SearchImei from "../components/SearchImei/SearchImei";
 import OrderStatusBar from "../components/OrderStatusBar/OrderStatusBar";
+import useScrollUp from "../hooks/useScrollUp";
 const OrdersCreate = () => {
   const [cliente_id, setCliente_id] = useState(null);
   const [estado, setEstado] = useState(-1);
   const [dispositivo_id, setDispositivo_id] = useState(null);
   const [recepcionado, setRecepcionado] = useState(false);
-
+  useScrollUp();
   useEffect(() => {
     if (cliente_id) {
       setEstado((currentStatus) => currentStatus + 1);

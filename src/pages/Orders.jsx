@@ -3,11 +3,13 @@ import TablaOrders from "../components/TablaOrders/TablaOrders";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Orders = () => {
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
+  useScrollUp();
 
   useEffect(() => {
     const fetchOts = async () => {

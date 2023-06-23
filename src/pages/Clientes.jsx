@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { Link } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Clientes = () => {
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
-
+  useScrollUp();
   useEffect(() => {
     const fetchClientes = async () => {
       try {

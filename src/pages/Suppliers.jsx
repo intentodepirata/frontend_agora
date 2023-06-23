@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import TablaProveedores from "../components/TablaProveedores/TablaProveedores";
+import useScrollUp from "../hooks/useScrollUp";
 
 export default function Suppliers() {
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
+  useScrollUp();
 
   const fetchProveedores = async () => {
     try {

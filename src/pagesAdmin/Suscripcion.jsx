@@ -1,9 +1,11 @@
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
 import FormSuscripcion from "../components/FormSuscripcion/FormSuscripcion";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Suscripcion = () => {
   const { user } = useUserContext();
+  useScrollUp();
 
   return (
     <>
@@ -12,10 +14,11 @@ const Suscripcion = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          p: 2,
+          py: 2,
+          my: 2,
         }}
       >
-        <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
+        <Typography component="h1" variant="h6" color="initial">
           Mi suscripcion
         </Typography>
         <Button
@@ -26,12 +29,8 @@ const Suscripcion = () => {
           Guardar
         </Button>
       </Box>
-      <Typography textAlign={"center"} variant="h6" color="grey">
-        Formulario de gestion de suscripcion
-      </Typography>
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormSuscripcion />
-      </Box>
+
+      <FormSuscripcion />
     </>
   );
 };

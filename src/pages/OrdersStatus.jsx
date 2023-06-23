@@ -3,11 +3,13 @@ import { useParams } from "react-router-dom";
 import logo from "../assets/img/logo-trans.png";
 import { useEffect, useState } from "react";
 import Footer from "../components/Footer/Footer";
+import useScrollUp from "../hooks/useScrollUp";
 
 export default function OrdersStatus() {
   const [order, setOrder] = useState(null);
   const [cargando, setCargando] = useState(false);
   const { id } = useParams();
+  useScrollUp();
   useEffect(() => {
     const statusFetch = async () => {
       try {

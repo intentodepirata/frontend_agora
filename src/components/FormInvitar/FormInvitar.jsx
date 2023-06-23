@@ -23,11 +23,15 @@ export default function FormInvitar() {
   const [email, setEmail] = useState("");
   const [rol, setRol] = useState("seleccione");
   return (
-    <Paper elevation={4} sx={{ p: 4, width: "100%" }}>
+    <Paper
+      elevation={1}
+      sx={{ border: "1px solid #C4C4C4", mt: 2, width: "100%", p: 2 }}
+    >
       <Box
         display={"flex"}
         sx={{ p: 2 }}
         alignItems={"center"}
+        justifyContent={"space-between"}
         maxWidth={"800px"}
         margin={"0 auto"}
       >

@@ -4,11 +4,12 @@ import { Link, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useUserContext } from "../contexts/UserContext";
 import FormClientes from "../components/FormClientes/FormClientes";
+import useScrollUp from "../hooks/useScrollUp";
 
 const ClientesEdit = () => {
   const [cliente, setCliente] = useState({});
   const { id } = useParams();
-
+  useScrollUp();
   const { user } = useUserContext();
   useEffect(() => {
     const fetchCliente = async () => {

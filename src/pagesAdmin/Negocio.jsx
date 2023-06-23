@@ -1,10 +1,11 @@
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
 import FormNegocio from "../components/FormNegocio/FormNegocio";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Negocio = () => {
   const { user } = useUserContext();
-
+  useScrollUp();
   return (
     <>
       <Box
@@ -12,10 +13,11 @@ const Negocio = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          p: 2,
+          py: 2,
+          my: 2,
         }}
       >
-        <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
+        <Typography component="h1" variant="h6" color="initial">
           Mi negocio
         </Typography>
         <Button
@@ -26,12 +28,7 @@ const Negocio = () => {
           Guardar
         </Button>
       </Box>
-      <Typography textAlign={"center"} variant="h6" color="grey">
-        Formulario de negocio
-      </Typography>
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormNegocio />
-      </Box>
+      <FormNegocio />
     </>
   );
 };

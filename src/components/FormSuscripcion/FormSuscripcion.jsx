@@ -27,12 +27,10 @@ export default function FormSuscripcion() {
   }, []);
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <>
       <Paper
-        elevation={4}
-        sx={{
-          p: 2,
-        }}
+        elevation={1}
+        sx={{ border: "1px solid #C4C4C4", mt: 2, width: "100%" }}
       >
         <Box
           sx={{
@@ -88,10 +86,10 @@ export default function FormSuscripcion() {
             />
           </Box>
         </Box>
-        <Typography pl={2} component={Link} variant="body2" color="warning">
+        <Typography p={2} component={Link} variant="body2" color="warning">
           Cancelar suscripcion?
         </Typography>
       </Paper>
-    </Box>
+    </>
   );
 }

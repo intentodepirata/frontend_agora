@@ -4,6 +4,7 @@ import TablaHome from "../components/TablaHome/TablaHome";
 import MainWidget from "../components/MainWidget/MainWidget";
 import { useUserContext } from "../contexts/UserContext";
 import { enqueueSnackbar } from "notistack";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Home = () => {
   const [rows, setRows] = useState([]);
@@ -11,7 +12,7 @@ const Home = () => {
   const [opcionesFiltro, setOpcionesFiltro] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("");
   const [totalFacturado, setTotalFacturado] = useState(0);
-
+  useScrollUp();
   const { user } = useUserContext();
 
   useEffect(() => {

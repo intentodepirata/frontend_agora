@@ -15,6 +15,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useState } from "react";
+import useScrollUp from "../hooks/useScrollUp";
 const initialValues = { password: "" };
 const passwordRules = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
 const passwordSchema = yup.object().shape({
@@ -72,7 +73,7 @@ const Seguridad = () => {
       actions.setSubmitting(false);
     },
   });
-
+  useScrollUp();
   return (
     <>
       <Box
@@ -80,10 +81,11 @@ const Seguridad = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          p: 2,
+          py: 2,
+          my: 2,
         }}
       >
-        <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
+        <Typography component="h1" variant="h6" color="initial">
           Seguridad
         </Typography>
         <Button
@@ -97,69 +99,66 @@ const Seguridad = () => {
       <Typography textAlign={"center"} variant="h6" color="grey">
         Formulario para restablecer contraseña
       </Typography>
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <Box width={"100%"}>
-          <Box
-            sx={{
-              p: 3,
-              width: "100%",
-              borderRadius: "4px",
-              border: "1px solid #E0E0E0",
-            }}
+
+      <Box
+        sx={{
+          p: 3,
+          width: "100%",
+          borderRadius: "4px",
+          border: "1px solid #E0E0E0",
+        }}
+      >
+        <FormControl
+          sx={{
+            mb: touched.password && errors.password ? 1 : 2,
+            bgcolor: "#F3F4F6",
+          }}
+          variant="outlined"
+        >
+          <InputLabel
+            error={touched.password && Boolean(errors.password)}
+            size="small"
+            htmlFor="outlined-adornment-password"
           >
-            <FormControl
-              sx={{
-                mb: touched.password && errors.password ? 1 : 2,
-                bgcolor: "#F3F4F6",
-              }}
-              variant="outlined"
-            >
-              <InputLabel
-                error={touched.password && Boolean(errors.password)}
-                size="small"
-                htmlFor="outlined-adornment-password"
-              >
-                Nuevo Password
-              </InputLabel>
-              <OutlinedInput
-                name="password"
-                value={values.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                error={touched.password && Boolean(errors.password)}
-                size="small"
-                aria-describedby="my-helper-text"
-                id="outlined-adornment-password"
-                type={showPassword ? "text" : "password"}
-                endAdornment={
-                  <InputAdornment size="small" position="end">
-                    <IconButton
-                      size="small"
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? (
-                        <VisibilityOff size="small" />
-                      ) : (
-                        <Visibility size="small" />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                label="Nuevo Password"
-              />
-              <FormHelperText
-                sx={{ backgroundColor: "white", px: 1, mx: 0 }}
-                error={touched.password && Boolean(errors.password)}
-                id="my-helper-text"
-              >
-                {touched.password && errors.password}
-              </FormHelperText>
-            </FormControl>
-          </Box>
-        </Box>
+            Nuevo Password
+          </InputLabel>
+          <OutlinedInput
+            name="password"
+            value={values.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.password && Boolean(errors.password)}
+            size="small"
+            aria-describedby="my-helper-text"
+            id="outlined-adornment-password"
+            type={showPassword ? "text" : "password"}
+            endAdornment={
+              <InputAdornment size="small" position="end">
+                <IconButton
+                  size="small"
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? (
+                    <VisibilityOff size="small" />
+                  ) : (
+                    <Visibility size="small" />
+                  )}
+                </IconButton>
+              </InputAdornment>
+            }
+            label="Nuevo Password"
+          />
+          <FormHelperText
+            sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+            error={touched.password && Boolean(errors.password)}
+            id="my-helper-text"
+          >
+            {touched.password && errors.password}
+          </FormHelperText>
+        </FormControl>
       </Box>
     </>
   );

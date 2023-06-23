@@ -10,8 +10,10 @@ import {
 import { useUserContext } from "../contexts/UserContext";
 import FormPlantillas from "../components/FormPlantillas/FormPlantillas";
 import TablaChecklist from "../components/TablaChecklist/TablaChecklist";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Plantillas = () => {
+  useScrollUp();
   const { user } = useUserContext();
 
   return (
@@ -21,10 +23,11 @@ const Plantillas = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          p: 2,
+          my: 2,
+          py: 2,
         }}
       >
-        <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
+        <Typography component="h1" variant="h6" color="initial">
           Politicas y plantillas
         </Typography>
         <Button
@@ -36,29 +39,24 @@ const Plantillas = () => {
         </Button>
       </Box>
 
-      <Typography textAlign={"center"} variant="h6" color="grey">
-        Formulario de politicas y plantillas
-      </Typography>
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormPlantillas />
-      </Box>
-      <Box
+      <FormPlantillas />
+
+      {/* <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           p: 2,
-          mt: 3,
+          mt: 2,
         }}
-      >
-        <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
-          Checklist de revision
-        </Typography>
-      </Box>
+      > */}
+      <Typography mt={2} component="h1" variant="h6" color="initial">
+        Checklist de revision
+      </Typography>
+      {/* </Box> */}
       <Typography textAlign={"center"} variant="h6" color="grey"></Typography>
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <TablaChecklist />
-      </Box>
+
+      <TablaChecklist />
     </>
   );
 };

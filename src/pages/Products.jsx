@@ -5,6 +5,7 @@ import { useUserContext } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
 import TablaCarrito from "../components/TablaCarrito/TablaCarrito";
 import { enqueueSnackbar } from "notistack";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Products = () => {
   const [rows, setRows] = useState([]);
@@ -12,7 +13,7 @@ const Products = () => {
   const [rowsCarrito, setRowsCarrito] = useState(
     JSON.parse(localStorage.getItem("carritoAgora")) || []
   );
-
+  useScrollUp();
   const { user } = useUserContext();
 
   useEffect(() => {

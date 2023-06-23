@@ -1,8 +1,10 @@
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
+import useScrollUp from "../hooks/useScrollUp";
 
 const Centros = () => {
   const { user } = useUserContext();
+  useScrollUp();
 
   return (
     <>
@@ -11,10 +13,11 @@ const Centros = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          p: 2,
+          py: 2,
+          my: 2,
         }}
       >
-        <Typography component="h1" variant="h6" color="initial" sx={{ p: 2 }}>
+        <Typography component="h1" variant="h6" color="initial">
           Centros de trabajo
         </Typography>
         <Button

@@ -3,8 +3,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormClientes from "../components/FormClientes/FormClientes";
+import useScrollUp from "../hooks/useScrollUp";
 
 const ClientsCreate = () => {
+  useScrollUp();
   return (
     <Box
       component="section"

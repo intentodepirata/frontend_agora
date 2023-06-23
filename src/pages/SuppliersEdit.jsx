@@ -5,10 +5,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { useUserContext } from "../contexts/UserContext";
 import FormProveedores from "../components/FormProveedores/FormProveedores";
+import useScrollUp from "../hooks/useScrollUp";
 
 const SuppliersEdit = () => {
   const [proveedor, setProveedor] = useState({});
   const { id } = useParams();
+  useScrollUp();
 
   const { user } = useUserContext();
   useEffect(() => {

@@ -25,7 +25,7 @@ const AdminLayout = () => {
           mt: "64px",
         }}
       >
-        <Box sx={{ maxWidth: "1200px", margin: "0 auto" }}>
+        <Box sx={{ maxWidth: "1200px", margin: "0 auto", p: 2 }}>
           <Outlet />
         </Box>
       </Box>

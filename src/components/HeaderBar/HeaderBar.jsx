@@ -10,8 +10,9 @@ import Menu from "@mui/material/Menu";
 import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-
-import { InputAdornment, TextField } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { InputAdornment, ListItemIcon, TextField } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext";
@@ -119,13 +120,23 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
               vertical: "top",
               horizontal: "right",
             }}
+            sx={{ mt: 5, ml: 2 }}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
             <MenuItem onClick={() => navigate("/admin")}>
+              <ListItemIcon>
+                <SettingsIcon fontSize="small" />
+              </ListItemIcon>
               Administrar mi taller
             </MenuItem>
-            <MenuItem onClick={handleLogout}>Cerrar sesion</MenuItem>
+
+            <MenuItem onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              Cerrar sesion
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>

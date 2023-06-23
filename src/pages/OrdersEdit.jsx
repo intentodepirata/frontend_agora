@@ -4,10 +4,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
 import { Link, useParams } from "react-router-dom";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
+import useScrollUp from "../hooks/useScrollUp";
 const OrdersEdit = () => {
   const [fetchData, setFetchData] = useState(false);
   const { id } = useParams();
-
+  useScrollUp();
   const handleButtonClick = () => {
     setFetchData(true);
   };

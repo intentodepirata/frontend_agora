@@ -7,7 +7,9 @@ import TablaTop5 from "../components/TablaTop5/TablaTop5";
 import { rows, rows2 } from "../components/TablaTop5/utils/columnas";
 import { GridToolbar } from "@mui/x-data-grid";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import useScrollUp from "../hooks/useScrollUp";
 export default function Stats() {
+  useScrollUp();
   return (
     <>
       <Box
