@@ -88,7 +88,7 @@ export default function FormInvitar() {
           width={"300px"}
           height={"300px"}
           component={"img"}
-          src={`/public/img/${rol}.png`}
+          src={`/img/${rol}.png`}
           alt="Rol"
         />
       </Box>

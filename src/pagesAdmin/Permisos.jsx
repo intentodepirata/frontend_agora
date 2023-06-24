@@ -28,9 +28,6 @@ const Permisos = () => {
           Guardar
         </Button>
       </Box>
-      {/* <Typography textAlign={"center"} variant="h6" color="grey">
-        Formulario de usuarios y permisos
-      </Typography> */}
 
       <FormInvitar />
     </>

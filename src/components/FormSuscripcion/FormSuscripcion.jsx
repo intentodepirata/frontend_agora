@@ -9,9 +9,18 @@ import {
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import SuscripcionModal from "../SuscripcionModal/SuscripcionModal";
 
 export default function FormSuscripcion() {
   const [fecha, setFecha] = useState("");
+  const [modalAbierto, setModalAbierto] = useState(false);
+
+  const abrirModalSuscripcion = () => {
+    setModalAbierto(true);
+  };
+  const closeModal = () => {
+    setModalAbierto(false);
+  };
   useEffect(() => {
     const obtenerFechaDelServidor = () => {
       const fechaServidor = new Date(); // Reemplaza esta línea con la lógica real de obtención de la fecha del servidor
@@ -52,9 +61,9 @@ export default function FormSuscripcion() {
               variant="outlined"
               color="primary"
               size="medium"
+              onClick={abrirModalSuscripcion}
               sx={{
                 mr: 2,
-
                 p: 0.8,
               }}
             >
@@ -90,6 +99,8 @@ export default function FormSuscripcion() {
           Cancelar suscripcion?
         </Typography>
       </Paper>
+
+      <SuscripcionModal modalAbierto={modalAbierto} closeModal={closeModal} />
     </>
   );
 }

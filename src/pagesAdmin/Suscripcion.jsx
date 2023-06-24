@@ -5,6 +5,7 @@ import useScrollUp from "../hooks/useScrollUp";
 
 const Suscripcion = () => {
   const { user } = useUserContext();
+
   useScrollUp();
 
   return (
@@ -21,13 +22,6 @@ const Suscripcion = () => {
         <Typography component="h1" variant="h6" color="initial">
           Mi suscripcion
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
-        >
-          Guardar
-        </Button>
       </Box>
 
       <FormSuscripcion />
