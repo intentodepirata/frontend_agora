@@ -27,6 +27,7 @@ const style = {
   bgcolor: "background.paper",
   borderRadius: 1,
   boxShadow: 24,
+  border: " 1px solid grey",
   py: 4,
   px: 2,
 };

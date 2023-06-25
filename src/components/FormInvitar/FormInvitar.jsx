@@ -2,40 +2,120 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
   InputLabel,
   List,
   ListItemText,
   MenuItem,
+  OutlinedInput,
   Paper,
   Select,
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useFormik } from "formik";
+import { initialValues } from "./utils/initialValues";
 
+import { FormInvitarSchema } from "./FormInvitarSchema";
+import { useUserContext } from "../../contexts/UserContext";
+import { enqueueSnackbar } from "notistack";
 const users = [
-  { id: 1, name: "Antonio Alvarez", role: "propietario" },
-  { id: 2, name: "Jane Smith", role: "tecnico" },
-  { id: 3, name: "Mike Johnson", role: "recepcionista" },
+  { id: 1, nombre: "Antonio ", apellidos: "Alvarez", role: "propietario" },
+  { id: 2, name: "Jane ", apellidos: "Smith", role: "tecnico" },
+  { id: 3, name: "Mike ", apellidos: "Johnson", role: "recepcionista" },
 ];
 
 export default function FormInvitar() {
-  const [email, setEmail] = useState("");
-  const [rol, setRol] = useState("seleccione");
+  const [showPassword, setShowPassword] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const { user } = useUserContext();
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  const {
+    isSubmitting,
+    values,
+    touched,
+    errors,
+    handleChange,
+    handleSubmit,
+    handleBlur,
+  } = useFormik({
+    initialValues,
+    validationSchema: FormInvitarSchema,
+    onSubmit: async function (values, actions) {
+      try {
+        actions.setSubmitting(true);
+        const invitado = {
+          ...values,
+          superior_id: user.id,
+        };
+        console.log(invitado);
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}user/register`,
+          {
+            method: "POST",
+            body: JSON.stringify(invitado),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        const data = await response.json();
+        if (!response.ok) {
+          enqueueSnackbar(data.error, { variant: "error" });
+          actions.resetForm();
+          actions.setSubmitting(false);
+          throw new Error(data.error);
+        }
+
+        enqueueSnackbar(
+          "Invitacion enviada correctamente, se ha enviado un email para confirmar la cuenta",
+          { variant: "success", persist: true }
+        );
+        actions.resetForm();
+        actions.setSubmitting(false);
+        getEmployees();
+      } catch (error) {
+        console.error(error.message);
+      }
+    },
+  });
+  const getEmployees = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}user/employees/${user.id}`
+      );
+      const data = await response.json();
+
+      setEmployees(data);
+      setEmployees((values) => {
+        return [...values, user];
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+  useEffect(() => {
+    getEmployees();
+  }, []);
+  console.log(employees);
   return (
     <Paper
       elevation={1}
       sx={{ border: "1px solid #C4C4C4", mt: 2, width: "100%", p: 2 }}
     >
-      <Box
-        display={"flex"}
-        sx={{ p: 2 }}
-        alignItems={"center"}
-        justifyContent={"space-between"}
-        maxWidth={"800px"}
-        margin={"0 auto"}
-      >
+      <Box display={"flex"} sx={{ p: 2 }} alignItems={"center"}>
         <Box
+          onSubmit={handleSubmit}
+          component="form"
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -47,17 +127,166 @@ export default function FormInvitar() {
             Invita a tu equipo
           </Typography>
           <Typography variant="subtitle1" color="grey" mb={2}>
-            Envia una invitación a los todos los miembros de tu equipo
+            Envia una invitación a los miembros de tu equipo
           </Typography>
-          <Box sx={{ display: "flex" }} mb={2}>
-            <TextField
+          <Box sx={{ display: "flex" }}>
+            <FormControl
               fullWidth
-              id="email"
-              label="Email de contacto"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              variant="outlined"
               size="small"
-            />
+              sx={{
+                mb: touched.nombre && errors.nombre ? 1 : 2,
+
+                width: "50%",
+                mr: 2,
+              }}
+            >
+              <InputLabel
+                error={touched.nombre && Boolean(errors.nombre)}
+                htmlFor="nombre"
+              >
+                Nombre
+              </InputLabel>
+              <OutlinedInput
+                id="nombre"
+                name="nombre"
+                value={values.nombre}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.nombre && Boolean(errors.nombre)}
+                label="Nombre"
+              />
+              {touched.nombre && errors.nombre && (
+                <FormHelperText
+                  sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                  error
+                >
+                  {errors.nombre}
+                </FormHelperText>
+              )}
+            </FormControl>
+
+            <FormControl
+              variant="outlined"
+              size="small"
+              sx={{
+                mb: touched.apellidos && errors.apellidos ? 1 : 2,
+
+                width: "50%",
+              }}
+            >
+              <InputLabel
+                error={touched.apellidos && Boolean(errors.apellidos)}
+                htmlFor="apellidos"
+              >
+                Apellidos
+              </InputLabel>
+              <OutlinedInput
+                id="apellidos"
+                name="apellidos"
+                value={values.apellidos}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.apellidos && Boolean(errors.apellidos)}
+                label="Apellidos"
+              />
+              {touched.apellidos && errors.apellidos && (
+                <FormHelperText
+                  sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                  error
+                >
+                  {errors.apellidos}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Box>
+          <Box sx={{ display: "flex" }}>
+            <FormControl
+              variant="outlined"
+              size="small"
+              sx={{
+                mb: touched.email && errors.email ? 1 : 2,
+                width: "50%",
+                mr: 2,
+              }}
+            >
+              <InputLabel
+                error={touched.email && Boolean(errors.email)}
+                htmlFor="email"
+              >
+                Correo electronico
+              </InputLabel>
+              <OutlinedInput
+                id="email"
+                name="email"
+                type="email"
+                value={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.email && Boolean(errors.email)}
+                label="Correo electronico"
+              />
+              {touched.email && errors.email && (
+                <FormHelperText
+                  sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                  error
+                >
+                  {errors.email}
+                </FormHelperText>
+              )}
+            </FormControl>
+
+            <FormControl
+              sx={{
+                mb: touched.password && errors.password ? 1 : 2,
+                width: "50%",
+              }}
+              variant="outlined"
+            >
+              <InputLabel
+                error={touched.password && Boolean(errors.password)}
+                size="small"
+                htmlFor="outlined-adornment-password"
+              >
+                Password
+              </InputLabel>
+              <OutlinedInput
+                name="password"
+                value={values.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.password && Boolean(errors.password)}
+                size="small"
+                aria-describedby="my-helper-text"
+                id="outlined-adornment-password"
+                type={showPassword ? "text" : "password"}
+                endAdornment={
+                  <InputAdornment size="small" position="end">
+                    <IconButton
+                      size="small"
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {showPassword ? (
+                        <VisibilityOff size="small" />
+                      ) : (
+                        <Visibility size="small" />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                }
+                label="Password"
+              />
+              <FormHelperText
+                sx={{ backgroundColor: "white", px: 1, mx: 0 }}
+                error={touched.password && Boolean(errors.password)}
+                id="my-helper-text"
+              >
+                {touched.password && errors.password}
+              </FormHelperText>
+            </FormControl>
           </Box>
           <FormControl fullWidth size="small" sx={{ mb: 2 }}>
             <InputLabel id="rol-label">Seleccionar Rol</InputLabel>
@@ -65,16 +294,20 @@ export default function FormInvitar() {
               fullWidth
               labelId="rol-label"
               id="rol"
-              value={rol}
-              onChange={(e) => setRol(e.target.value)}
+              name="role"
+              value={values.role}
+              onChange={handleChange}
+              onBlur={handleBlur}
               label="Seleccionar Rol"
             >
-              <MenuItem value="seleccione">Seleccionar rol</MenuItem>
-              <MenuItem value="tecnico">Técnico</MenuItem>
-              <MenuItem value="recepcionista">Recepcionista</MenuItem>
+              <MenuItem value="1">Seleccionar rol</MenuItem>
+              <MenuItem value="2">Técnico</MenuItem>
+              <MenuItem value="3">Recepcionista</MenuItem>
             </Select>
           </FormControl>
           <Button
+            disabled={isSubmitting}
+            type="submit"
             variant="contained"
             color="primary"
             sx={{ textTransform: "none", fontSize: "16px" }}
@@ -88,23 +321,74 @@ export default function FormInvitar() {
           width={"300px"}
           height={"300px"}
           component={"img"}
-          src={`/img/${rol}.png`}
+          src={`/img/${values.role}.png`}
+          mx={"auto"}
           alt="Rol"
         />
       </Box>
 
-      <Box sx={{ p: 2 }} maxWidth={"800px"} margin={"0 auto"}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="h6" color="primary" mb={2} fontWeight={"bold"}>
           Listado de usuarios
         </Typography>
 
-        <Box sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
-          {users.map((user) => (
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            border: "1px solid grey",
+            p: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography
+              variant="h6"
+              color="initial"
+              mb={1}
+              sx={{ width: "100%", p: 1 }}
+            >
+              Nombre
+            </Typography>
+            <Typography
+              variant="h6"
+              color="initial"
+              mb={1}
+              sx={{ width: "100%", p: 1 }}
+            >
+              Correo
+            </Typography>
+            <Typography
+              variant="h6"
+              color="initial"
+              mb={1}
+              sx={{ width: "100%", p: 1 }}
+            >
+              Confirmado
+            </Typography>
+            <Typography
+              variant="h6"
+              color="initial"
+              mb={1}
+              sx={{ width: "100%", p: 1 }}
+            >
+              Rol
+            </Typography>
+          </Box>
+          {employees.map((user) => (
             <Box
               sx={{ display: "flex", justifyContent: "space-between" }}
-              key={user.id}
+              key={user.nombre}
             >
-              <ListItemText sx={{ width: "100%" }}>{user.name}</ListItemText>
+              <ListItemText sx={{ width: "100%", p: 1 }}>
+                {user.nombre}
+              </ListItemText>
+              <ListItemText sx={{ width: "100%", p: 1 }}>
+                {user.email}
+              </ListItemText>
+              <ListItemText sx={{ width: "100%", p: 1 }}>
+                {user.confirmado == 1 ? "Si" : "No"}
+              </ListItemText>
               <FormControl sx={{ mb: 2, width: "100%" }}>
                 <InputLabel size="small" id={`rol-label-${user.id}`}>
                   Rol
@@ -114,13 +398,13 @@ export default function FormInvitar() {
                   id={`rol-${user.id}`}
                   value={user.role}
                   size="small"
-                  disabled={user.role === "propietario"} // Desactivar el Select para el propietario
+                  disabled={user.role == "1"} // Desactivar el Select para el propietario
                   label="Rol"
-                  sx={{ width: "100%" }} // Ajustar el ancho del Select según sea necesario
+                  sx={{ width: "100%" }}
                 >
-                  <MenuItem value="propietario">Propietario</MenuItem>
-                  <MenuItem value="tecnico">Técnico</MenuItem>
-                  <MenuItem value="recepcionista">Recepcionista</MenuItem>
+                  <MenuItem value="1">Propietario</MenuItem>
+                  <MenuItem value="2">Técnico</MenuItem>
+                  <MenuItem value="3">Recepcionista</MenuItem>
                 </Select>
               </FormControl>
             </Box>

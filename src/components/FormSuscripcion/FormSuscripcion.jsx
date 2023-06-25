@@ -10,11 +10,12 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SuscripcionModal from "../SuscripcionModal/SuscripcionModal";
+import { useUserContext } from "../../contexts/UserContext";
 
 export default function FormSuscripcion() {
   const [fecha, setFecha] = useState("");
   const [modalAbierto, setModalAbierto] = useState(false);
-
+  const { user } = useUserContext();
   const abrirModalSuscripcion = () => {
     setModalAbierto(true);
   };
@@ -22,14 +23,24 @@ export default function FormSuscripcion() {
     setModalAbierto(false);
   };
   useEffect(() => {
-    const obtenerFechaDelServidor = () => {
-      const fechaServidor = new Date(); // Reemplaza esta línea con la lógica real de obtención de la fecha del servidor
-      const fechaUnMesDespues = new Date(
-        fechaServidor.getFullYear(),
-        fechaServidor.getMonth() + 1,
-        fechaServidor.getDate()
-      );
-      setFecha(fechaUnMesDespues.toISOString().split("T")[0]);
+    const obtenerFechaDelServidor = async () => {
+      try {
+        const url = `${import.meta.env.VITE_API_URL}user/fecha/${user.id}`;
+        const response = await fetch(url, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + user.token,
+          },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error("Error al obtener la fecha");
+        }
+
+        setFecha(data);
+      } catch (error) {
+        console.error(error.message);
+      }
     };
 
     obtenerFechaDelServidor();
@@ -83,7 +94,7 @@ export default function FormSuscripcion() {
               disabled={true}
               type="date"
               value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
+              // onChange={(e) => setFecha(e.target.value)}
               sx={{ mr: 2, width: "50%", bgcolor: "grey.100" }}
               InputProps={{
                 startAdornment: (
