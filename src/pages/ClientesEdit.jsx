@@ -7,7 +7,7 @@ import FormClientes from "../components/FormClientes/FormClientes";
 import useScrollUp from "../hooks/useScrollUp";
 
 const ClientesEdit = () => {
-  const [cliente, setCliente] = useState({});
+  const [cliente, setCliente] = useState(null);
   const { id } = useParams();
   useScrollUp();
   const { user } = useUserContext();

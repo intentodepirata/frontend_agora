@@ -7,7 +7,7 @@ import { useUserContext } from "../contexts/UserContext";
 import useScrollUp from "../hooks/useScrollUp";
 
 const ProductsEdit = () => {
-  const [producto, setProducto] = useState({});
+  const [producto, setProducto] = useState(null);
   const { id } = useParams();
   useScrollUp();
 

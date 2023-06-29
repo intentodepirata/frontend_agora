@@ -92,9 +92,10 @@ const Plantillas = () => {
         </Button>
       </Box>
 
-      <Box
+      <Paper
+        elevation={1}
         sx={{
-          p: 3,
+          p: 6,
           width: "100%",
           borderRadius: "4px",
           border: "1px solid #E0E0E0",
@@ -115,7 +116,7 @@ const Plantillas = () => {
           // rows={20}
           variant="filled"
         />
-      </Box>
+      </Paper>
 
       <Typography mt={2} component="h1" variant="h6" color="initial">
         Checklist de revision

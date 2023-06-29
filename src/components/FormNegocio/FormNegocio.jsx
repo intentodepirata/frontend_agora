@@ -32,7 +32,7 @@ export default function FormNegocio({
       <Paper elevation={1} sx={{ border: "1px solid #C4C4C4" }}>
         <Box
           sx={{
-            p: 2,
+            p: 4,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
@@ -89,7 +89,7 @@ export default function FormNegocio({
           />
         </Box>
       </Paper>
-      <Paper elevation={1} sx={{ border: "1px solid #C4C4C4", mt: 4, p: 2 }}>
+      <Paper elevation={1} sx={{ border: "1px solid #C4C4C4", mt: 4, p: 4 }}>
         <Typography variant="body1" color="initial" mb={2}>
           Logo:
         </Typography>

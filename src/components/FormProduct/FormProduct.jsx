@@ -179,12 +179,9 @@ const FormProduct = ({ producto }) => {
             mt: 2,
           }}
         >
-          <InputLabel htmlFor="marca" id="marca_label">
-            Marca del dispositivo
-          </InputLabel>
+          <InputLabel>Marca del dispositivo</InputLabel>
           <Select
             id="marca"
-            labelId="marca_label"
             name="marca"
             label="Marca del dispositivo"
             value={getSelectedValue(marcas, values.marca, "id")}
@@ -212,13 +209,10 @@ const FormProduct = ({ producto }) => {
             width: "100%",
           }}
         >
-          <InputLabel htmlFor="modelos_id" id="modelos_id_label">
-            Modelo del dispositivo
-          </InputLabel>
+          <InputLabel>Modelo del dispositivo</InputLabel>
           <Select
             id="modelos_id"
             label="Modelo del dispositivo"
-            labelId="modelos_id_label"
             name="modelos_id"
             value={getSelectedValue(modelos, values.modelos_id, "id")}
             onChange={handleChange}
@@ -244,7 +238,7 @@ const FormProduct = ({ producto }) => {
           label="Cantidad"
           type="number"
           InputLabelProps={{
-            shrink: producto?.cantidad && true,
+            shrink: producto?.precio && true,
           }}
           value={values.cantidad}
           onChange={handleChange}

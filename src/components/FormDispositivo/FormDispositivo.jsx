@@ -154,9 +154,9 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           error={touched.marca && Boolean(errors.marca)}
           sx={{ mr: 2, width: "33%" }}
         >
-          <InputLabel htmlFor="marca">Marca del dispositivo</InputLabel>
+          <InputLabel>Marca del dispositivo</InputLabel>
           <Select
-            labelId="marca"
+            id="marca"
             name="marca"
             label="Marca del dispositivo"
             value={values.marca}
@@ -181,12 +181,10 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           error={touched.modelos_id && Boolean(errors.modelos_id)}
           sx={{ width: "33%" }}
         >
-          <InputLabel htmlFor="modelos_id" id="modelos_id">
-            Modelo del dispositivo
-          </InputLabel>
+          <InputLabel>Modelo del dispositivo</InputLabel>
           <Select
             label="Modelo del dispositivo"
-            labelId="modelos_id"
+            id="modelos_id"
             name="modelos_id"
             value={values.modelos_id}
             onChange={handleChange}
@@ -247,7 +245,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
         <TextField
           sx={{ width: "25%", mr: 2 }}
           id="fechaCompra"
-          labelId="fechaCompra_label"
+          // labelId="fechaCompra_label"
           size="small"
           label="Fecha de compra"
           name="fechaCompra"

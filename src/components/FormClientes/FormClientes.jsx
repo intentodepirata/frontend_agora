@@ -123,6 +123,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
           <TextField
             size="small"
             name="email"
+            autoComplete="email"
             label="Correo electronico"
             InputLabelProps={{ shrink: cliente?.email && true }}
             disabled={guardado}

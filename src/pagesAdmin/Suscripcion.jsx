@@ -16,7 +16,8 @@ const Suscripcion = () => {
           alignItems: "center",
           justifyContent: "space-between",
           py: 2,
-          my: 2,
+          mt: 2,
+          mb: 3,
         }}
       >
         <Typography component="h1" variant="h6" color="initial">

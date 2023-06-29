@@ -54,7 +54,7 @@ export default function FormSuscripcion() {
       >
         <Box
           sx={{
-            p: 2,
+            p: 4,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",

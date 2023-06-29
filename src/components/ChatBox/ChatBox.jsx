@@ -20,18 +20,51 @@ import {
 
 import { enqueueSnackbar } from "notistack";
 import { shakeAnimation } from "./utils/shakeAnimation";
+import { useUserContext } from "../../contexts/UserContext";
 const ChatBox = () => {
   const [openModal, setOpenModal] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [shake, setShake] = useState(false);
+  const [emailInvitado, setEmailInvitado] = useState("");
   const horaActual = new Date().getHours();
   const onlineTime = horaActual >= 10 && horaActual <= 18;
-
-  const handleModal = () => {
+  const { user } = useUserContext();
+  const handleModal = async () => {
     if (openModal && mensaje !== "") {
-      setMensaje("");
-      enqueueSnackbar("Mensaje enviado correctamente", { variant: "success" });
+      const url = `${import.meta.env.VITE_API_URL}mensajes`;
+
+      if (emailInvitado === "" && !user) {
+        enqueueSnackbar("Escribe tu email", { variant: "error" });
+        setOpenModal((value) => !value);
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            mensaje,
+            email: user ? user.email : emailInvitado,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          enqueueSnackbar("Error al enviar el mensaje", { variant: "error" });
+          throw new Error(data.message);
+        }
+
+        setMensaje("");
+        setEmailInvitado("");
+        enqueueSnackbar("Mensaje enviado correctamente", {
+          variant: "success",
+        });
+      } catch (error) {
+        console.error(error.message);
+      }
     }
     setShake(true);
     setOpenModal((value) => !value);
@@ -134,6 +167,7 @@ const ChatBox = () => {
                   justifyContent: "space-between",
                   alignItems: "center",
                   px: 2,
+                  mb: 2,
                 }}
               >
                 <Typography variant="h3" color={"white"}>
@@ -175,7 +209,7 @@ const ChatBox = () => {
                 <Typography color={"white"} component={"p"} fontSize={"1.1rem"}>
                   Bienvenido a Agora ¿Como podemos ayudarte? 🥸
                 </Typography>
-                <Avatar sx={{ width: 80, height: 80 }} />
+                <Avatar sx={{ width: 70, height: 70 }} />
               </Box>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", pr: 2 }}>
@@ -201,6 +235,15 @@ const ChatBox = () => {
                 value={mensaje}
                 onChange={(e) => setMensaje(e.target.value)}
               />
+              {!user && (
+                <Input
+                  sx={{ mt: 2 }}
+                  id="emailInvitado"
+                  placeholder="Introduce tu email"
+                  value={emailInvitado}
+                  onChange={(e) => setEmailInvitado(e.target.value)}
+                />
+              )}
             </Box>
           </Box>
         </Fade>

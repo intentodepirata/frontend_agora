@@ -166,7 +166,7 @@ export default function FormInvitar() {
       elevation={1}
       sx={{ border: "1px solid #C4C4C4", mt: 2, width: "100%", p: 2 }}
     >
-      <Box display={"flex"} sx={{ p: 2 }} alignItems={"center"}>
+      <Box display={"flex"} sx={{ p: 4 }} alignItems={"center"}>
         <Box
           onSubmit={handleSubmit}
           component="form"
@@ -381,7 +381,7 @@ export default function FormInvitar() {
         />
       </Box>
 
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 4 }}>
         <Typography variant="h6" color="primary" mb={2} fontWeight={"bold"}>
           Listado de usuarios
         </Typography>
