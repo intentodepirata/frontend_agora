@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
 import CustomNoRowsOverlay from "../CustomNoRowsOverlay/CustomNoRowsOverlay";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 
 const TablaReparacion = ({
   ots_id,
@@ -122,7 +123,10 @@ const TablaReparacion = ({
         setOperacion("");
         setComponentes_id("");
         setTiempo("");
-        alert("Datos Guardados Correctamente", data);
+        enqueueSnackbar("Operacion agregada correctamente", {
+          variant: "success",
+        });
+
         setActualizarTabla(true);
       } else {
         console.error("Error al guardar operacion:", response.status);
@@ -151,32 +155,59 @@ const TablaReparacion = ({
   function handleEditar(id) {
     console.log("editando", id[0]);
   }
-  function handleEliminar(id) {
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que quieres eliminar este elemento?"
-    );
 
-    if (confirmacion) {
-      fetch(`${import.meta.env.VITE_API_URL}operacion/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error al eliminar el elemento");
-          }
+  const handleDeleteOperaciones = (id) => {
+    enqueueSnackbar("Desear eliminar la operacion?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => handleConfirmar(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
+  const handleConfirmar = ([id], snackbarId) => {
+    console.log("confirmado" + id);
+    fetch(`${import.meta.env.VITE_API_URL}operacion/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error al eliminar el elemento");
+        }
 
-          alert("Eliminado correctamente");
-          setActualizarTabla(true); // Obtener los datos actualizados
-        })
-        .catch((error) => {
-          alert(error.message);
+        enqueueSnackbar("Operacion eliminada correctamente", {
+          variant: "success",
         });
-    }
-  }
+        setActualizarTabla(true); // Obtener los datos actualizados
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+    closeSnackbar(snackbarId);
+  };
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -291,7 +322,7 @@ const TablaReparacion = ({
 
       <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
         <Button
-          onClick={() => handleEliminar(selectionModel)}
+          onClick={() => handleDeleteOperaciones(selectionModel)}
           color="error"
           variant="contained"
           startIcon={<DeleteIcon />}

@@ -136,7 +136,10 @@ export default function ListBar({ showDrawer }) {
         </ListItemButton>
         <ListItemButton
           selected={selectedIndex === 7}
-          onClick={(event) => handleListItemClick(event, 7)}
+          onClick={(event) => {
+            handleListItemClick(event, 7);
+            navigate("/admin/permisos");
+          }}
           sx={{ bottom: "1rem", position: " fixed" }}
         >
           <ListItemIcon>

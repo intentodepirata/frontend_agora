@@ -12,6 +12,7 @@ import {
   OutlinedInput,
   Paper,
   Select,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
@@ -19,22 +20,17 @@ import { useEffect, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import { FormInvitarSchema } from "./FormInvitarSchema";
 import { useUserContext } from "../../contexts/UserContext";
-import { enqueueSnackbar } from "notistack";
-const users = [
-  { id: 1, nombre: "Antonio ", apellidos: "Alvarez", role: "propietario" },
-  { id: 2, name: "Jane ", apellidos: "Smith", role: "tecnico" },
-  { id: 3, name: "Mike ", apellidos: "Johnson", role: "recepcionista" },
-];
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 
 export default function FormInvitar() {
   const [showPassword, setShowPassword] = useState(false);
   const [employees, setEmployees] = useState([]);
+  const { user } = useUserContext();
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const { user } = useUserContext();
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
@@ -57,7 +53,6 @@ export default function FormInvitar() {
           ...values,
           superior_id: user.id,
         };
-        console.log(invitado);
 
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}user/register`,
@@ -70,16 +65,15 @@ export default function FormInvitar() {
 
         const data = await response.json();
         if (!response.ok) {
-          enqueueSnackbar(data.error, { variant: "error" });
+          enqueueSnackbar("Error al enviar invitacion", { variant: "error" });
           actions.resetForm();
           actions.setSubmitting(false);
           throw new Error(data.error);
         }
 
-        enqueueSnackbar(
-          "Invitacion enviada correctamente, se ha enviado un email para confirmar la cuenta",
-          { variant: "success", persist: true }
-        );
+        enqueueSnackbar("Invitacion enviada correctamente", {
+          variant: "success",
+        });
         actions.resetForm();
         actions.setSubmitting(false);
         getEmployees();
@@ -93,8 +87,13 @@ export default function FormInvitar() {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}user/employees/${user.id}`
       );
-      const data = await response.json();
 
+      const data = await response.json();
+      if (!response.ok) {
+        console.error(data.error);
+        setEmployees([user]);
+        return;
+      }
       setEmployees(data);
       setEmployees((values) => {
         return [...values, user];
@@ -106,7 +105,62 @@ export default function FormInvitar() {
   useEffect(() => {
     getEmployees();
   }, []);
-  console.log(employees);
+  const handleConfirmar = (id, snackbarId) => {
+    console.log("confirmado" + id);
+    fetchDeleteEmployee(id);
+    closeSnackbar(snackbarId);
+  };
+
+  const fetchDeleteEmployee = async (id) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}user/employees/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        enqueueSnackbar(data.error, { variant: "error" });
+        return;
+      }
+      enqueueSnackbar("El empleado ha sido eliminado", { variant: "success" });
+      getEmployees();
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const handleDeleteEmployee = (id) => {
+    enqueueSnackbar("Desear eliminar al empleado?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => handleConfirmar(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
+
   return (
     <Paper
       elevation={1}
@@ -378,7 +432,7 @@ export default function FormInvitar() {
           {employees.map((user) => (
             <Box
               sx={{ display: "flex", justifyContent: "space-between" }}
-              key={user.nombre}
+              key={user.id}
             >
               <ListItemText sx={{ width: "100%", p: 1 }}>
                 {user.nombre}
@@ -407,6 +461,15 @@ export default function FormInvitar() {
                   <MenuItem value="3">Recepcionista</MenuItem>
                 </Select>
               </FormControl>
+              <IconButton
+                aria-label="delete"
+                color="error"
+                onClick={() => handleDeleteEmployee(user.id)}
+                sx={{ mb: 2 }}
+                disabled={user.role == "1"}
+              >
+                <DeleteIcon fontSize="inherit" />
+              </IconButton>
             </Box>
           ))}
         </Box>

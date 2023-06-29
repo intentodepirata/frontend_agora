@@ -1,6 +1,7 @@
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
 import useScrollUp from "../hooks/useScrollUp";
+import CustomNoRowsOverlay from "../components/CustomNoRowsOverlay/CustomNoRowsOverlay";
 
 const Notificaciones = () => {
   const { user } = useUserContext();
@@ -27,9 +28,10 @@ const Notificaciones = () => {
           Guardar
         </Button>
       </Box>
-      <Typography textAlign={"center"} variant="h6" color="grey">
+      <Typography textAlign={"center"} variant="h6" color="grey" mb={5}>
         Mensajes recibidos
       </Typography>
+      <CustomNoRowsOverlay />
     </>
   );
 };

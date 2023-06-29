@@ -29,7 +29,7 @@ const style = {
   boxShadow: 24,
   border: " 1px solid grey",
   py: 4,
-  px: 2,
+  px: 4,
 };
 
 const steps = [
@@ -144,13 +144,9 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
                     border: "1px solid #C1C1C1",
                   }}
                 >
-                  <Typography component={"div"} variant="h6">
-                    {option.label}
-                  </Typography>
-                  <Typography component={"div"} variant="body1">
-                    {option.description}
-                  </Typography>
-                  <Typography sx={{ ml: 35 }} component={"div"} variant="h6">
+                  <Typography variant="h6">{option.label}</Typography>
+                  <Typography variant="body1">{option.description}</Typography>
+                  <Typography sx={{ textAlign: "end" }} variant="h6">
                     {option.price}
                   </Typography>
                 </Button>

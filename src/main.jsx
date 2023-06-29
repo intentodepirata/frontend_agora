@@ -14,7 +14,6 @@ import {
 } from "notistack";
 import styled from "@emotion/styled";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 const myRef = createRef();
 const theme = createTheme({
@@ -30,6 +29,17 @@ const theme = createTheme({
       main: "#F3F4F6",
     },
   },
+  breakpoints: {
+    values: {
+      xs: 0, // Desactivar el breakpoint 'xs'
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+      xxl: 2560,
+      xxxl: 3840,
+    },
+  },
 });
 const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
   "&.notistack-MuiContent-success": {
@@ -42,7 +52,7 @@ const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
     padding: "12px 14px 12px 14px",
   },
   "&.notistack-MuiContent-warning": {
-    padding: "12px 14px 12px 14px",
+    padding: "14px 14px 14px 14px",
   },
   "&.notistack-MuiContent-default": {
     padding: "12px 14px 12px 14px",

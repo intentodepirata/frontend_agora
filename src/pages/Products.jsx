@@ -122,7 +122,14 @@ const Products = () => {
         </Button>
       </Box>
 
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          mx: "auto",
+          gap: 4,
+          maxWidth: "1400px",
+        }}
+      >
         <Box>
           <Typography mb={2} textAlign={"center"} variant="h6" color="grey">
             Stock local

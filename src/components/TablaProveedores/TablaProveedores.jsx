@@ -9,7 +9,7 @@ import { customLocaleText } from "../../traductions/customGridLocaleText";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
-import { enqueueSnackbar } from "notistack";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 
 export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
@@ -24,38 +24,61 @@ export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
   function handleEditar(id) {
     navigate("/home/suppliers/edit/" + id[0]);
   }
+  const handleDeleteProveedores = (id) => {
+    enqueueSnackbar("Desear eliminar al proveedor?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => handleEliminar(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
 
-  async function handleEliminar(id) {
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que quieres eliminar este elemento?"
-    );
-
-    if (confirmacion) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}proveedores/${id}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + user.token,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Error al eliminar el elemento");
+  async function handleEliminar([id]) {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}proveedores/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + user.token,
+          },
         }
+      );
 
-        enqueueSnackbar("Proveedor eliminado correctamente", {
-          variant: "success",
-        });
-        fetchProveedores();
-      } catch (error) {
-        console.error(error.message);
+      if (!response.ok) {
+        throw new Error("Error al eliminar el elemento");
       }
+
+      enqueueSnackbar("Proveedor eliminado correctamente", {
+        variant: "success",
+      });
+      fetchProveedores();
+    } catch (error) {
+      console.error(error.message);
     }
   }
+
   return (
     <Box sx={{ height: 740, width: "100%", maxWidth: "1400px" }}>
       <DataGrid
@@ -96,7 +119,7 @@ export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
       />
       <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
         <Button
-          onClick={() => handleEliminar(selectionModel)}
+          onClick={() => handleDeleteProveedores(selectionModel)}
           color="error"
           variant="contained"
           startIcon={<DeleteIcon />}

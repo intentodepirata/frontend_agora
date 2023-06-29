@@ -7,19 +7,40 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { InputAdornment, ListItemIcon, TextField } from "@mui/material";
+import {
+  CircularProgress,
+  ClickAwayListener,
+  Divider,
+  InputAdornment,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Slide,
+  TextField,
+} from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext";
+import { useDebounce } from "use-debounce";
+import useScrollUp from "../../hooks/useScrollUp";
 
 const HeaderBar = ({ handleOpenCloseDrawer }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [value] = useDebounce(searchText, 1000);
+  const [searchResults, setSearchResults] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  useScrollUp();
+
   const { user, logout } = useUserContext();
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -33,6 +54,53 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    if (value !== "") {
+      handleSearch();
+    }
+  }, [value]);
+  const handleSearch = async () => {
+    const url = `${import.meta.env.VITE_API_URL}ot/search/${value}`;
+    try {
+      setIsLoading(true);
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      const data = await response.json();
+      if (data.length === 0) {
+        searchResults([]);
+        setIsLoading(false);
+        return;
+      }
+      setSearchResults(data);
+
+      console.log(searchResults);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error.message);
+    }
+
+    setDialogOpen(true);
+  };
+  const handleClick = (id) => {
+    navigate(`/home/orders/edit/${id}`);
+    setDialogOpen(false);
+  };
+  const handleOpenDialog = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSearchResults([]);
+    setSearchText("");
+  };
   return (
     <Box sx={{ flexGrow: 1, backgroundColor: "white" }}>
       <AppBar sx={{ flexGrow: 1, backgroundColor: "white" }} position="fixed">
@@ -48,7 +116,6 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
             <MenuIcon sx={{ backgroundColor: "#F3F4F6" }} />
           </IconButton>
           <Typography
-            // fontWeight={"bold"}
             color="grey.700"
             variant="h6"
             component="div"
@@ -68,11 +135,20 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
               size="small"
               fullWidth
               label="Buscar reparaciones, clientes ..."
-              id="fullWidth"
+              id="search-input"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onClick={handleOpenDialog}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <SearchIcon />
+                    <IconButton
+                      edge="end"
+                      aria-label="search"
+                      onClick={handleOpenDialog}
+                    >
+                      <SearchIcon />
+                    </IconButton>
                   </InputAdornment>
                 ),
               }}
@@ -115,7 +191,6 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
               vertical: "top",
               horizontal: "right",
             }}
-            keepMounted
             transformOrigin={{
               vertical: "top",
               horizontal: "right",
@@ -140,6 +215,66 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
           </Menu>
         </Toolbar>
       </AppBar>
+
+      {dialogOpen && (
+        <ClickAwayListener onClickAway={handleCloseDialog}>
+          <Slide direction="down" in={dialogOpen} mountOnEnter unmountOnExit>
+            <Paper
+              sx={{
+                position: "absolute",
+                top: "40px",
+                left: {
+                  xxxl: "34.5%",
+                  xxl: "26.7%",
+                  xl: "18.9%",
+                  lg: "26.5%",
+                },
+                right: 0,
+                maxWidth: "1300px",
+                width: { lg: "55.5%", xl: "100%", xxl: "100%" },
+                bgcolor: "#F3F4F6",
+                height: "auto",
+                zIndex: 2,
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.3)",
+                overflow: "scroll",
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                sx={{
+                  mt: 5,
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  color: "grey.600",
+                  pb: 0,
+                }}
+              >
+                {searchResults.length > 0
+                  ? `Resultados de búsqueda (${searchResults.length})`
+                  : "No hay resultados"}
+              </Typography>
+
+              {isLoading ? (
+                <CircularProgress sx={{ mt: 5, mb: 5 }} />
+              ) : (
+                <List>
+                  {searchResults.length > 0 &&
+                    searchResults.map((item) => (
+                      <Box key={item.ot_id}>
+                        <ListItemButton onClick={() => handleClick(item.ot_id)}>
+                          <ListItemText
+                            primary={`OT${item.ot_id} - ${item.nombre_cliente} -  ${item.nombre_modelo} - IMEI: ${item.imei}`}
+                          />
+                        </ListItemButton>
+                        <Divider />
+                      </Box>
+                    ))}
+                </List>
+              )}
+            </Paper>
+          </Slide>
+        </ClickAwayListener>
+      )}
     </Box>
   );
 };

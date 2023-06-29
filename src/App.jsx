@@ -35,6 +35,7 @@ import Centros from "./pagesAdmin/Centros";
 import Notificaciones from "./pagesAdmin/Notificaciones";
 import Plantillas from "./pagesAdmin/Plantillas";
 import Seguridad from "./pagesAdmin/Seguridad";
+import ChatBox from "./components/ChatBox/ChatBox";
 const App = () => {
   return (
     <UserContextProvider>
@@ -88,6 +89,7 @@ const App = () => {
           <Route path="seguridad" element={<Seguridad />} />
         </Route>
       </Routes>
+      <ChatBox />
     </UserContextProvider>
   );
 };
