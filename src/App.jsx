@@ -12,7 +12,7 @@ import OrdersCreate from "./pages/OrdersCreate";
 import OrdersEdit from "./pages/OrdersEdit";
 import ProductsEdit from "./pages/ProductsEdit";
 import ProductsCreate from "./pages/ProductsCreate";
-import { UserContextProvider } from "./contexts/UserContext";
+import { UserContextProvider, useUserContext } from "./contexts/UserContext";
 import Forgot from "./pages/Forgot";
 import ResetPassword from "./pages/ResetPassword";
 import ClientsCreate from "./pages/ClientsCreate";
@@ -36,9 +36,19 @@ import Notificaciones from "./pagesAdmin/Notificaciones";
 import Plantillas from "./pagesAdmin/Plantillas";
 import Seguridad from "./pagesAdmin/Seguridad";
 import ChatBox from "./components/ChatBox/ChatBox";
+import ProtectedRoute from "./router/ProtectedRoutes";
+
+// const ProtectedRoute = ({ path, element: Element, allowedRoles }) => {
+//   const { user } = useUserContext();
+//   const isAuthorized = allowedRoles.includes(user.role);
+
+//   return isAuthorized ? <Element /> : <Navigate to="/" replace />;
+// };
+
 const App = () => {
   return (
     <UserContextProvider>
+      {/* Rutas Publicas */}
       <Routes>
         <Route path="/" element={<LandingLayout />}>
           <Route index element={<Landing />} />
@@ -47,46 +57,77 @@ const App = () => {
           <Route path="forgot" element={<Forgot />} />
           <Route path="reset-password/:token" element={<ResetPassword />} />
         </Route>
-        <Route path="home" element={<HomeLayout />}>
-          <Route index element={<Home />} />
-          <Route path="orders">
-            <Route index element={<Orders />} />
-            <Route path="create" element={<OrdersCreate />} />
-            <Route path="edit/:id" element={<OrdersEdit />} />
-          </Route>
-          <Route path="products">
-            <Route index element={<Products />} />
-            <Route path="create" element={<ProductsCreate />} />
-            <Route path="edit/:id" element={<ProductsEdit />} />
-          </Route>
-          <Route path="clientes">
-            <Route index element={<Clients />} />
-            <Route path="create" element={<ClientsCreate />} />
-            <Route path="edit/:id" element={<ClientesEdit />} />
-          </Route>
-          <Route path="suppliers">
-            <Route index element={<Suppliers />} />
-            <Route path="create" element={<SuppliersCreate />} />
-            <Route path="edit/:id" element={<SuppliersEdit />} />
-          </Route>
-          <Route path="services">
-            <Route index element={<Services />} />
-          </Route>
-          <Route path="stats">
-            <Route index element={<Stats />} />
+
+        {/* Rutas Privadas  */}
+        <Route
+          element={<ProtectedRoute allowedRoles={[1, 2, 3]} redirect={"/"} />}
+        >
+          <Route path="home" element={<HomeLayout />}>
+            <Route index element={<Home />} />
+
+            <Route path="orders">
+              <Route index element={<Orders />} />
+              <Route path="create" element={<OrdersCreate />} />
+              <Route path="edit/:id" element={<OrdersEdit />} />
+            </Route>
+
+            {/* Rutas protegidas, Recepcionista no puede entrar aqui*/}
+            <Route
+              element={<ProtectedRoute allowedRoles={[1, 2]} redirect={"/"} />}
+            >
+              <Route path="products">
+                <Route index element={<Products />} />
+                <Route path="create" element={<ProductsCreate />} />
+                <Route path="edit/:id" element={<ProductsEdit />} />
+              </Route>
+
+              <Route path="clientes">
+                <Route index element={<Clients />} />
+                <Route path="create" element={<ClientsCreate />} />
+                <Route path="edit/:id" element={<ClientesEdit />} />
+              </Route>
+
+              <Route path="suppliers">
+                <Route index element={<Suppliers />} />
+                <Route path="create" element={<SuppliersCreate />} />
+                <Route path="edit/:id" element={<SuppliersEdit />} />
+              </Route>
+              <Route path="services">
+                <Route index element={<Services />} />
+              </Route>
+            </Route>
+
+            {/* Ruta Super protegida  */}
+            <Route
+              element={<ProtectedRoute allowedRoles={[1]} redirect={"/"} />}
+            >
+              <Route path="stats">
+                <Route index element={<Stats />} />
+              </Route>
+            </Route>
           </Route>
         </Route>
-        <Route path="print/:id" element={<OrdersPrint />} />
+
+        {/* Rutas protegida */}
+        <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
+          <Route path="print/:id" element={<OrdersPrint />} />
+        </Route>
+
+        {/* Ruta para clientes */}
         <Route path="order-status/:id" element={<OrdersStatus />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Negocio />} />
-          <Route path="suscripcion" element={<Suscripcion />} />
-          <Route path="permisos" element={<Permisos />} />
-          <Route path="centros" element={<Centros />} />
-          <Route path="notificaciones" element={<Notificaciones />} />
-          <Route path="plantillas" element={<Plantillas />} />
-          <Route path="mis-datos" element={<MisDatos />} />
-          <Route path="seguridad" element={<Seguridad />} />
+
+        {/* Rutas Super protegidas */}
+        <Route element={<ProtectedRoute allowedRoles={[1]} redirect={"/"} />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Negocio />} />
+            <Route path="suscripcion" element={<Suscripcion />} />
+            <Route path="permisos" element={<Permisos />} />
+            <Route path="centros" element={<Centros />} />
+            <Route path="notificaciones" element={<Notificaciones />} />
+            <Route path="plantillas" element={<Plantillas />} />
+            <Route path="mis-datos" element={<MisDatos />} />
+            <Route path="seguridad" element={<Seguridad />} />
+          </Route>
         </Route>
       </Routes>
       <ChatBox />

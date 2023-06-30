@@ -229,21 +229,21 @@ const ChatBox = () => {
               </Typography>
             </Box>
             <Box sx={{ px: 2, mt: 8 }}>
-              <Input
-                id="chatbox"
-                placeholder="Introduce tu mensaje"
-                value={mensaje}
-                onChange={(e) => setMensaje(e.target.value)}
-              />
               {!user && (
                 <Input
-                  sx={{ mt: 2 }}
                   id="emailInvitado"
                   placeholder="Introduce tu email"
                   value={emailInvitado}
                   onChange={(e) => setEmailInvitado(e.target.value)}
                 />
               )}
+              <Input
+                sx={{ mt: 2 }}
+                id="chatbox"
+                placeholder="Introduce tu mensaje"
+                value={mensaje}
+                onChange={(e) => setMensaje(e.target.value)}
+              />
             </Box>
           </Box>
         </Fade>
