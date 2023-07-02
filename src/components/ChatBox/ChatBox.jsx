@@ -34,6 +34,7 @@ const ChatBox = () => {
     if (openModal && mensaje !== "") {
       const url = `${import.meta.env.VITE_API_URL}mensajes`;
 
+      //Por si se usa desde el landing, necesitaremos tambien un email
       if (emailInvitado === "" && !user) {
         enqueueSnackbar("Escribe tu email", { variant: "error" });
         setOpenModal((value) => !value);
@@ -130,7 +131,7 @@ const ChatBox = () => {
       <Modal
         open={openModal}
         onClose={handleModal}
-        sx={{ zIndex: 0, backdropFilter: "0" }}
+        sx={{ zIndex: 4, backdropFilter: "0" }}
         slotProps={{
           backdrop: {
             invisible: true,
