@@ -1,6 +1,7 @@
 import React from "react";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EmailIcon from "@mui/icons-material/Email";
+import PublicIcon from "@mui/icons-material/Public";
 import {
   Box,
   Paper,
@@ -14,6 +15,7 @@ import {
   ListItemButton,
   Divider,
 } from "@mui/material";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -98,9 +100,10 @@ const ProveedoresModal = ({
         </List>
         {proveedorSeleccionado && (
           <Stack
-            sx={{ mt: 2, justifyContent: "end" }}
+            sx={{ mt: 2, justifyContent: "center" }}
             direction={"row"}
             spacing={2}
+            a
           >
             <Button
               variant="contained"
@@ -109,6 +112,14 @@ const ProveedoresModal = ({
               endIcon={<WhatsAppIcon />}
             >
               WhatsApp
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => window.open(proveedorSeleccionado.web, "_blank")}
+              endIcon={<PublicIcon />}
+            >
+              Web
             </Button>
             <Button
               variant="contained"

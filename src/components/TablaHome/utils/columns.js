@@ -46,8 +46,10 @@ export const columns = [
     width: 140,
   },
   {
-    field: "fechaModificacion",
-    headerName: "Fecha modificacion",
-    width: 140,
+    field: "entregada",
+    headerName: "Entregada",
+    align: "center",
+    valueGetter: (params) => (params.value === 1 ? "Sí" : "No"),
+    width: 80,
   },
 ];

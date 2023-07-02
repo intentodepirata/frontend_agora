@@ -14,6 +14,7 @@ export default function CheckListRevision({
   setChecklist_id,
   dispositivo_id,
   updatedDispositivo_id,
+  entregada,
 }) {
   const initialState = {
     encendido: false,
@@ -99,6 +100,7 @@ export default function CheckListRevision({
               checked={state.encendido}
               onChange={handleChange}
               name="encendido"
+              disabled={entregada}
             />
           }
           label="Encendido"
@@ -109,6 +111,7 @@ export default function CheckListRevision({
               checked={state.cobertura}
               onChange={handleChange}
               name="cobertura"
+              disabled={entregada}
             />
           }
           label="Cobertura"
@@ -119,13 +122,19 @@ export default function CheckListRevision({
               checked={state.pantalla}
               onChange={handleChange}
               name="pantalla"
+              disabled={entregada}
             />
           }
           label="Pantalla"
         />
         <FormControlLabel
           control={
-            <Switch checked={state.tapa} onChange={handleChange} name="tapa" />
+            <Switch
+              checked={state.tapa}
+              onChange={handleChange}
+              name="tapa"
+              disabled={entregada}
+            />
           }
           label="Tapa trasera"
         />
@@ -135,6 +144,7 @@ export default function CheckListRevision({
               checked={state.camaras}
               onChange={handleChange}
               name="camaras"
+              disabled={entregada}
             />
           }
           label="Cámaras"
@@ -145,6 +155,7 @@ export default function CheckListRevision({
               checked={state.sonido}
               onChange={handleChange}
               name="sonido"
+              disabled={entregada}
             />
           }
           label="Sonido"
@@ -155,6 +166,7 @@ export default function CheckListRevision({
               checked={state.carga}
               onChange={handleChange}
               name="carga"
+              disabled={entregada}
             />
           }
           label="Carga"
@@ -165,6 +177,7 @@ export default function CheckListRevision({
               checked={state.microfono}
               onChange={handleChange}
               name="microfono"
+              disabled={entregada}
             />
           }
           label="Micrófono"
@@ -175,6 +188,7 @@ export default function CheckListRevision({
               checked={state.huella}
               onChange={handleChange}
               name="huella"
+              disabled={entregada}
             />
           }
           label="Huella o Face ID"
@@ -189,6 +203,7 @@ export default function CheckListRevision({
         variant="contained"
         color="primary"
         sx={{ textTransform: "none", fontSize: "16px" }}
+        disabled={entregada}
       >
         Guardar
       </Button>

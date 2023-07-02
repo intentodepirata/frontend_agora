@@ -23,6 +23,7 @@ const FormOperacionesTecnicas = ({
   fetchData,
   setFetchData,
   setEstado,
+  entregada,
 }) => {
   const { id } = useParams();
   const [averia, setAveria] = useState("");
@@ -233,10 +234,16 @@ const FormOperacionesTecnicas = ({
             <Typography variant="h4" color="primary" fontWeight={"bold"}>
               OT000{id || numeroOt}
             </Typography>
-            <Typography ml={2} variant="h6" color="primary">
-              {estados &&
-                estados.find((estado) => estado.id === estado_id)?.nombre}
-            </Typography>
+            {entregada ? (
+              <Typography ml={2} variant="h6" color="primary">
+                Entregada
+              </Typography>
+            ) : (
+              <Typography ml={2} variant="h6" color="primary">
+                {estados &&
+                  estados.find((estado) => estado.id === estado_id)?.nombre}
+              </Typography>
+            )}
           </Box>
         </Box>
         <Box
@@ -265,6 +272,7 @@ const FormOperacionesTecnicas = ({
                 value={averia}
                 onChange={handleAveria}
                 size="small"
+                disabled={entregada}
               >
                 <MenuItem value="">Seleccionar Averia</MenuItem>
                 {nombreAverias.map((name) => (
@@ -279,6 +287,7 @@ const FormOperacionesTecnicas = ({
               label="Descripcion"
               value={descripcion}
               onChange={handleDescripcion}
+              disabled={entregada}
             />
             <TextField
               sx={{ mt: 2 }}
@@ -289,6 +298,7 @@ const FormOperacionesTecnicas = ({
               variant="filled"
               value={observaciones}
               onChange={handleObservaciones}
+              disabled={entregada}
             />
           </Box>
         </Box>
@@ -307,6 +317,7 @@ const FormOperacionesTecnicas = ({
           dispositivo_id={dispositivo_id}
           updatedDispositivo_id={updatedDispositivo_id}
           setPrecio={setPrecio}
+          entregada={entregada}
         />
       </Box>
       <Box sx={{ ml: 4 }}>
@@ -345,6 +356,7 @@ const FormOperacionesTecnicas = ({
                 autoWidth
                 label="Estado"
                 name="estado"
+                disabled={entregada}
               >
                 {estados?.map((estado) => (
                   <MenuItem key={estado.id} value={estado.id}>
@@ -362,6 +374,7 @@ const FormOperacionesTecnicas = ({
                 autoWidth
                 label="Garantia"
                 name="tipoGarantia"
+                disabled={entregada}
               >
                 <MenuItem value={""}>
                   <em>Seleccione</em>
@@ -380,6 +393,7 @@ const FormOperacionesTecnicas = ({
             setChecklist_id={setChecklist_id}
             dispositivo_id={dispositivo_id}
             updatedDispositivo_id={updatedDispositivo_id}
+            entregada={entregada}
           />
         </Paper>
       </Box>

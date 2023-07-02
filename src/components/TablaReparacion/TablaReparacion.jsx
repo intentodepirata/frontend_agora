@@ -22,6 +22,7 @@ const TablaReparacion = ({
   dispositivo_id,
   updatedDispositivo_id,
   setPrecio,
+  entregada,
 }) => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [componentes, setComponentes] = useState([]);
@@ -216,7 +217,7 @@ const TablaReparacion = ({
   }
 
   return (
-    <>
+    <Box>
       <Box
         onSubmit={handleSubmit}
         component={"form"}
@@ -230,6 +231,7 @@ const TablaReparacion = ({
             value={operacion}
             label="Agregar Operacion"
             onChange={(e) => setOperacion(e.target.value)}
+            disabled={entregada}
           >
             <MenuItem value={"sustitucion"}>Sustitucion</MenuItem>
             <MenuItem value={"componente presupuestado"}>
@@ -247,6 +249,7 @@ const TablaReparacion = ({
             value={componentes_id}
             label="Agregar Componente"
             onChange={(e) => setComponentes_id(e.target.value)}
+            disabled={entregada}
           >
             <MenuItem value={""}>
               {componentes.length === 0
@@ -268,6 +271,7 @@ const TablaReparacion = ({
             value={tiempo}
             label="Coste operacion"
             onChange={(e) => setTiempo(e.target.value)}
+            disabled={entregada}
           >
             <MenuItem value={0}>0</MenuItem>
             <MenuItem value={0.25}>0.25</MenuItem>
@@ -281,6 +285,7 @@ const TablaReparacion = ({
           variant="contained"
           color="primary"
           type="submit"
+          disabled={entregada}
         >
           Agregar
         </Button>
@@ -326,6 +331,7 @@ const TablaReparacion = ({
           color="error"
           variant="contained"
           startIcon={<DeleteIcon />}
+          disabled={entregada}
         >
           Eliminar
         </Button>
@@ -333,11 +339,12 @@ const TablaReparacion = ({
           onClick={() => handleEditar(selectionModel)}
           variant="contained"
           endIcon={<EditNoteIcon />}
+          disabled={entregada}
         >
           Editar
         </Button>
       </Stack>
-    </>
+    </Box>
   );
 };
 export default TablaReparacion;

@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import TablaOrders from "../components/TablaOrders/TablaOrders";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";

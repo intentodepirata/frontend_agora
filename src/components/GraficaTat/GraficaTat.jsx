@@ -16,33 +16,29 @@ const GraficaReparaciones = ({ data }) => {
   if (!data) {
     return <CircularProgress />;
   }
-  const modelos = data.map((item) => item.modelo);
-  const series = data.map((item) => ({
-    name: `${item.modelo} - ${item.averia}`,
-    data: [item.total_reparaciones],
-  }));
+
+  const otIds = data.map((item) => `OT${item.id}`);
+  const tiempoTranscurrido = data.map((item) => item.Tats);
 
   const options = {
     chart: {
       type: "column",
     },
     title: {
-      text: "Top 5 Modelos Más Reparados",
+      text: "TAT (Tiempo de ejecución) en dias ",
     },
     xAxis: {
-      categories: modelos,
+      categories: otIds,
       title: {
-        text: "Ganador",
+        text: "Orden de Trabajo",
       },
     },
     yAxis: {
       title: {
-        text: "Total de Reparaciones",
+        text: "Tiempo Transcurrido (días)",
       },
-      labels: {
-        format: "{value}",
-      },
-      tickInterval: 1,
+      min: 0,
+      allowDecimals: false,
     },
     credits: {
       enabled: false,
@@ -50,8 +46,23 @@ const GraficaReparaciones = ({ data }) => {
     accessibility: {
       enabled: true,
     },
-
-    series: series,
+    tooltip: {
+      formatter: function () {
+        const index = this.point.index;
+        const imei = data[index].imei;
+        const modelo = data[index].modelo;
+        return `<b>${this.x}</b><br/>Tiempo Transcurrido: ${this.y} días<br/>IMEI: ${imei}<br/>Modelo: ${modelo}`;
+      },
+    },
+    legend: {
+      enabled: false,
+    },
+    series: [
+      {
+        name: "Tiempo Transcurrido",
+        data: tiempoTranscurrido,
+      },
+    ],
   };
 
   return (

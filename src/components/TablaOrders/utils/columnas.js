@@ -1,8 +1,13 @@
 export const columns = [
   { field: "id", headerName: "OT", width: 80 },
   { field: "marca", headerName: "Marca", width: 80 },
-  { field: "modelo", headerName: "Modelo", width: 180 },
-  { field: "cliente", headerName: "Cliente", width: 200 },
+  { field: "modelo", headerName: "Modelo", width: 160 },
+  {
+    field: "imei",
+    headerName: "IMEI",
+    width: 135,
+  },
+  { field: "cliente", headerName: "Cliente", width: 170 },
   { field: "telefono", headerName: "Telefono", width: 100 },
   { field: "dni", headerName: "DNI", width: 100 },
   { field: "estado", headerName: "Estado", width: 170 },
@@ -11,11 +16,13 @@ export const columns = [
   {
     field: "fechaEntrada",
     headerName: "Fecha de entrada",
-    width: 135,
+    width: 150,
   },
   {
-    field: "fechaModificacion",
-    headerName: "Fecha modificacion",
-    width: 135,
+    field: "entregada",
+    headerName: "Entregada",
+    align: "center",
+    valueGetter: (params) => (params.value === 1 ? "Sí" : "No"),
+    width: 80,
   },
 ];

@@ -259,9 +259,9 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
                   backgroundColor: "#1565C0",
                   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
                   maxWidth: "400px",
-                  margin: "0 auto",
                   position: "relative",
                   mb: 2,
+                  mx: 2,
                 }}
               >
                 <Box

@@ -1,8 +1,9 @@
 import { Box, Typography, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import InventoryIcon from "@mui/icons-material/Inventory";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import ManageHistoryIcon from "@mui/icons-material/ManageHistory";
 import Highcharts from "highcharts";
 import { HighchartsReact } from "highcharts-react-official";
 import { useUserContext } from "../../contexts/UserContext";
@@ -98,7 +99,7 @@ const MainWidget = ({
               color="primary"
               onClick={() => handleFiltrarClick("Pendiente")}
             >
-              <PeopleAltIcon
+              <ErrorOutlineIcon
                 color="primary"
                 sx={{ fontSize: "1.5rem", mr: 1 }}
               />
@@ -132,7 +133,7 @@ const MainWidget = ({
               color="primary"
               onClick={() => handleFiltrarClick("En reparacion")}
             >
-              <PendingActionsIcon
+              <ManageHistoryIcon
                 color="primary"
                 sx={{ fontSize: "1.5rem", mr: 1 }}
               />
@@ -163,7 +164,7 @@ const MainWidget = ({
               color="primary"
               onClick={() => handleFiltrarClick("Finalizada")}
             >
-              <InventoryIcon
+              <CheckCircleOutlineRoundedIcon
                 color="primary"
                 sx={{ fontSize: "1.5rem", mr: 1 }}
               />

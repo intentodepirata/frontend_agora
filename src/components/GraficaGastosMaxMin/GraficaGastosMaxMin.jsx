@@ -9,40 +9,37 @@ const GraficaGastos = ({ data }) => {
   useEffect(() => {
     if (chartRef.current && data) {
       const chart = chartRef.current.chart;
-
       chart.update({});
     }
   }, [data]);
+
   if (!data) {
-    return <CircularProgress sx={{ textAlign: "center" }} />;
+    return <CircularProgress />;
   }
 
-  const categories = data
-    .map((item) => {
-      const date = new Date(item.fecha);
-      const day = date.getDate().toString().padStart(2, "0");
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      return `${day}/${month}`;
-    })
-    .filter((item, index, array) => array.indexOf(item) === index);
-
-  const gastos = data
+  const totalGastos = data
     .filter((item) => item.tipo === "Gasto")
-    .map((item) => parseFloat(item.cantidad));
+    .reduce((total, item) => total + parseFloat(item.cantidad), 0);
 
-  const ingresos = data
+  const totalIngresos = data
     .filter((item) => item.tipo === "Ingreso")
-    .map((item) => parseFloat(item.cantidad));
+    .reduce((total, item) => total + parseFloat(item.cantidad), 0);
+
+  const diferencia = totalIngresos - totalGastos;
+  const diferenciaLabel = diferencia >= 0 ? "Ganancias" : "Pérdidas";
 
   const options = {
     chart: {
-      type: "line",
+      type: "column",
     },
     title: {
-      text: "Gastos e Ingresos",
+      text: "Total de Gastos e Ingresos",
     },
     xAxis: {
-      categories: categories,
+      categories: [diferenciaLabel],
+      title: {
+        text: `Total ${diferencia}€`,
+      },
     },
     yAxis: {
       title: {
@@ -52,18 +49,29 @@ const GraficaGastos = ({ data }) => {
     credits: {
       enabled: false,
     },
-    accessibility: {
-      enabled: true,
-    },
     series: [
       {
         name: "Gastos",
-        data: gastos,
+        data: [
+          {
+            y: totalGastos,
+            dataLabels: {
+              enabled: true,
+            },
+          },
+        ],
         color: "red",
       },
       {
         name: "Ingresos",
-        data: ingresos,
+        data: [
+          {
+            y: totalIngresos,
+            dataLabels: {
+              enabled: true,
+            },
+          },
+        ],
         color: "green",
       },
     ],

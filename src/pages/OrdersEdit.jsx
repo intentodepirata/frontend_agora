@@ -1,14 +1,99 @@
 import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
+import DoneAllRoundedIcon from "@mui/icons-material/DoneAllRounded";
 import { Link, useParams } from "react-router-dom";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 import useScrollUp from "../hooks/useScrollUp";
+import PlagiarismIcon from "@mui/icons-material/Plagiarism";
+import DatosOrdenModal from "../components/DatosOrdenModal/DatosOrdenModal";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { useUserContext } from "../contexts/UserContext";
 const OrdersEdit = () => {
   const [fetchData, setFetchData] = useState(false);
+  const [modal, setModal] = useState(false);
+  const [entregada, setEntregada] = useState(false);
   const { id } = useParams();
+  const { user } = useUserContext();
   useScrollUp();
+
+  useEffect(() => {
+    fetchIsEntregada();
+  }, [id]);
+
+  const fetchIsEntregada = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      const data = await response.json();
+      if (data.entregada === 1) {
+        setEntregada(true);
+      }
+    } catch (error) {
+      console.error("Error al entregar la Orden:");
+    }
+  };
+
+  const fetchEntregar = async (snackbarId) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/deliver/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data) {
+        throw new Error("Error al entregar la Orden");
+      }
+
+      setEntregada(true);
+      closeSnackbar(snackbarId);
+      enqueueSnackbar("Orden entregada correctamente", {
+        variant: "success",
+      });
+    } catch (error) {
+      closeSnackbar(snackbarId);
+      console.error("Error al entregar la Orden:");
+    }
+  };
+  const handleEntregar = () => {
+    enqueueSnackbar("Desear entregar el terminal al Cliente?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => fetchEntregar(snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
   const handleButtonClick = () => {
     setFetchData(true);
   };
@@ -16,6 +101,9 @@ const OrdersEdit = () => {
     // navigate("/print/" + id[0]);
     window.open(`/print/${id}`, "_blank");
   }
+  const handleModal = () => {
+    setModal((value) => !value);
+  };
   return (
     <Box
       component="section"
@@ -34,7 +122,7 @@ const OrdersEdit = () => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton component={Link} to="/home" aria-label="Back">
+          <IconButton component={Link} to="/home/orders" aria-label="Back">
             <ArrowBackIcon />
           </IconButton>
           <Typography
@@ -51,6 +139,27 @@ const OrdersEdit = () => {
           direction="row"
           spacing={2}
         >
+          <Button
+            onClick={() => handleModal()}
+            variant="contained"
+            endIcon={<PlagiarismIcon />}
+            color="warning"
+            sx={{ textTransform: "none", fontSize: "16px" }}
+          >
+            Datos Orden
+          </Button>
+          {!entregada && (
+            <Button
+              onClick={() => handleEntregar()}
+              variant="contained"
+              endIcon={<DoneAllRoundedIcon />}
+              color="success"
+              sx={{ textTransform: "none", fontSize: "16px" }}
+              disabled={entregada}
+            >
+              Entregar a cliente
+            </Button>
+          )}
           <Button
             onClick={() => handlePrint()}
             variant="contained"
@@ -70,11 +179,15 @@ const OrdersEdit = () => {
           </Button>
         </Stack>
       </Box>
+      {modal && (
+        <DatosOrdenModal modal={modal} handleModal={handleModal} id={id} />
+      )}
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <FormOperacionesTecnicas
           fetchData={fetchData}
           setFetchData={setFetchData}
+          entregada={entregada}
         />
       </Box>
     </Box>
