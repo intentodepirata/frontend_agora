@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Landing from "./pages/Landing";
@@ -12,21 +12,19 @@ import OrdersCreate from "./pages/OrdersCreate";
 import OrdersEdit from "./pages/OrdersEdit";
 import ProductsEdit from "./pages/ProductsEdit";
 import ProductsCreate from "./pages/ProductsCreate";
-import { UserContextProvider, useUserContext } from "./contexts/UserContext";
+import { UserContextProvider } from "./contexts/UserContext";
 import Forgot from "./pages/Forgot";
 import ResetPassword from "./pages/ResetPassword";
 import ClientsCreate from "./pages/ClientsCreate";
 import ClientesEdit from "./pages/clientesEdit";
 import OrdersPrint from "./pages/OrdersPrint";
 import OrdersStatus from "./pages/OrdersStatus";
-
 import Suppliers from "./pages/Suppliers";
 import SuppliersCreate from "./pages/SuppliersCreate";
 import SuppliersEdit from "./pages/SuppliersEdit";
 import Services from "./pages/Services";
 import Stats from "./pages/Stats";
 import AdminLayout from "./Layout/AdminLayout/AdminLayout";
-import Admin from "./pages/Admin";
 import MisDatos from "./pagesAdmin/MisDatos";
 import Negocio from "./pagesAdmin/Negocio";
 import Suscripcion from "./pagesAdmin/Suscripcion";
@@ -38,14 +36,11 @@ import Seguridad from "./pagesAdmin/Seguridad";
 import ChatBox from "./components/ChatBox/ChatBox";
 import ProtectedRoute from "./router/ProtectedRoutes";
 
-// const ProtectedRoute = ({ path, element: Element, allowedRoles }) => {
-//   const { user } = useUserContext();
-//   const isAuthorized = allowedRoles.includes(user.role);
-
-//   return isAuthorized ? <Element /> : <Navigate to="/" replace />;
-// };
-
 const App = () => {
+  const location = useLocation();
+
+  // No renderizar chatbox si estamos imprimiendo
+  const shouldRenderChatBox = !location.pathname.includes("print");
   return (
     <UserContextProvider>
       {/* Rutas Publicas */}
@@ -64,14 +59,11 @@ const App = () => {
         >
           <Route path="home" element={<HomeLayout />}>
             <Route index element={<Home />} />
-
             <Route path="orders">
               <Route index element={<Orders />} />
               <Route path="create" element={<OrdersCreate />} />
               <Route path="edit/:id" element={<OrdersEdit />} />
             </Route>
-
-            {/* Rutas protegidas, Recepcionista no puede entrar aqui*/}
             <Route
               element={<ProtectedRoute allowedRoles={[1, 2]} redirect={"/"} />}
             >
@@ -80,13 +72,11 @@ const App = () => {
                 <Route path="create" element={<ProductsCreate />} />
                 <Route path="edit/:id" element={<ProductsEdit />} />
               </Route>
-
               <Route path="clientes">
                 <Route index element={<Clients />} />
                 <Route path="create" element={<ClientsCreate />} />
                 <Route path="edit/:id" element={<ClientesEdit />} />
               </Route>
-
               <Route path="suppliers">
                 <Route index element={<Suppliers />} />
                 <Route path="create" element={<SuppliersCreate />} />
@@ -130,7 +120,7 @@ const App = () => {
           </Route>
         </Route>
       </Routes>
-      <ChatBox />
+      {shouldRenderChatBox && <ChatBox />}
     </UserContextProvider>
   );
 };
