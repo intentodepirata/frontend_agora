@@ -22,8 +22,6 @@ export default function OrdersStatus() {
 
         setOrder(data);
 
-        console.log(data);
-
         setCargando(false);
       } catch (error) {
         console.error("Error al obtener la Orden:", error);
@@ -83,11 +81,11 @@ export default function OrdersStatus() {
                 alt="logo"
               />
               <Typography fontWeight={"bold"} variant="h5" color="grey">
-                Reparaciones Lucatoni
+                Agora TechSolutions
               </Typography>
               <Box textAlign={"right"}>
                 <Typography fontWeight={"bold"} variant="h6" color="primary">
-                  OT 000{id}
+                  OT00{order?.id}
                 </Typography>
                 <Typography variant="subtitle2" color="grey">
                   {fechaModificacion}

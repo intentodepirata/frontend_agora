@@ -136,6 +136,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
       </Typography>
       <Box sx={{ display: "flex", mb: 2 }}>
         <TextField
+          id="imei"
           size="small"
           name="imei"
           label="IMEI"
@@ -204,6 +205,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
       </Box>
       <Box sx={{ display: "flex", mb: 2 }}>
         <TextField
+          id="cosmetica"
           size="small"
           name="cosmetica"
           label="Estado cosmetico del dispositivo"
@@ -216,6 +218,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           sx={{ width: "75%", mr: 2 }}
         />
         <TextField
+          id="color"
           size="small"
           name="color"
           label="Color del dispositivo"

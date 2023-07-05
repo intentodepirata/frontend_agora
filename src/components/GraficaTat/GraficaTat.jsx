@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 
 const GraficaReparaciones = ({ data }) => {
   const chartRef = useRef(null);
@@ -14,7 +14,7 @@ const GraficaReparaciones = ({ data }) => {
   }, [data]);
 
   if (!data) {
-    return <CircularProgress />;
+    return <Typography>No hay datos</Typography>;
   }
 
   const otIds = data.map((item) => `OT${item.id}`);

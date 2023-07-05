@@ -12,6 +12,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import {
   CircularProgress,
   ClickAwayListener,
@@ -78,8 +79,6 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
         return;
       }
       setSearchResults(data);
-
-      console.log(searchResults);
       setIsLoading(false);
     } catch (error) {
       console.error(error.message);
@@ -134,19 +133,15 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
               sx={{ backgroundColor: "#F3F4F6" }}
               size="small"
               fullWidth
+              autoComplete="off"
               label="Buscar reparaciones, clientes ..."
-              id="search-input"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               onClick={handleOpenDialog}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      edge="end"
-                      aria-label="search"
-                      onClick={handleOpenDialog}
-                    >
+                    <IconButton edge="end" onClick={handleOpenDialog}>
                       <SearchIcon />
                     </IconButton>
                   </InputAdornment>

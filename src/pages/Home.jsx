@@ -12,8 +12,8 @@ const Home = () => {
   const [opcionesFiltro, setOpcionesFiltro] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("");
   const [totalFacturado, setTotalFacturado] = useState(0);
-  useScrollUp();
   const { user } = useUserContext();
+  useScrollUp();
 
   useEffect(() => {
     const opcionesFiltro = {
@@ -45,7 +45,7 @@ const Home = () => {
         console.error("Error al obtener las ots:", error);
       }
     };
-    fetchOts();
+    // fetchOts();
     fetchOtsByTime("mes");
   }, []);
   const fetchOtsByTime = async (time) => {

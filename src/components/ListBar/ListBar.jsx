@@ -13,6 +13,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BuildIcon from "@mui/icons-material/Build";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -138,6 +139,18 @@ export default function ListBar({ showDrawer }) {
           selected={selectedIndex === 7}
           onClick={(event) => {
             handleListItemClick(event, 7);
+            navigate("/home/treasury");
+          }}
+        >
+          <ListItemIcon>
+            <AccountBalanceIcon />
+          </ListItemIcon>
+          <ListItemText primary="Tesoreria" />
+        </ListItemButton>
+        <ListItemButton
+          selected={selectedIndex === 8}
+          onClick={(event) => {
+            handleListItemClick(event, 8);
             navigate("/admin/permisos");
           }}
           sx={{ bottom: "1rem", position: " fixed" }}

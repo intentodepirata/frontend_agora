@@ -25,7 +25,6 @@ export default function OrdersPrint() {
       precio: 30,
       unidades: 1,
     },
-    // Agrega aquí más operaciones si es necesario
   ];
   const fechaActual = new Date().toLocaleDateString("es-ES");
   useEffect(() => {
@@ -73,7 +72,7 @@ export default function OrdersPrint() {
         Fecha: {fechaActual}
       </Typography>
       <Typography variant="h4" align="center" gutterBottom>
-        Factura 000{order?.id}
+        Factura 000{`${order?.id}`}
       </Typography>
       {/* Datos del cliente */}
       <Box mb={2}>
@@ -172,12 +171,14 @@ export default function OrdersPrint() {
           </Typography>
         </Box>
         <Box
-          to={`/order-status/${id}`}
+          to={`/order-status/${order?.uuid}`}
           component={Link}
           sx={{ display: "flex", textAlign: "flex-end" }}
           mr={4}
         >
-          <QRCode value={`${import.meta.env.VITE_URL}order-status/${id}`} />
+          <QRCode
+            value={`${import.meta.env.VITE_URL}order-status/${order?.uuid}`}
+          />
         </Box>
       </Box>
       <Box mb={2}>

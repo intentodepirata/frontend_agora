@@ -35,6 +35,8 @@ import Plantillas from "./pagesAdmin/Plantillas";
 import Seguridad from "./pagesAdmin/Seguridad";
 import ChatBox from "./components/ChatBox/ChatBox";
 import ProtectedRoute from "./router/ProtectedRoutes";
+import Treasury from "./pages/Treasury";
+import NoAuth from "./pages/NoAuth";
 
 const App = () => {
   const location = useLocation();
@@ -63,6 +65,9 @@ const App = () => {
               <Route index element={<Orders />} />
               <Route path="create" element={<OrdersCreate />} />
               <Route path="edit/:id" element={<OrdersEdit />} />
+            </Route>
+            <Route path="treasury">
+              <Route index element={<Treasury />} />
             </Route>
             <Route
               element={<ProtectedRoute allowedRoles={[1, 2]} redirect={"/"} />}
@@ -105,6 +110,7 @@ const App = () => {
 
         {/* Ruta para clientes */}
         <Route path="order-status/:id" element={<OrdersStatus />} />
+        <Route path="no-auth" element={<NoAuth />} />
 
         {/* Rutas Super protegidas */}
         <Route element={<ProtectedRoute allowedRoles={[1]} redirect={"/"} />}>

@@ -49,6 +49,19 @@ const MainWidget = ({
     }
   };
   const isFiltroActivo = (estado) => filtroEstado === estado;
+
+  function obtenerRolUsuario(role) {
+    switch (role) {
+      case 1:
+        return "Propietario";
+      case 2:
+        return "Técnico";
+      case 3:
+        return "Recepcionista";
+      default:
+        return "rol desconocido";
+    }
+  }
   return (
     <>
       <Box
@@ -64,6 +77,9 @@ const MainWidget = ({
           </Typography>
           <Typography textAlign={"center"} variant="h5" color="initial">
             Saludos, {user?.nombre} {user?.apellidos}
+            <Box ml={1} component={"span"} sx={{ color: "#0150F5" }}>
+              {`(${obtenerRolUsuario(user?.role)})`}
+            </Box>
           </Typography>
           <Box
             sx={{
