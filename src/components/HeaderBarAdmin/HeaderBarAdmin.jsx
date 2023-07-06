@@ -11,7 +11,7 @@ import { useUserContext } from "../../contexts/UserContext";
 const HeaderBarAdmin = ({ handleOpenCloseDrawer }) => {
   const navigate = useNavigate();
 
-  const { user, logout } = useUserContext();
+  const { user } = useUserContext();
 
   return (
     <Box sx={{ flexGrow: 1, backgroundColor: "white" }}>
@@ -34,7 +34,9 @@ const HeaderBarAdmin = ({ handleOpenCloseDrawer }) => {
               component="div"
               sx={{ mr: 2, maxWidth: 250, width: "100%" }}
             >
-              Ágora TechSolutions
+              {user.negocio?.nombre
+                ? user.negocio?.nombre
+                : "Agora TechSolutions"}
             </Typography>
           </Box>
           <Button

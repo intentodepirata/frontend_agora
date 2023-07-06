@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
 import DoneAllRoundedIcon from "@mui/icons-material/DoneAllRounded";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import EmailIcon from "@mui/icons-material/Email";
 import { Link, useParams } from "react-router-dom";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 import useScrollUp from "../hooks/useScrollUp";
@@ -10,17 +12,40 @@ import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 import DatosOrdenModal from "../components/DatosOrdenModal/DatosOrdenModal";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
+import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
 const OrdersEdit = () => {
   const [fetchData, setFetchData] = useState(false);
   const [modal, setModal] = useState(false);
   const [entregada, setEntregada] = useState(false);
+  const [cliente, setCliente] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
   useScrollUp();
 
   useEffect(() => {
+    fetchCliente();
     fetchIsEntregada();
   }, [id]);
+
+  const fetchCliente = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/print/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      setCliente(data);
+    } catch (error) {
+      console.error("Error al obtener al cliente");
+    }
+  };
 
   const fetchIsEntregada = async () => {
     try {
@@ -104,6 +129,7 @@ const OrdersEdit = () => {
   const handleModal = () => {
     setModal((value) => !value);
   };
+
   return (
     <Box
       component="section"
@@ -139,6 +165,24 @@ const OrdersEdit = () => {
           direction="row"
           spacing={2}
         >
+          <BotonNotificar cliente={cliente} />
+          {/* <Button
+            variant="contained"
+            color="success"
+            onClick={() => notificarPorWhatsApp()}
+            endIcon={<WhatsAppIcon />}
+          >
+            WhatsApp
+          </Button>
+
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => notificarPorEmail()}
+            endIcon={<EmailIcon />}
+          >
+            Email
+          </Button> */}
           <Button
             onClick={() => handleModal()}
             variant="contained"

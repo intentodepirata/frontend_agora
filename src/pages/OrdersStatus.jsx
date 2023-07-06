@@ -4,10 +4,12 @@ import logo from "../assets/img/logo-trans.png";
 import { useEffect, useState } from "react";
 import Footer from "../components/Footer/Footer";
 import useScrollUp from "../hooks/useScrollUp";
+import { useUserContext } from "../contexts/UserContext";
 
 export default function OrdersStatus() {
   const [order, setOrder] = useState(null);
   const [cargando, setCargando] = useState(false);
+  const { user } = useUserContext();
   const { id } = useParams();
   useScrollUp();
   useEffect(() => {
@@ -75,13 +77,15 @@ export default function OrdersStatus() {
             >
               <Box
                 component={"img"}
-                src={logo}
+                src={user?.negocio.logo}
                 maxWidth="120px"
                 width={"100%"}
                 alt="logo"
               />
-              <Typography fontWeight={"bold"} variant="h5" color="grey">
-                Agora TechSolutions
+              <Typography fontWeight={"bold"} variant="subtitle1" color="grey">
+                {user?.negocio.nombre
+                  ? user?.negocio.nombre
+                  : "Agora TechSolutions"}
               </Typography>
               <Box textAlign={"right"}>
                 <Typography fontWeight={"bold"} variant="h6" color="primary">

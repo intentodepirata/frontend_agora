@@ -40,6 +40,7 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   useScrollUp();
 
   const { user, logout } = useUserContext();
@@ -120,7 +121,9 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
             component="div"
             sx={{ mr: 2, maxWidth: 250, width: "100%" }}
           >
-            Ágora TechSolutions
+            {user.negocio?.nombre
+              ? user.negocio?.nombre
+              : "Agora TechSolutions"}
           </Typography>
           <Box
             sx={{

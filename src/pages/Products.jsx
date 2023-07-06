@@ -56,9 +56,7 @@ const Products = () => {
   };
 
   const handleCellEditStop = (params) => {
-    // Puedes agregar lógica personalizada al finalizar la edición de celda aquí
     const { id, field, value } = params;
-
     const updatedRows = rowsCarrito.map((row) => {
       if (row.id === id) {
         return { ...row, [field]: value };

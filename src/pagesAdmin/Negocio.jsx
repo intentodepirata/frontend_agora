@@ -14,7 +14,7 @@ const Negocio = () => {
   const [direccion, setDireccion] = useState("");
   const [logo, setLogo] = useState(null);
   const [logoUrl, setLogoUrl] = useState("");
-  const { user } = useUserContext();
+  const { user, login } = useUserContext();
   useScrollUp();
   async function getNegocio() {
     const response = await fetch(
@@ -40,6 +40,19 @@ const Negocio = () => {
     setDireccion(data.direccion);
     setNegocioId(data.id);
     setLogoUrl(data.logo);
+    login({
+      ...user,
+      negocio: {
+        ...user.negocio,
+        id: data.id,
+        nombre: data.nombre,
+        telefono: data.telefono,
+        pais: data.pais,
+        precioHora: data.precioHora,
+        direccion: data.direccion,
+        logo: data.logo,
+      },
+    });
   }
 
   useEffect(() => {
