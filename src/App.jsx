@@ -16,7 +16,7 @@ import { UserContextProvider } from "./contexts/UserContext";
 import Forgot from "./pages/Forgot";
 import ResetPassword from "./pages/ResetPassword";
 import ClientsCreate from "./pages/ClientsCreate";
-import ClientesEdit from "./pages/clientesEdit";
+import ClientesEdit from "./pages/ClientesEdit";
 import OrdersPrint from "./pages/OrdersPrint";
 import OrdersStatus from "./pages/OrdersStatus";
 import Suppliers from "./pages/Suppliers";
