@@ -275,7 +275,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Agrega fotos de las reparaciones
+                  Genera un QR para el seguimiento de las reparaciones
                 </Typography>
               </Box>
             )}
@@ -298,6 +298,7 @@ const Caracteristicas = () => {
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
                   Administra tus inventarios de una manera sencilla
                 </Typography>
+
                 <Typography
                   marginBottom={1}
                   variant="h6"
@@ -305,7 +306,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Se actualiza a la par de las órdenes
+                  Todo el stock esta sincronizado con las reparaciones
                 </Typography>
                 <Typography
                   marginBottom={1}
@@ -314,7 +315,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Inventario por cada centro de trabajo
+                  Realiza nuevos pedidos desde tu inventario
                 </Typography>
                 <Typography
                   marginBottom={1}
@@ -323,7 +324,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Programa la realizacion de tus inventarios
+                  Conoce rapidamente los componentes que estan sin stock
                 </Typography>
               </Box>
             )}
@@ -362,7 +363,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Historial de clientes
+                  Historial de clientes con numero de reparaciones y fecha
                 </Typography>
                 <Typography
                   marginBottom={1}
@@ -393,8 +394,16 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} /> Registra a
-                  tus proveedores, son una parte importante en el proceso de
-                  reparacion
+                  tus proveedores
+                </Typography>
+                <Typography
+                  marginBottom={1}
+                  variant="h6"
+                  color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} /> Contacto
+                  directo con tus proveedores
                 </Typography>
                 <Typography
                   marginBottom={1}
@@ -403,7 +412,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Guarda al instante un nuevo proveedor que encontraste
+                  Enlace a su website, email o whatsapp
                 </Typography>
               </Box>
             )}
@@ -425,7 +434,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Lleva un registro de todas tus reparaciones
+                  Personaliza las caracteristicas de tu Servicio Tecnico
                 </Typography>
                 <Typography
                   marginBottom={1}
@@ -434,7 +443,16 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Agrega tus propios serivios
+                  Agrega tus propios servicios
+                </Typography>
+                <Typography
+                  marginBottom={1}
+                  variant="h6"
+                  color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Personaliza el tipo y coste del servicio
                 </Typography>
                 <Typography
                   marginBottom={1}
@@ -465,7 +483,7 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Administra los resultados de tu negocio
+                  Realiza un cierre diario de caja con gastos e ingresos
                 </Typography>
                 <Typography
                   marginBottom={1}
@@ -474,7 +492,27 @@ const Caracteristicas = () => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
-                  Registra todos tus ingresos y gastos
+                  Consulta la evolucion de tu negocio por fechas
+                </Typography>
+                <Typography
+                  marginBottom={1}
+                  variant="h6"
+                  color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Consulta el tiempo de ejecucion de cada una de tus
+                  reparaciones.
+                </Typography>
+                <Typography
+                  marginBottom={1}
+                  variant="h6"
+                  color="textPrimary"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <CheckCircleIcon fontSize="small" sx={{ mr: 1 }} />
+                  Consulta cuales son los dispositivos mas reparados y sus
+                  averias
                 </Typography>
                 <Typography
                   marginBottom={1}
