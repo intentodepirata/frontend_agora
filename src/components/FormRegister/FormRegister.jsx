@@ -2,7 +2,6 @@ import {
   Box,
   Paper,
   Typography,
-  TextField,
   Button,
   InputLabel,
   OutlinedInput,
@@ -20,13 +19,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { FormRegisterSchema } from "./FormRegisterSchema";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
-import { useUserContext } from "../../contexts/UserContext";
-import { addUser } from "../../api/usuarios";
 import { enqueueSnackbar } from "notistack";
 
 const FormRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useUserContext();
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const navigate = useNavigate();
 
@@ -66,9 +63,10 @@ const FormRegister = () => {
         }
 
         enqueueSnackbar(
-          "Usuario registrado con exito, revise su bandeja de entrada para confirmar su cuenta",
-          { variant: "success", persist: true }
+          "Usuario registrado con exito, verifique su bandeja de entrada",
+          { variant: "success" }
         );
+        navigate("/");
         actions.resetForm();
         actions.setSubmitting(false);
       } catch (error) {

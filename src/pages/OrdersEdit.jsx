@@ -5,7 +5,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import DoneAllRoundedIcon from "@mui/icons-material/DoneAllRounded";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EmailIcon from "@mui/icons-material/Email";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 import useScrollUp from "../hooks/useScrollUp";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
@@ -20,6 +20,7 @@ const OrdersEdit = () => {
   const [cliente, setCliente] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
+  const navigate = useNavigate();
   useScrollUp();
 
   useEffect(() => {
@@ -123,8 +124,8 @@ const OrdersEdit = () => {
     setFetchData(true);
   };
   function handlePrint() {
-    // navigate("/print/" + id[0]);
-    window.open(`/print/${id}`, "_blank");
+    // navigate(`/print/${id}`);
+    window.open(`/print/${id}`);
   }
   const handleModal = () => {
     setModal((value) => !value);
