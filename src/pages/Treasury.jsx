@@ -73,9 +73,6 @@ export default function Treasury() {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton component={Link} to="/home/Treasury" aria-label="Back">
-            <ArrowBackIcon />
-          </IconButton>
           <Typography
             component="h1"
             variant="h6"

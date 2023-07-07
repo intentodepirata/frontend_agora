@@ -77,8 +77,8 @@ export default function OrdersStatus() {
             >
               <Box
                 component={"img"}
-                src={user?.negocio.logo}
-                maxWidth="120px"
+                src={user?.negocio.logo ? user?.negocio.logo : logo}
+                maxWidth="150px"
                 width={"100%"}
                 alt="logo"
               />

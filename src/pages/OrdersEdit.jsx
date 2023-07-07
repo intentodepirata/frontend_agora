@@ -165,24 +165,6 @@ const OrdersEdit = () => {
           direction="row"
           spacing={2}
         >
-          <BotonNotificar cliente={cliente} />
-          {/* <Button
-            variant="contained"
-            color="success"
-            onClick={() => notificarPorWhatsApp()}
-            endIcon={<WhatsAppIcon />}
-          >
-            WhatsApp
-          </Button>
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => notificarPorEmail()}
-            endIcon={<EmailIcon />}
-          >
-            Email
-          </Button> */}
           <Button
             onClick={() => handleModal()}
             variant="contained"
@@ -190,8 +172,11 @@ const OrdersEdit = () => {
             color="warning"
             sx={{ textTransform: "none", fontSize: "16px" }}
           >
-            Datos Orden
+            Datos
           </Button>
+
+          <BotonNotificar cliente={cliente} />
+
           {!entregada && (
             <Button
               onClick={() => handleEntregar()}
@@ -201,7 +186,7 @@ const OrdersEdit = () => {
               sx={{ textTransform: "none", fontSize: "16px" }}
               disabled={entregada}
             >
-              Entregar a cliente
+              Entregar
             </Button>
           )}
           <Button

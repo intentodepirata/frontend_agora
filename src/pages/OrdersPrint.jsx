@@ -52,6 +52,7 @@ export default function OrdersPrint() {
     };
     printFetch();
   }, []);
+
   useEffect(() => {
     if (order) {
       window.print();

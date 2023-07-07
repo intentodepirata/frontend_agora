@@ -201,7 +201,9 @@ const FormOperacionesTecnicas = ({
   }, [fetchData]);
   const handleEstado = (event) => {
     setEstado_id(event.target.value);
-    setEstado(event.target.value + 1);
+    if (setEstado) {
+      setEstado(event.target.value + 1);
+    }
   };
   const handleTipoGarantia = (event) => {
     setTipoGarantia(event.target.value);
@@ -261,7 +263,10 @@ const FormOperacionesTecnicas = ({
               width: "100%",
             }}
           >
-            <FormControl htmlFor="averia" sx={{ mb: 2, width: "100%" }}>
+            <FormControl
+              htmlFor="averia"
+              sx={{ mb: 2, mt: 0.5, width: "100%" }}
+            >
               <InputLabel size="small" id="averia">
                 Averia principal
               </InputLabel>
@@ -321,7 +326,7 @@ const FormOperacionesTecnicas = ({
         />
       </Box>
       <Box sx={{ ml: 4 }}>
-        <Paper elevation={4} sx={{ p: 2, mb: 4 }}>
+        <Paper elevation={4} sx={{ p: 2, mb: 2 }}>
           <Box
             sx={{
               display: "flex",

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useRef } from "react";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -14,18 +14,21 @@ import { ListItemIcon } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../../contexts/UserContext";
 
-const options = ["Whatsapp  ", "Email"];
+const options = ["Whatsapp", "Email"];
 
-export default function BotonNotificar({ cliente }) {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+const BotonNotificar = ({ cliente }) => {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const { user } = useUserContext();
 
   const handleClick = () => {
-    options[selectedIndex] === "Whatsapp"
-      ? notificarPorWhatsApp()
-      : notificarPorEmail();
+    const selectedOption = options[selectedIndex];
+    if (selectedOption === "Whatsapp") {
+      notificarPorWhatsApp();
+    } else {
+      notificarPorEmail();
+    }
   };
 
   const handleMenuItemClick = (event, index) => {
@@ -41,59 +44,116 @@ export default function BotonNotificar({ cliente }) {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
-
     setOpen(false);
   };
 
-  const generarMensaje = () => {
-    return `¡Hola ${cliente.cliente}!
-      Su reparacion ha cambiado de estado a: ${cliente.estado}.
-      Datos del terminal: Marca: ${cliente.marca}, ${cliente.modelo}, ${
-      cliente.imei
-    }, ${cliente.color}.
-      Averia principal: ${cliente.averiaDetectadaSat}.
-      Descripcion: ${cliente.descripcionDetectadaSat}.
-      Observaciones: ${cliente.observacionesDetectadasSat || ""}.
-      Resolucion: ${cliente.tipoGarantia}.
-      Precio: ${cliente.precio}.
+  const generarMensaje = (email) => {
+    if (!cliente) {
+      return "";
+    }
+    const enlace = `${import.meta.env.VITE_URL}order-status/${cliente.uuid}`;
+    const {
+      cliente: clienteName,
+      estado,
+      marca,
+      modelo,
+      imei,
+      color,
+      averiaDetectadaSat,
+      descripcionDetectadaSat,
+      observacionesDetectadasSat,
+      tipoGarantia,
+      precio,
+    } = cliente;
 
-Su terminal está disponible para recogida en:
-    Direccion: ${user.negocio.direccion}.
-    Telefono: ${user.negocio.telefono}.
+    return !email
+      ? `¡Hola *${clienteName}*!
+
+    Su reparación ha cambiado de estado a: *${estado}*.
+    *Datos del terminal:* ${marca}, ${modelo}, ${imei}, color: ${color}.
+    *Averia principal:* ${averiaDetectadaSat}.
+    *Descripcion:* ${descripcionDetectadaSat}.
+    *Observaciones:* ${observacionesDetectadasSat || ""}.
+    *Resolucion:* ${tipoGarantia}.
+    *Precio: ${precio}.*
     
-Un saludo desde ${user.negocio.nombre},
-    `;
+    Puede realizar un seguimiento a su reparacion en el *siguiente enlace:*
+    ${enlace}
+
+    ${
+      estado == "Reparacion Finaliazada"
+        ? "Su terminal está disponible para recogida en:"
+        : ""
+    }
+    *Direccion:* ${user.negocio.direccion}.
+    *Telefono:* ${user.negocio.telefono}.
+  
+
+    Un saludo desde *${user.negocio.nombre}*
+    `
+      : `¡Hola ${clienteName}!
+
+      Su reparación ha cambiado de estado a: ${estado}.
+      Datos del terminal: ${marca}, ${modelo}, ${imei}, color: ${color}.
+      Averia principal: ${averiaDetectadaSat}.
+      Descripcion: ${descripcionDetectadaSat}.
+      Observaciones: ${observacionesDetectadasSat || ""}.
+      Resolucion: ${tipoGarantia}.
+      Precio: ${precio}.
+
+      Puede realizar un seguimiento a su reparacion en el siguiente enlace:
+      ${enlace}
+      
+      ${
+        estado == "Reparacion Finaliazada"
+          ? "Su terminal está disponible para recogida en:"
+          : ""
+      }
+      Direccion: ${user.negocio.direccion}.
+      Telefono: ${user.negocio.telefono}.
+      
+
+      Un saludo desde ${user.negocio.nombre}
+      `;
   };
+
   const notificarPorWhatsApp = () => {
+    if (!cliente || !cliente.telefono) {
+      return;
+    }
+
     const telefono = encodeURIComponent(`+34${cliente.telefono}`);
     const mensaje = encodeURIComponent(generarMensaje());
     const enlace = `https://web.whatsapp.com/send?phone=${telefono}&text=${mensaje}`;
 
     window.open(enlace, "_blank");
 
-    enqueueSnackbar("Cliente notificado por WhatsApp", {
+    enqueueSnackbar("Abriendo WhatsApp", {
       variant: "success",
-      persist: true,
     });
   };
+
   const notificarPorEmail = () => {
+    if (!cliente || !cliente.email) {
+      return;
+    }
+
     const email = encodeURIComponent(cliente.email);
     const asunto = encodeURIComponent(
       `${user.negocio.nombre} - ${cliente.estado}`
     );
-    const cuerpo = encodeURIComponent(generarMensaje());
-    const url = `mailto:${email}?subject=${asunto}&body=${cuerpo}`;
-    // window.location.href = url;
+    const cuerpo = encodeURIComponent(generarMensaje(true));
+    const url = `mailto:${email}?subject=${asunto}&body=${cuerpo}&content-type=text/html`;
+
     window.open(url, "_blank");
 
-    enqueueSnackbar("Cliente notificado por Email", {
+    enqueueSnackbar("Abriendo Email", {
       variant: "success",
-      persist: true,
     });
   };
 
   return (
-    <React.Fragment>
+    <>
       <ButtonGroup
         variant="contained"
         ref={anchorRef}
@@ -103,6 +163,7 @@ Un saludo desde ${user.negocio.nombre},
           onClick={handleClick}
           startIcon={selectedIndex === 0 ? <WhatsAppIcon /> : <EmailIcon />}
           sx={{ textTransform: "none", fontSize: "16px" }}
+          color={selectedIndex === 0 ? "success" : "warning"}
         >
           {options[selectedIndex]}
         </Button>
@@ -113,19 +174,38 @@ Un saludo desde ${user.negocio.nombre},
           aria-label="Notificar-boton-cliente"
           aria-haspopup="menu"
           onClick={handleToggle}
+          color={selectedIndex === 0 ? "success" : "warning"}
         >
           <ArrowDropDownIcon />
         </Button>
       </ButtonGroup>
       <Popper
-        sx={{
-          zIndex: 1,
-        }}
         open={open}
         anchorEl={anchorRef.current}
         role={undefined}
         transition
         disablePortal
+        style={{ zIndex: 1 }}
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 2],
+            },
+          },
+          {
+            name: "preventOverflow",
+            options: {
+              padding: 0,
+            },
+          },
+          {
+            name: "flip",
+            options: {
+              padding: 0,
+            },
+          },
+        ]}
       >
         {({ TransitionProps, placement }) => (
           <Grow
@@ -162,6 +242,8 @@ Un saludo desde ${user.negocio.nombre},
           </Grow>
         )}
       </Popper>
-    </React.Fragment>
+    </>
   );
-}
+};
+
+export default BotonNotificar;
