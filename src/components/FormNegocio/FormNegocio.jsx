@@ -9,6 +9,7 @@ import {
 import { MuiFileInput } from "mui-file-input";
 import { enqueueSnackbar } from "notistack";
 import { useState } from "react";
+import { useUserContext } from "../../contexts/UserContext";
 
 export default function FormNegocio({
   nombre,
@@ -27,6 +28,8 @@ export default function FormNegocio({
   logoUrl,
   borrarImagen,
 }) {
+  const { user } = useUserContext();
+  console.log(user.negocio ? "hay negocio" : "no hay negocio");
   return (
     <>
       <Paper elevation={1} sx={{ border: "1px solid #C4C4C4" }}>
@@ -112,6 +115,7 @@ export default function FormNegocio({
                 variant="contained"
                 color="success"
                 onClick={() => subirImagen()}
+                disabled={!user.negocio}
               >
                 Subir Logo
               </Button>
@@ -119,6 +123,7 @@ export default function FormNegocio({
                 variant="contained"
                 color="error"
                 onClick={() => borrarImagen()}
+                disabled={!user.negocio}
               >
                 Eliminar Logo
               </Button>

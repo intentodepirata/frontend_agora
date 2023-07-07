@@ -5,7 +5,7 @@ import { CssBaseline, IconButton } from "@mui/material";
 import { BrowserRouter } from "react-router-dom";
 import "@fontsource/outfit/";
 import { createTheme } from "@mui/material/styles";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider, Typography } from "@mui/material";
 import "./main.css";
 import {
   SnackbarProvider,
@@ -31,7 +31,7 @@ const theme = createTheme({
   },
   breakpoints: {
     values: {
-      xs: 0, // Desactivar el breakpoint 'xs'
+      xs: 0,
       sm: 600,
       md: 960,
       lg: 1280,
@@ -44,9 +44,11 @@ const theme = createTheme({
 const StyledMaterialDesignContent = styled(MaterialDesignContent)(() => ({
   "&.notistack-MuiContent-success": {
     padding: "12px 14px 12px 14px",
+    maxWidth: "400px",
   },
   "&.notistack-MuiContent-error": {
     padding: "12px 14px 12px 14px",
+    maxWidth: "400px",
   },
   "&.notistack-MuiContent-info": {
     padding: "12px 14px 12px 14px",
@@ -84,6 +86,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               size="small"
               onClick={() => closeSnackbar(snackbarId)}
             >
+              <Typography mr={1} variant="caption" color="inherit">
+                Cerrar
+              </Typography>
               <HighlightOffIcon fontSize="inherit" />
             </IconButton>
           )}

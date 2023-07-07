@@ -63,12 +63,13 @@ const FormRegister = () => {
         }
 
         enqueueSnackbar(
-          "Usuario registrado con exito, verifique su bandeja de entrada",
-          { variant: "success" }
+          `Usuario registrado con exito, Se ha enviado un email de 
+          confirmacion a su bandeja de entrada`,
+          { variant: "success", persist: true }
         );
-        navigate("/");
         actions.resetForm();
         actions.setSubmitting(false);
+        navigate("/login");
       } catch (error) {
         console.error(error.message);
       }

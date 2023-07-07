@@ -39,6 +39,9 @@ const HeaderBarAdmin = ({ handleOpenCloseDrawer }) => {
                 : "Agora TechSolutions"}
             </Typography>
           </Box>
+          <Typography color="grey.700" variant="h5">
+            Panel de Administración
+          </Typography>
           <Button
             size="small"
             variant="outlined"
@@ -46,7 +49,7 @@ const HeaderBarAdmin = ({ handleOpenCloseDrawer }) => {
               navigate("/home");
             }}
           >
-            Atras
+            Volver a Inicio
           </Button>
         </Toolbar>
       </AppBar>
