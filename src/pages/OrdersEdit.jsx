@@ -124,8 +124,8 @@ const OrdersEdit = () => {
     setFetchData(true);
   };
   function handlePrint() {
-    navigate(`/print/${id}`);
-    // window.open(`/print/${id}`);
+    // navigate(`/print/${id}`);
+    window.open(`/print/${id}`);
   }
   const handleModal = () => {
     setModal((value) => !value);
