@@ -146,9 +146,9 @@ const ChatBox = () => {
             sx={{
               position: "absolute",
               bottom: 20,
-              right: 40,
+              right: { xs: 14, sm: 40 },
               padding: 3,
-              width: 368,
+              width: 362,
               borderRadius: 4,
               backgroundImage: "url('/img/background-landpage.svg')",
               backgroundPosition: "80%",
