@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import CheckListRevision from "../CheckListRevision/CheckListRevision";
 import TablaReparacion from "../TablaReparacion/TablaReparacion";
 import { nombreAverias } from "./utils/nombreAverias";
-import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
 import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
@@ -40,8 +39,6 @@ const FormOperacionesTecnicas = ({
   const [updateCliente_id, setUpdateCliente_id] = useState(null);
   const [ots_id, setOts_id] = useState(id || null);
   const { user } = useUserContext();
-
-  console.log(precio);
 
   const fetchOt = async () => {
     try {

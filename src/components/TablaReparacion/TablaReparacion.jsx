@@ -36,9 +36,6 @@ const TablaReparacion = ({
 
   const { user } = useUserContext();
 
-  const { id } = useParams();
-  console.log(ots_id);
-  console.log(id);
   const fetchcomponentes = async () => {
     try {
       const response = await fetch(

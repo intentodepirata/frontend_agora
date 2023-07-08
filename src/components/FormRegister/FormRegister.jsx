@@ -77,7 +77,7 @@ const FormRegister = () => {
   });
 
   return (
-    <Paper sx={{ p: 2, margin: "3rem auto", maxWidth: "400px" }}>
+    <Paper sx={{ px: 2, py: 4, margin: "3rem auto", maxWidth: "662px" }}>
       <Box sx={{ p: 2 }}>
         <Typography
           textAlign="center"

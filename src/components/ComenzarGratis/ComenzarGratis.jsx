@@ -9,17 +9,16 @@ const ComenzarGratis = () => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", md: "row" },
             alignItems: "center",
-            textAlign: "left",
+            textAlign: { xs: "center", md: "left" },
             justifyContent: "space-between",
-            marginTop: 10,
           }}
         >
           <Box
             sx={{
-              width: "40%",
+              width: "100%",
               display: "flex",
-              alignItems: "flex-start",
               justifyContent: "center",
               flexDirection: "column",
             }}
@@ -29,29 +28,79 @@ const ComenzarGratis = () => {
               component="h1"
               variant="h2"
               color="initial"
+              sx={{
+                fontSize: {
+                  xs: "2rem",
+                  sm: "2.5rem",
+                  md: "3rem",
+                  lg: "3.5rem",
+                  xl: "4rem",
+                  xxl: "4.5rem",
+                  xxxl: "5rem",
+                },
+              }}
             >
               El mejor software
             </Typography>
-            <Typography component="h1" variant="h2" color="initial">
+            <Typography
+              component="h1"
+              variant="h2"
+              color="initial"
+              sx={{
+                fontSize: {
+                  xs: "2rem",
+                  sm: "2.5rem",
+                  md: "3rem",
+                  lg: "3.5rem",
+                  xl: "4rem",
+                  xxl: "4.5rem",
+                  xxxl: "5rem",
+                },
+              }}
+            >
               para administrar
             </Typography>
-
             <Typography
               component="h1"
               variant="h2"
               color="primary"
               fontWeight="700"
-              sx={{ pb: 2 }}
+              sx={{
+                fontSize: {
+                  xs: "2rem",
+                  sm: "2.5rem",
+                  md: "3rem",
+                  lg: "3.5rem",
+                  xl: "4rem",
+                  xxl: "4.5rem",
+                  xxxl: "5rem",
+                },
+                paddingBottom: 2,
+              }}
             >
               tu servicio técnico.
             </Typography>
-
-            <Typography sx={{ fontSize: "1.25rem", color: "gray", mb: "32px" }}>
+            <Typography
+              sx={{
+                fontSize: {
+                  xs: "1rem",
+                  sm: "1.25rem",
+                  md: "1.5rem",
+                  lg: "1.75rem",
+                  xl: "2rem",
+                  xxl: "2.25rem",
+                  xxxl: "2.5rem",
+                },
+                color: "gray",
+                marginBottom: "32px",
+              }}
+            >
               Toma el control de tu negocio.
             </Typography>
             <Box
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", md: "row" },
                 alignItems: "center",
                 gap: 2,
               }}
@@ -71,14 +120,14 @@ const ComenzarGratis = () => {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ width: "60%", py: 4 }}>
+          <Box sx={{ width: "100%", py: 4 }}>
             <Box
               sx={{
-                width: "80%",
+                width: "100%",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                marginLeft: "200px",
+                // marginLeft: "200px",
               }}
               component="img"
               src={imagenHero}

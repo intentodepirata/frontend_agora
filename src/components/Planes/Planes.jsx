@@ -1,7 +1,7 @@
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import { useState } from "react";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Link } from "react-router-dom";
 
 const Planes = () => {
@@ -10,9 +10,48 @@ const Planes = () => {
   const handleShowMensual = () => {
     setShowAnual(false);
   };
+
   const handleShowAnual = () => {
     setShowAnual(true);
   };
+
+  const planData = [
+    {
+      name: "BÁSICO",
+      price: showAnual ? "179.99€" : "19.99€",
+      billing: showAnual ? " Euros / año" : " Euros / mes",
+      features: [
+        "Un centro de trabajo por cuenta",
+        "Administración de reparaciones",
+        "Administración de stock de componentes",
+        "Administración de servicios",
+        "Administración de clientes",
+        "Administración de proveedores",
+        "Soporte a usuarios",
+      ],
+      buttonLabel: "Comenzar prueba",
+      buttonLink: "/login",
+    },
+    {
+      name: "PRO",
+      price: "¡Próximamente!",
+      billing: "",
+      features: [
+        "De 1 a 5 centros de trabajo por cuenta",
+        "Administración de reparaciones",
+        "Administración de stock de componentes",
+        "Administración de servicios",
+        "Administración de clientes",
+        "Administración de proveedores",
+        "Soporte a usuarios",
+        "Estadísticas",
+        "Salud financiera",
+        "Reportes de ventas diarios, semanales o mensuales",
+      ],
+      buttonLabel: "",
+      buttonLink: "",
+    },
+  ];
 
   return (
     <Box id="planes" component="section" py={8} px={1}>
@@ -82,337 +121,89 @@ const Planes = () => {
         )}
       </Box>
 
-      <Box sx={{ display: "flex" }}>
-        <Box
-          sx={{
-            width: "50%",
-            borderRadius: "4px",
-            border: "2px solid lightgrey",
-            mx: 2,
-          }}
-        >
-          <Box sx={{ display: "flex", flexDirection: "column", p: 4 }}>
-            <Typography
-              variant="h5"
-              component="h2"
-              color="initial"
-              mb={0.25}
-              textAlign="left"
-            >
-              BÁSICO
-            </Typography>
-            <Typography
-              component="h1"
-              variant="h3"
-              color="initial"
-              sx={{
-                display: "flex",
-                gap: "16px",
-                alignItems: "center",
-              }}
-            >
-              <Box component="span">
-                {showAnual ? "179.99€" : "19.99€"}{" "}
-                <Box component="span" sx={{ fontSize: "1rem" }}>
-                  {showAnual ? " Euros / año" : " Euros / mes"}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          gap: 4,
+        }}
+      >
+        {planData.map((plan, index) => (
+          <Box
+            key={index}
+            sx={{
+              width: "100%",
+              borderRadius: "4px",
+              border: index === 0 ? "2px solid #0150F5" : "2px solid lightgrey",
+            }}
+          >
+            <Box sx={{ display: "flex", flexDirection: "column", p: 4 }}>
+              <Typography variant="h5" component="h2" color="initial" mb={0.25}>
+                {plan.name}
+              </Typography>
+              <Typography
+                component="h1"
+                variant="h3"
+                color="initial"
+                sx={{
+                  display: "flex",
+                  gap: "16px",
+                  alignItems: "center",
+                }}
+              >
+                <Box component="span">
+                  {plan.price}
+
+                  <Box component="span" sx={{ fontSize: "1rem" }}>
+                    {plan.billing}
+                  </Box>
                 </Box>
-              </Box>
-
-              <Box component="span" sx={{ fontSize: " 1.5rem " }}>
-                Usuarios ilimitados
-              </Box>
-            </Typography>
-            <Divider sx={{ mt: 2, mb: 2 }} />
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" /> Un
-              centro de trabajo por cuenta
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de reparaciones
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de stock de componentes
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de servicios
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de clientes
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de proveedores
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 5,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" /> Soporte
-              a usuarios
-            </Typography>
-
-            <Button
-              to="/login"
-              component={Link}
-              variant="contained"
-              color="primary"
-              sx={{
-                py: 1.5,
-                mt: 5,
-                textTransform: "none",
-                fontSize: "1.125rem",
-                fontWeight: "bold",
-                boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
-              }}
-            >
-              Comenzar prueba
-            </Button>
+                {index === 0 && (
+                  <Box component="span" sx={{ fontSize: "1.5rem" }}>
+                    Usuarios ilimitados
+                  </Box>
+                )}
+              </Typography>
+              {<Divider sx={{ mt: 2, mb: 2 }} />}
+              {plan.features.map((feature, index) => (
+                <Typography
+                  key={index}
+                  component="p"
+                  variant="body1"
+                  color="initial"
+                  sx={{
+                    mb: index === plan.features.length - 1 ? 5 : 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    fontSize: { xs: "0.875rem", md: "1.4rem" },
+                  }}
+                >
+                  <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />
+                  {feature}
+                </Typography>
+              ))}
+              {index === 0 && (
+                <Button
+                  to={plan.buttonLink}
+                  component={Link}
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    py: 1.5,
+                    mt: 5,
+                    textTransform: "none",
+                    fontSize: "1.125rem",
+                    fontWeight: "bold",
+                    boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  {plan.buttonLabel}
+                </Button>
+              )}
+            </Box>
           </Box>
-        </Box>
-        <Box
-          sx={{
-            width: "50%",
-            borderRadius: "4px",
-            border: "2px solid #0150F5",
-            mx: 1,
-          }}
-        >
-          <Box sx={{ display: "flex", flexDirection: "column", p: 4 }}>
-            <Typography
-              variant="h5"
-              component="h2"
-              color="initial"
-              mb={0.25}
-              textAlign="left"
-            >
-              PRO
-            </Typography>
-            <Typography
-              component="h1"
-              variant="h3"
-              color="initial"
-              sx={{
-                display: "flex",
-                gap: "16px",
-                alignItems: "center",
-              }}
-            >
-              ¡Próximamente!
-            </Typography>
-            <Divider sx={{ mt: 2, mb: 2 }} />
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />
-              De 1 a 5 centros de trabajo por cuenta
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de reparaciones
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de stock de componentes
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de servicios
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de clientes
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Administracion de proveedores
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" /> Soporte
-              a usuarios
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" />{" "}
-              Estadisticas
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 1,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" /> Salud
-              financiera
-            </Typography>
-            <Typography
-              component="p"
-              variant="body1"
-              color="initial"
-              sx={{
-                mb: 5,
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <CheckCircleIcon sx={{ fontSize: 20 }} color="primary" /> Reportes
-              de ventas diarios, semanales o mensuales
-            </Typography>
-          </Box>
-        </Box>
+        ))}
       </Box>
     </Box>
   );

@@ -2,7 +2,6 @@ import {
   Box,
   Paper,
   Typography,
-  TextField,
   Button,
   InputLabel,
   OutlinedInput,
@@ -70,7 +69,7 @@ const FormLogin = () => {
   });
 
   return (
-    <Paper sx={{ p: 2, margin: "3rem auto", maxWidth: "400px" }}>
+    <Paper sx={{ px: 2, py: 4, margin: "3rem auto", maxWidth: "662px" }}>
       <Box sx={{ p: 2 }}>
         <Typography
           textAlign="center"
@@ -83,7 +82,7 @@ const FormLogin = () => {
           Iniciar sesión
         </Typography>
         <Typography variant="h6" color="initial" sx={{ mb: 2 }}>
-          Inicia sesion con tus datos anteriores
+          Inicia sesión con tus datos anteriores
         </Typography>
         <Box
           onSubmit={handleSubmit}
@@ -178,7 +177,7 @@ const FormLogin = () => {
           <Typography
             component={Link}
             to="/forgot"
-            variant="body1"
+            variant="body2"
             color="primary"
             sx={{ mb: 4 }}
           >
@@ -195,6 +194,24 @@ const FormLogin = () => {
           >
             Iniciar sesion
           </Button>
+          <Typography
+            component={"div"}
+            variant="body2"
+            color="inherit"
+            sx={{ mt: 4, textAlign: "center" }}
+          >
+            ¿Aún no tienes cuenta?
+            <Typography
+              component={Link}
+              to="/register"
+              variant="body2"
+              color="primary"
+              sx={{ mt: 4, textAlign: "center" }}
+            >
+              {" "}
+              Regístrate
+            </Typography>
+          </Typography>
         </Box>
       </Box>
     </Paper>

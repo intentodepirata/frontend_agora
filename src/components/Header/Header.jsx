@@ -5,53 +5,60 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <>
-      <Box
-        component="header"
-        sx={{
-          maxWidth: "1440px",
-          margin: "0 auto",
+    <Box
+      component="header"
+      sx={{
+        maxWidth: {
+          xs: "100%",
+          sm: "100%",
+          md: "960px",
+          lg: "1280px",
+          xl: "1440px",
+          xxl: "1920px",
+          xxxl: "2560px",
+        },
+        margin: "0 auto",
 
-          p: 2,
+        p: 2,
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" },
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <Link to="/" underline="none">
+        <Box
+          component={"img"}
+          src={logo}
+          alt="Agora Tech solutions"
+          sx={{ width: "160px" }}
+        />
+      </Link>
+
+      <Box
+        component="nav"
+        sx={{
           display: "flex",
+          gap: "16px",
           alignItems: "center",
-          justifyContent: "space-between",
         }}
       >
-        <Link to="/" underline="none">
-          <Box
-            component={"img"}
-            src={logo}
-            alt="Agora Tech solutions"
-            sx={{ width: "160px" }}
-          />
+        <a href="/#caracteristicas">Caracteristicas</a>
+        <a href="/#planes">Precios</a>
+        <Link to="/login" underline="none">
+          Iniciar Sesion
         </Link>
-
-        <Box
-          component="nav"
-          sx={{
-            display: "flex",
-            gap: "16px",
-            alignItems: "center",
-          }}
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
+          to="/register"
+          sx={{ textTransform: "none", fontSize: "16px" }}
         >
-          <a href="/#caracteristicas">Caracteristicas</a>
-          <a href="/#planes">Precios</a>
-          <Link to="/login" underline="none">
-            Iniciar Sesion
-          </Link>
-          <Button
-            variant="contained"
-            color="primary"
-            component={Link}
-            to="/register"
-            sx={{ textTransform: "none", fontSize: "16px" }}
-          >
-            Registrate
-          </Button>
-        </Box>
+          Registrate
+        </Button>
       </Box>
-    </>
+    </Box>
   );
 };
 

@@ -14,17 +14,17 @@ import { ListItemIcon } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../../contexts/UserContext";
 
-const options = ["Whatsapp", "Email"];
+const options = ["Avisar Whatsapp", "Avisar Email"];
 
 const BotonNotificar = ({ cliente }) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+
   const { user } = useUserContext();
 
   const handleClick = () => {
-    const selectedOption = options[selectedIndex];
-    if (selectedOption === "Whatsapp") {
+    if (selectedIndex == 0) {
       notificarPorWhatsApp();
     } else {
       notificarPorEmail();
@@ -48,9 +48,6 @@ const BotonNotificar = ({ cliente }) => {
   };
 
   const generarMensaje = (email) => {
-    if (!cliente) {
-      return "";
-    }
     const enlace = `${import.meta.env.VITE_URL}order-status/${cliente.uuid}`;
     const {
       cliente: clienteName,
@@ -85,11 +82,10 @@ const BotonNotificar = ({ cliente }) => {
         ? "Su terminal está disponible para recogida en:"
         : ""
     }
-    *Direccion:* ${user.negocio.direccion}.
-    *Telefono:* ${user.negocio.telefono}.
-  
 
     Un saludo desde *${user.negocio.nombre}*
+    *Direccion:* ${user.negocio.direccion}.
+    *Telefono:* ${user.negocio.telefono}.
     `
       : `¡Hola ${clienteName}!
 
@@ -109,35 +105,28 @@ const BotonNotificar = ({ cliente }) => {
           ? "Su terminal está disponible para recogida en:"
           : ""
       }
-      Direccion: ${user.negocio.direccion}.
-      Telefono: ${user.negocio.telefono}.
+      
       
 
       Un saludo desde ${user.negocio.nombre}
+      Direccion: ${user.negocio.direccion}.
+      Telefono: ${user.negocio.telefono}.
       `;
   };
 
   const notificarPorWhatsApp = () => {
-    if (!cliente || !cliente.telefono) {
-      return;
-    }
-
     const telefono = encodeURIComponent(`+34${cliente.telefono}`);
     const mensaje = encodeURIComponent(generarMensaje());
     const enlace = `https://web.whatsapp.com/send?phone=${telefono}&text=${mensaje}`;
 
-    window.open(enlace, "_blank");
-
     enqueueSnackbar("Abriendo WhatsApp", {
       variant: "success",
     });
+    window.open(enlace);
   };
 
   const notificarPorEmail = () => {
-    if (!cliente || !cliente.email) {
-      return;
-    }
-
+    console.log(cliente?.estado);
     const email = encodeURIComponent(cliente.email);
     const asunto = encodeURIComponent(
       `${user.negocio.nombre} - ${cliente.estado}`
@@ -145,11 +134,10 @@ const BotonNotificar = ({ cliente }) => {
     const cuerpo = encodeURIComponent(generarMensaje(true));
     const url = `mailto:${email}?subject=${asunto}&body=${cuerpo}&content-type=text/html`;
 
-    window.open(url, "_blank");
-
     enqueueSnackbar("Abriendo Email", {
       variant: "success",
     });
+    window.open(url);
   };
 
   return (
