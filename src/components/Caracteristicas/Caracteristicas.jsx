@@ -132,7 +132,7 @@ const Caracteristicas = () => {
                 <Typography
                   sx={{
                     fontSize: {
-                      xs: "2rem",
+                      xs: "1.8rem",
                       sm: "2.5rem",
                       md: "3rem",
                     },
@@ -144,7 +144,7 @@ const Caracteristicas = () => {
                 <Typography
                   sx={{
                     fontSize: {
-                      xs: "1.4rem",
+                      xs: "1.2rem",
                       sm: "1.5rem",
                       md: "1.6rem",
                     },

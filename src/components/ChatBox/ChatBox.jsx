@@ -110,19 +110,19 @@ const ChatBox = () => {
           onMouseLeave={handleHoverLeave}
           sx={{
             position: "fixed",
-            bottom: 50,
-            right: 50,
+            bottom: 40,
+            right: 20,
             padding: 4,
           }}
         >
           {openModal ? (
-            <SendIcon fontSize="large" />
+            <SendIcon fontSize="medium" />
           ) : (
             <>
               {hovered ? (
-                <EditIcon fontSize="large" />
+                <EditIcon fontSize="medium" />
               ) : (
-                <ChatIcon fontSize="large" />
+                <ChatIcon fontSize="medium" />
               )}
             </>
           )}
@@ -144,11 +144,11 @@ const ChatBox = () => {
           <Box
             bgcolor={"primary.main"}
             sx={{
-              position: "fixed",
-              bottom: 30,
-              right: 70,
+              position: "absolute",
+              bottom: 20,
+              right: 40,
               padding: 3,
-              width: 400,
+              width: 368,
               borderRadius: 4,
               backgroundImage: "url('/img/background-landpage.svg')",
               backgroundPosition: "80%",

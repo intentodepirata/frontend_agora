@@ -151,7 +151,10 @@ const Planes = () => {
                   alignItems: "center",
                 }}
               >
-                <Box component="span">
+                <Box
+                  component="span"
+                  sx={{ fontSize: index === 1 && "2.4rem" }}
+                >
                   {plan.price}
 
                   <Box component="span" sx={{ fontSize: "1rem" }}>

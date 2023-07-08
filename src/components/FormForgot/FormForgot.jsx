@@ -126,13 +126,13 @@ const FormForgot = () => {
           >
             Enviar instrucciones
           </Button>
-          <Typography textAlign={"center"} variant="body1" color="initial">
+          <Typography textAlign={"center"} variant="body2" color="initial">
             {" "}
             ¿Ya tienes cuenta?{" "}
             <Typography
               component={Link}
               to="/login"
-              variant="body1"
+              variant="body2"
               color="primary"
               sx={{ mb: 4 }}
             >
