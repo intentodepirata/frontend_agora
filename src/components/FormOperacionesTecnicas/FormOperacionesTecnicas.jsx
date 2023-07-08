@@ -41,6 +41,8 @@ const FormOperacionesTecnicas = ({
   const [ots_id, setOts_id] = useState(id || null);
   const { user } = useUserContext();
 
+  console.log(precio);
+
   const fetchOt = async () => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
@@ -323,6 +325,7 @@ const FormOperacionesTecnicas = ({
           updatedDispositivo_id={updatedDispositivo_id}
           setPrecio={setPrecio}
           entregada={entregada}
+          numeroOt={numeroOt}
         />
       </Box>
       <Box sx={{ ml: 4 }}>

@@ -16,6 +16,7 @@ import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
 import CustomNoRowsOverlay from "../CustomNoRowsOverlay/CustomNoRowsOverlay";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { useParams } from "react-router-dom";
 
 const TablaReparacion = ({
   ots_id,
@@ -34,6 +35,10 @@ const TablaReparacion = ({
   const [cargando, setCargando] = useState(false);
 
   const { user } = useUserContext();
+
+  const { id } = useParams();
+  console.log(ots_id);
+  console.log(id);
   const fetchcomponentes = async () => {
     try {
       const response = await fetch(
@@ -85,16 +90,13 @@ const TablaReparacion = ({
   const fetchPrecio = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/price/${ots_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
+        `${import.meta.env.VITE_API_URL}ot/price/${ots_id}`
       );
 
       const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error);
+      }
       setPrecio(data);
     } catch (error) {
       console.error("Error al obtener los estados:", error);
