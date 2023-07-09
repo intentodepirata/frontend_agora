@@ -127,10 +127,10 @@ const ComenzarGratis = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                // marginLeft: "200px",
               }}
               component="img"
               src={imagenHero}
+              alt="imagen hero"
             />
           </Box>
         </Box>

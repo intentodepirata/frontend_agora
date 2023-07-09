@@ -175,6 +175,7 @@ const Caracteristicas = () => {
                         key={index}
                         marginBottom={1}
                         variant="h6"
+                        component={"p"}
                         color="textPrimary"
                         sx={{ display: "flex", alignItems: "center" }}
                       >
