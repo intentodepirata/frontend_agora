@@ -166,6 +166,7 @@ const Caracteristicas = () => {
                       paddingBottom={2}
                       fontWeight="700"
                       variant="h4"
+                      component={"h2"}
                       color="primary"
                     >
                       {feature.label}
