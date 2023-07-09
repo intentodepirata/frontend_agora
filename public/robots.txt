@@ -1,0 +1,13 @@
+User-agent: *
+Disallow: /home
+Disallow: /orders
+Disallow: /treasury
+Disallow: /products
+Disallow: /clientes
+Disallow: /suppliers
+Disallow: /services
+Disallow: /stats
+Disallow: /admin
+Disallow: /print
+Disallow: /order-status
+Disallow: /no-auth
