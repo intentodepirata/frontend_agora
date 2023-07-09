@@ -29,23 +29,6 @@ const Home = () => {
   }, [filtroEstado]);
 
   useEffect(() => {
-    const fetchOts = async () => {
-      try {
-        setCargando(true);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-        const data = await response.json();
-        setRows(data);
-        setCargando(false);
-      } catch (error) {
-        console.error("Error al obtener las ots:", error);
-      }
-    };
-    // fetchOts();
     fetchOtsByTime("mes");
   }, []);
   const fetchOtsByTime = async (time) => {

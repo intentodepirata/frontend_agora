@@ -37,6 +37,7 @@ import ChatBox from "./components/ChatBox/ChatBox";
 import ProtectedRoute from "./router/ProtectedRoutes";
 import Treasury from "./pages/Treasury";
 import NoAuth from "./pages/NoAuth";
+import OrdersPrint2 from "./pages/OrdersPrint2";
 
 const App = () => {
   const location = useLocation();
@@ -105,7 +106,7 @@ const App = () => {
 
         {/* Rutas protegida */}
         <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
-          <Route path="print/:id" element={<OrdersPrint />} />
+          <Route path="print/:id" element={<OrdersPrint2 />} />
         </Route>
 
         {/* Ruta para clientes */}
