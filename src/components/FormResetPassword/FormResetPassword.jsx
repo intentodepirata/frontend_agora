@@ -2,16 +2,12 @@ import {
   Box,
   Paper,
   Typography,
-  TextField,
   Button,
   InputLabel,
   OutlinedInput,
   InputAdornment,
   IconButton,
   FormControl,
-  FormControlLabel,
-  Checkbox,
-  FormGroup,
 } from "@mui/material";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -19,6 +15,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormResetPasswordSchema } from "./FormResetPasswordSchema";
+import { enqueueSnackbar } from "notistack";
 
 const FormResetpassword = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -53,17 +50,18 @@ const FormResetpassword = () => {
             headers: { "Content-Type": "application/json" },
           }
         );
-        console.log(response);
+
         if (!response.ok) {
           const data = await response.json();
           throw new Error(data.error);
         }
 
-        alert("Contraseña restablecida");
+        enqueueSnackbar("Contraseña restablecida");
         actions.resetForm();
+        navigate("/login");
+        actions.setSubmitting(false);
       } catch (error) {
         alert("Error al resetear el password: " + error.message);
-        actions.setSubmitting(false);
       }
     },
   });
