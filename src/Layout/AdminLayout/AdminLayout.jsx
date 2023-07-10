@@ -1,14 +1,18 @@
-import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useRef, useState } from "react";
 import { Box } from "@mui/material";
 import useScrollUp from "../../hooks/useScrollUp";
 import Footer from "../../components/Footer/Footer";
 import HeaderBarAdmin from "../../components/HeaderBarAdmin/HeaderBarAdmin";
 import ListBarAdmin from "../../components/ListBarAdmin/ListBarAdmin";
+import { AnimatedOutlet } from "../../components/AnimatedOutlet/AnimatedOutlet";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 
 const AdminLayout = () => {
-  useScrollUp();
   const [showDrawer, setShowDrawer] = useState(true);
+  const nodeRef = useRef(null);
+  const location = useLocation();
+  useScrollUp();
   const handleOpenCloseDrawer = () => {
     setShowDrawer((currentStatus) => !currentStatus);
   };
@@ -24,7 +28,18 @@ const AdminLayout = () => {
         }}
       >
         <Box sx={{ maxWidth: "1200px", margin: "0 auto", p: 2 }}>
-          <Outlet />
+          <SwitchTransition>
+            <CSSTransition
+              key={location.pathname}
+              nodeRef={nodeRef}
+              classNames="page-transition"
+              timeout={200}
+            >
+              <div ref={nodeRef}>
+                <AnimatedOutlet />
+              </div>
+            </CSSTransition>
+          </SwitchTransition>
         </Box>
       </Box>
       <Box

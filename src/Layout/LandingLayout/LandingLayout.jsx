@@ -1,10 +1,14 @@
-import { Outlet } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import Header from "../../components/Header/Header";
 import useScrollUp from "../../hooks/useScrollUp";
 import Footer from "../../components/Footer/Footer";
-
+import { CSSTransition, SwitchTransition } from "react-transition-group";
+import { useRef } from "react";
+import { AnimatedOutlet } from "../../components/AnimatedOutlet/AnimatedOutlet";
 const LandingLayout = () => {
+  const nodeRef = useRef(null);
+  const location = useLocation();
   useScrollUp();
   return (
     <>
@@ -19,7 +23,18 @@ const LandingLayout = () => {
       >
         <Box sx={{ height: "100vh" }}>
           <Header />
-          <Outlet />
+          <SwitchTransition>
+            <CSSTransition
+              key={location.pathname}
+              nodeRef={nodeRef}
+              classNames="page-transition"
+              timeout={200}
+            >
+              <div ref={nodeRef}>
+                <AnimatedOutlet />
+              </div>
+            </CSSTransition>
+          </SwitchTransition>
           <Footer />
         </Box>
       </Box>

@@ -8,7 +8,7 @@ const Register = lazy(() => import("./pages/Register"));
 const Forgot = lazy(() => import("./pages/Forgot"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Home = lazy(() => import("./pages/Home"));
-const HomeLayout = lazy(() => import("./Layout/HomeLayout/HomeLayout"));
+
 const Orders = lazy(() => import("./pages/Orders"));
 const Products = lazy(() => import("./pages/Products"));
 const Clients = lazy(() => import("./pages/Clientes"));
@@ -25,7 +25,7 @@ const SuppliersCreate = lazy(() => import("./pages/SuppliersCreate"));
 const SuppliersEdit = lazy(() => import("./pages/SuppliersEdit"));
 const Services = lazy(() => import("./pages/Services"));
 const Stats = lazy(() => import("./pages/Stats"));
-const AdminLayout = lazy(() => import("./Layout/AdminLayout/AdminLayout"));
+
 const MisDatos = lazy(() => import("./pagesAdmin/MisDatos"));
 const Negocio = lazy(() => import("./pagesAdmin/Negocio"));
 const Suscripcion = lazy(() => import("./pagesAdmin/Suscripcion"));
@@ -40,7 +40,10 @@ const NoAuth = lazy(() => import("./pages/NoAuth"));
 const OrdersPrint2 = lazy(() => import("./pages/OrdersPrint2"));
 
 import ChatBox from "./components/ChatBox/ChatBox";
+
 import { UserContextProvider } from "./contexts/UserContext";
+import HomeLayout from "./Layout/HomeLayout/HomeLayout";
+import AdminLayout from "./Layout/AdminLayout/AdminLayout";
 
 const App = () => {
   const location = useLocation();
@@ -50,7 +53,7 @@ const App = () => {
   return (
     <UserContextProvider>
       {/* Rutas Publicas */}
-      <Suspense fallback={<div>Loading Landing...</div>}>
+      <Suspense>
         <Routes>
           <Route path="/" element={<LandingLayout />}>
             <Route index element={<Landing />} />

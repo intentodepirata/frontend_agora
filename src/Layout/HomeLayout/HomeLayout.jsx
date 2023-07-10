@@ -1,17 +1,23 @@
 import ListBar from "../../components/ListBar/ListBar";
-import { Outlet } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import HeaderBar from "../../components/HeaderBar/HeaderBar";
 import { useState } from "react";
 import { Box, Container } from "@mui/material";
 import useScrollUp from "../../hooks/useScrollUp";
 import Footer from "../../components/Footer/Footer";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
+import { useRef } from "react";
+import { AnimatedOutlet } from "../../components/AnimatedOutlet/AnimatedOutlet";
 
 const HomeLayout = () => {
-  useScrollUp();
   const [showDrawer, setShowDrawer] = useState(true);
+  useScrollUp();
+
   const handleOpenCloseDrawer = () => {
     setShowDrawer((currentStatus) => !currentStatus);
   };
+  const nodeRef = useRef(null);
+  const location = useLocation();
   return (
     <>
       <HeaderBar handleOpenCloseDrawer={handleOpenCloseDrawer} />
@@ -33,7 +39,18 @@ const HomeLayout = () => {
             },
           }}
         >
-          <Outlet />
+          <SwitchTransition>
+            <CSSTransition
+              key={location.pathname}
+              nodeRef={nodeRef}
+              classNames="page-transition"
+              timeout={200}
+            >
+              <div ref={nodeRef}>
+                <AnimatedOutlet />
+              </div>
+            </CSSTransition>
+          </SwitchTransition>
         </Container>
       </Box>
       <Box
