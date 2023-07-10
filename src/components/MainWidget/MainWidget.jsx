@@ -13,6 +13,7 @@ import {
   initialValues,
   updateHighcharts,
 } from "./utils/utils";
+import accessibility from "highcharts/modules/accessibility";
 const MainWidget = ({
   rows,
   fetchOtsByTime,
@@ -25,7 +26,7 @@ const MainWidget = ({
   const [chartKey, setChartKey] = useState(0);
 
   const { user } = useUserContext();
-
+  accessibility(Highcharts);
   useEffect(() => {
     const data = updateHighcharts(rows);
     setOptions((prevOptions) => ({

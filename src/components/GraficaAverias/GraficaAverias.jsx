@@ -2,10 +2,11 @@ import { useEffect, useRef } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { Typography } from "@mui/material";
+import accessibility from "highcharts/modules/accessibility";
 
 const GraficaReparaciones = ({ data }) => {
   const chartRef = useRef(null);
-
+  accessibility(Highcharts);
   useEffect(() => {
     if (chartRef.current && data) {
       const chart = chartRef.current.chart;

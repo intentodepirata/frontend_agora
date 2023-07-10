@@ -18,7 +18,7 @@ export const initialValues = {
     enabled: false,
   },
   accessibility: {
-    enabled: false,
+    enabled: true,
   },
 
   series: [

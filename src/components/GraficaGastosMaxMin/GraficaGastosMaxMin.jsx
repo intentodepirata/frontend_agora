@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import { CircularProgress } from "@mui/material";
-
+import accessibility from "highcharts/modules/accessibility";
 const GraficaGastos = ({ data }) => {
   const chartRef = useRef(null);
 
@@ -16,7 +16,7 @@ const GraficaGastos = ({ data }) => {
   if (!data) {
     return <CircularProgress />;
   }
-
+  accessibility(Highcharts);
   const totalGastos = data
     .filter((item) => item.tipo === "Gasto")
     .reduce((total, item) => total + parseFloat(item.cantidad), 0);
@@ -48,6 +48,9 @@ const GraficaGastos = ({ data }) => {
     },
     credits: {
       enabled: false,
+    },
+    accessibility: {
+      enabled: true,
     },
     series: [
       {
