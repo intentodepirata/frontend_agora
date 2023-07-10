@@ -42,45 +42,46 @@ const ProveedoresModal = ({
         </Typography>
 
         <List sx={{ width: "100%" }}>
-          {proveedores.map((proveedor) => (
-            <Box key={proveedor.id}>
-              <ListItemButton
-                button
-                selected={proveedor === proveedorSeleccionado}
-                onClick={() => seleccionarProveedor(proveedor)}
-              >
-                <ListItemText
-                  primary={
-                    <Typography variant="h6" color="GrayText">
-                      {proveedor.empresa}
-                    </Typography>
-                  }
-                  secondary={
-                    <>
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        fontWeight="bold"
-                      >
-                        Teléfono:
-                      </Typography>{" "}
-                      {proveedor.telefono}
-                      <br />
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        fontWeight="bold"
-                      >
-                        Email:
-                      </Typography>{" "}
-                      {proveedor.email}
-                    </>
-                  }
-                />
-              </ListItemButton>
-              {proveedores.length > 1 && <Divider />}
-            </Box>
-          ))}
+          {proveedores &&
+            proveedores.map((proveedor) => (
+              <Box key={proveedor.id}>
+                <ListItemButton
+                  button
+                  selected={proveedor === proveedorSeleccionado}
+                  onClick={() => seleccionarProveedor(proveedor)}
+                >
+                  <ListItemText
+                    primary={
+                      <Typography variant="h6" color="GrayText">
+                        {proveedor.empresa}
+                      </Typography>
+                    }
+                    secondary={
+                      <>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          fontWeight="bold"
+                        >
+                          Teléfono:
+                        </Typography>{" "}
+                        {proveedor.telefono}
+                        <br />
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          fontWeight="bold"
+                        >
+                          Email:
+                        </Typography>{" "}
+                        {proveedor.email}
+                      </>
+                    }
+                  />
+                </ListItemButton>
+                {proveedores.length > 1 && <Divider />}
+              </Box>
+            ))}
         </List>
         {proveedorSeleccionado && (
           <Stack
