@@ -1,4 +1,4 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import logo from "../assets/img/logo-trans.png";
 import { useEffect, useState } from "react";
@@ -48,6 +48,7 @@ export default function OrdersStatus() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          px: 2,
           height: "80vh",
           backgroundImage: "url('/img/background-landpage.svg')",
           backgroundColor: "#F3F4F6",
@@ -69,10 +70,12 @@ export default function OrdersStatus() {
           <Box sx={{ p: 1 }}>
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(2, 1fr)",
+                  sm: "repeat(3, 1fr) ",
+                },
                 p: 1,
-                alignItems: "flex-start",
               }}
             >
               <Box
@@ -82,12 +85,23 @@ export default function OrdersStatus() {
                 width={"100%"}
                 alt="logo"
               />
-              <Typography fontWeight={"bold"} variant="subtitle1" color="grey">
+              <Typography
+                sx={{ textAlign: { xs: "center" } }}
+                fontWeight={"bold"}
+                variant="subtitle1"
+                color="grey"
+              >
                 {user?.negocio.nombre
                   ? user?.negocio.nombre
                   : "Agora TechSolutions"}
               </Typography>
-              <Box textAlign={"right"}>
+              <Box
+                textAlign={"right"}
+                sx={{
+                  gridRow: { xs: "1", sm: "1" },
+                  gridColumn: { xs: "2", sm: "3" },
+                }}
+              >
                 <Typography fontWeight={"bold"} variant="h6" color="primary">
                   OT00{order?.id}
                 </Typography>
@@ -96,12 +110,15 @@ export default function OrdersStatus() {
                 </Typography>
               </Box>
             </Box>
+            <Divider />
             <Box
               sx={{
-                display: "flex",
-                justifyContent: "space-between",
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(1, 1fr)",
+                  sm: "repeat(3, 1fr) ",
+                },
                 p: 1,
-                alignItems: "center",
                 mt: 2,
               }}
             >
@@ -121,7 +138,7 @@ export default function OrdersStatus() {
                   {imei}
                 </Typography>
               </Box>
-              <Box textAlign={"right"}>
+              <Box sx={{ textAlign: { xs: "left", sm: "right" } }}>
                 <Typography fontWeight={"bold"} variant="body2" color="initial">
                   Resolucion:
                 </Typography>
