@@ -6,14 +6,12 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
-  List,
   ListItemText,
   MenuItem,
   OutlinedInput,
   Paper,
   Select,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -225,7 +223,6 @@ export default function FormInvitar() {
               size="small"
               sx={{
                 mb: touched.apellidos && errors.apellidos ? 1 : 2,
-
                 width: "50%",
               }}
             >

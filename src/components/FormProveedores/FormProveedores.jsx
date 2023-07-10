@@ -206,8 +206,6 @@ const FormProveedores = ({ proveedor }) => {
           {isSubmitting ? "Guardando" : "Guardar proveedor"}
         </Button>
       </Box>
-      {/* <pre>{JSON.stringify(proveedor, null, 2)}</pre>
-      <pre>{JSON.stringify(values, null, 2)}</pre> */}
     </Paper>
   );
 };

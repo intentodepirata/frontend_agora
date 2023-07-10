@@ -1,5 +1,4 @@
 import { Box, Button } from "@mui/material";
-
 import logo from "../../assets/img/logo-trans.png";
 import { Link } from "react-router-dom";
 

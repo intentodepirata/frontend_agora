@@ -28,7 +28,7 @@ const FormLogin = () => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const {
     isSubmitting,
     values,

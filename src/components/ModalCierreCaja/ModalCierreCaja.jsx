@@ -2,25 +2,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useUserContext } from "../../contexts/UserContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Divider, Stack, TextField } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { style } from "./style/style";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "400px",
-  bgcolor: "background.paper",
-  borderRadius: 1,
-  boxShadow: 24,
-  border: " 1px solid grey",
-  py: 4,
-  px: 4,
-};
 export default function ModalCierreCaja({
   modal,
   handleModal,

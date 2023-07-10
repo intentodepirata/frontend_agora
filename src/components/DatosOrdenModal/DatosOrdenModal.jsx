@@ -3,20 +3,8 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useUserContext } from "../../contexts/UserContext";
 import { useEffect, useState } from "react";
+import { style } from "./style/style";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "900px",
-  bgcolor: "background.paper",
-  borderRadius: 1,
-  boxShadow: 24,
-  border: " 1px solid grey",
-  py: 4,
-  px: 4,
-};
 export default function DatosOrdenModal({ modal, handleModal, id }) {
   const [cliente, setCliente] = useState(null);
   const [dispositivo, setDispositivo] = useState({});

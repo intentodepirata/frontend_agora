@@ -10,7 +10,6 @@ import { useUserContext } from "../../contexts/UserContext";
 
 const HeaderBarAdmin = ({ handleOpenCloseDrawer }) => {
   const navigate = useNavigate();
-
   const { user } = useUserContext();
 
   return (

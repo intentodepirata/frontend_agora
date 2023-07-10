@@ -42,6 +42,7 @@ const FormResetpassword = () => {
     validationSchema: FormResetPasswordSchema,
     onSubmit: async function (values, actions) {
       try {
+        actions.setSubmitting(true);
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}user/reset-password/${decodedToken}`,
           {

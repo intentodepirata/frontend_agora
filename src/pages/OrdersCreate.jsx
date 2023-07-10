@@ -1,12 +1,10 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link } from "react-router-dom";
 import FormClientes from "../components/FormClientes/FormClientes";
 import FormDispositivo from "../components/FormDispositivo/FormDispositivo";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
-import SearchCliente from "../components/SearchCliente/SearchCliente";
-import SearchImei from "../components/SearchImei/SearchImei";
 import OrderStatusBar from "../components/OrderStatusBar/OrderStatusBar";
 import useScrollUp from "../hooks/useScrollUp";
 const OrdersCreate = () => {
@@ -74,10 +72,6 @@ const OrdersCreate = () => {
       <Box sx={{ px: 2, my: 2, maxWidth: "1308px", mx: "auto" }}>
         <OrderStatusBar estado={estado} />
       </Box>
-      {/* <Box sx={{ display: "flex", justifyContent: "space-evenly" }}>
-        <SearchCliente />
-        <SearchImei />
-      </Box> */}
 
       <Box sx={{ py: 1, px: 2, my: 5 }}>
         <FormClientes setCliente_id={setCliente_id} />

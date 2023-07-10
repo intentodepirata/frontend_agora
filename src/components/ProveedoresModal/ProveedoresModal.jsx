@@ -1,34 +1,18 @@
-import React from "react";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EmailIcon from "@mui/icons-material/Email";
 import PublicIcon from "@mui/icons-material/Public";
 import {
   Box,
-  Paper,
   Typography,
   Button,
   Modal,
   Stack,
   List,
-  ListItem,
   ListItemText,
   ListItemButton,
   Divider,
 } from "@mui/material";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 500,
-
-  bgcolor: "background.paper",
-  // border: "1px solid grey",
-  borderRadius: 1,
-  boxShadow: 24,
-  p: 5,
-};
+import { style } from "./style/style";
 
 const ProveedoresModal = ({
   modalAbierto,

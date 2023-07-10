@@ -1,19 +1,5 @@
-import {
-  Box,
-  Button,
-  Paper,
-  Stack,
-  Typography,
-  AppBar,
-  Tabs,
-  List,
-  ListItemText,
-  Divider,
-  ListItem,
-  LinearProgress,
-} from "@mui/material";
-
-import { columnas, style } from "./utils/columnas";
+import { Box, Button, Stack, LinearProgress } from "@mui/material";
+import { columnas } from "./utils/columnas";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
@@ -21,7 +7,6 @@ import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
 import Carrito from "../Carrito/Carrito";
 import CustomNoRowsOverlay2 from "../CustomNoRowsOverlay2/CustomNoRowsOverlay2";
 
@@ -34,7 +19,7 @@ export default function TablaCarrito({
 }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const { user } = useUserContext();
-  const navigate = useNavigate();
+
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);
   };

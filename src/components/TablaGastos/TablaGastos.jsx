@@ -1,18 +1,13 @@
-import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { columns } from "./utils/columnas";
-
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useUserContext } from "../../contexts/UserContext";
 
 export default function TablaGastos({ rows, fetchProveedores, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
-  const { user } = useUserContext();
-  const navigate = useNavigate();
 
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);

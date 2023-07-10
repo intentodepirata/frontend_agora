@@ -107,6 +107,7 @@ const App = () => {
         {/* Rutas protegida */}
         <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
           <Route path="print/:id" element={<OrdersPrint2 />} />
+          <Route path="print-simple/:id" element={<OrdersPrint />} />
         </Route>
 
         {/* Ruta para clientes */}

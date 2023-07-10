@@ -18,7 +18,6 @@ import { useUserContext } from "../../contexts/UserContext";
 import { enqueueSnackbar } from "notistack";
 
 const FormDispositivo = ({ setDispositivo_id }) => {
-  const [imeiSearch, setImeiSearch] = useState("");
   const [marcas, setMarcas] = useState([]);
   const [modelos, setModelos] = useState([]);
   const [guardado, setGuardado] = useState(false);
@@ -248,7 +247,6 @@ const FormDispositivo = ({ setDispositivo_id }) => {
         <TextField
           sx={{ width: "25%", mr: 2 }}
           id="fechaCompra"
-          // labelId="fechaCompra_label"
           size="small"
           label="Fecha de compra"
           name="fechaCompra"

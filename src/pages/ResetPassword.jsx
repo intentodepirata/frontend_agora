@@ -1,4 +1,3 @@
-import React from "react";
 import { Box } from "@mui/material";
 import FormForgot from "../components/FormResetPassword/FormResetPassword";
 import useScrollUp from "../hooks/useScrollUp";

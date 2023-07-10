@@ -1,5 +1,5 @@
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
+import { Box, Button, LinearProgress, Stack } from "@mui/material";
 import { useState } from "react";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -57,7 +57,7 @@ export default function TablaProducts({
         enqueueSnackbar("Elemento eliminado correctamente", {
           variant: "success",
         });
-        fetchComponentes(); // Obtener los datos actualizados
+        fetchComponentes();
       } catch (error) {
         console.error(error.message);
       }

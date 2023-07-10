@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TablaHome from "../components/TablaHome/TablaHome";
 import MainWidget from "../components/MainWidget/MainWidget";
 import { useUserContext } from "../contexts/UserContext";
@@ -13,6 +13,7 @@ const Home = () => {
   const [filtroEstado, setFiltroEstado] = useState("");
   const [totalFacturado, setTotalFacturado] = useState(0);
   const { user } = useUserContext();
+
   useScrollUp();
 
   useEffect(() => {

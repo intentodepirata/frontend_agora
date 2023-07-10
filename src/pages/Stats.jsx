@@ -1,15 +1,9 @@
 import { Box, Button, Typography } from "@mui/material";
 import GraficaGastos from "../components/GraficaGastos/GraficaGastos";
 import GraficaAverias from "../components/GraficaAverias/GraficaAverias";
-import TablaGastos from "../components/TablaGastos/TablaGastos";
-import { rows as rowsGastos } from "../components/TablaGastos/utils/columnas";
-import TablaTop5 from "../components/TablaTop5/TablaTop5";
-import { rows, rows2 } from "../components/TablaTop5/utils/columnas";
-import { GridToolbar } from "@mui/x-data-grid";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import useScrollUp from "../hooks/useScrollUp";
 import FormEstadisticas from "../components/FormEstadisticas/FormEstadisticas";
-import { addDays, set } from "date-fns";
+import { addDays } from "date-fns";
 import { useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import GraficaGastosMaxMin from "../components/GraficaGastosMaxMin/GraficaGastosMaxMin";

@@ -1,7 +1,6 @@
 import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { columnas } from "./utils/columnas";
-
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { customLocaleText } from "../../traductions/customGridLocaleText";

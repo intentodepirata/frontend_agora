@@ -2,14 +2,10 @@ import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-
 import { Paper, Typography } from "@mui/material";
-
 import ForwardToInboxIcon from "@mui/icons-material/ForwardToInbox";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-
-import InfoIcon from "@mui/icons-material/Info";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import StoreIcon from "@mui/icons-material/Store";

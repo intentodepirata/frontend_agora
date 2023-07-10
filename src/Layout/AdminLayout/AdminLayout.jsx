@@ -1,6 +1,4 @@
-import ListBar from "../../components/ListBar/ListBar";
 import { Outlet } from "react-router-dom";
-
 import { useState } from "react";
 import { Box } from "@mui/material";
 import useScrollUp from "../../hooks/useScrollUp";
@@ -33,7 +31,7 @@ const AdminLayout = () => {
         component={"footer"}
         sx={{ marginLeft: showDrawer ? "16rem" : "64px", mt: "64px" }}
       >
-        {/* <Footer /> */}
+        <Footer />
       </Box>
     </>
   );

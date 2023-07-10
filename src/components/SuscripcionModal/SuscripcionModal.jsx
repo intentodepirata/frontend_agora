@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Paper,
@@ -8,7 +8,6 @@ import {
   Stepper,
   Step,
   StepLabel,
-  StepContent,
   TextField,
   FormControl,
   InputLabel,
@@ -17,47 +16,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "500px",
-  bgcolor: "background.paper",
-  borderRadius: 1,
-  boxShadow: 24,
-  border: " 1px solid grey",
-  py: 4,
-  px: 4,
-};
-
-const steps = [
-  { label: "Productos" },
-  { label: "Tarjetas" },
-  { label: "Cupones" },
-  { label: "Resumen" },
-];
-
-const planOptions = [
-  {
-    label: "Básico Mensual",
-    description: "Tu plan se renovará automáticamente cada mes",
-    price: "19.99€/mes",
-  },
-  {
-    label: "Básico Anual",
-    description: "Un solo pago cada año",
-    price: "179.99€/año",
-  },
-];
-const initialCardData = {
-  cardNumber: "",
-  cardType: "",
-  cardYear: "",
-  cardMonth: "",
-  cardName: "",
-};
+import { initialCardData, planOptions, steps, style } from "./utils/utils";
 
 const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const [activeStep, setActiveStep] = useState(0);

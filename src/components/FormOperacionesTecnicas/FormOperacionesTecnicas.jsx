@@ -127,7 +127,9 @@ const FormOperacionesTecnicas = ({
         setOts_id(data);
         setNumeroOt(data);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {

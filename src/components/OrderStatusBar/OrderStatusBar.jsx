@@ -3,16 +3,7 @@ import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-
-const steps = [
-  "Introduzca datos del cliente",
-  "Introduzca datos del terminal",
-  "Recepcionado",
-  "Asignado a tecnico",
-  "En reparacion",
-  "Pendiente de repuesto",
-  "Reparacion Finalizada",
-];
+import { steps } from "./utils/steps";
 
 export default function OrderStatusBar({ estado }) {
   const [activeStep, setActiveStep] = useState(-1);

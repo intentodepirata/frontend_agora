@@ -16,7 +16,6 @@ import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
 import CustomNoRowsOverlay from "../CustomNoRowsOverlay/CustomNoRowsOverlay";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
-import { useParams } from "react-router-dom";
 
 const TablaReparacion = ({
   ots_id,

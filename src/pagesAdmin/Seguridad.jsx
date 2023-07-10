@@ -1,6 +1,5 @@
 import {
   Box,
-  Paper,
   Typography,
   Button,
   InputLabel,

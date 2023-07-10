@@ -1,11 +1,9 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
 import FormSuscripcion from "../components/FormSuscripcion/FormSuscripcion";
 import useScrollUp from "../hooks/useScrollUp";
 
 const Suscripcion = () => {
-  const { user } = useUserContext();
-
   useScrollUp();
 
   return (

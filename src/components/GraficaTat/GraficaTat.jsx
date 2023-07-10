@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { CircularProgress, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 
 const GraficaReparaciones = ({ data }) => {
   const chartRef = useRef(null);

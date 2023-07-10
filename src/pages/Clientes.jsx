@@ -1,5 +1,4 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
-
+import { Box, Typography, Button } from "@mui/material";
 import TablaClients from "../components/TablaClients/TablaClients";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";

@@ -51,11 +51,12 @@ const FormForgot = () => {
           }
         );
         actions.resetForm();
+        actions.setSubmitting(false);
+        navigate("/login");
       } catch (error) {
         enqueueSnackbar("Error al restablecer su password", {
           variant: "error",
         });
-        actions.setSubmitting(false);
       }
     },
   });
