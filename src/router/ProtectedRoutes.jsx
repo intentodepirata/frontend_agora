@@ -8,6 +8,9 @@ const ProtectedRoute = ({ allowedRoles, redirect }) => {
   if (user?.role == 2 || user?.role == 3) {
     redirect = "/no-auth";
   }
+  if (user?.role == 4) {
+    redirect = "/admin/suscripcion";
+  }
 
   return isAuthorized ? <Outlet /> : <Navigate to={redirect} replace />;
 };

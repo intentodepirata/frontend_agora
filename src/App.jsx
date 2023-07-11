@@ -118,7 +118,9 @@ const App = () => {
         <Route path="no-auth" element={<NoAuth />} />
 
         {/* Rutas Super protegidas */}
-        <Route element={<ProtectedRoute allowedRoles={[1]} redirect={"/"} />}>
+        <Route
+          element={<ProtectedRoute allowedRoles={[1, 4]} redirect={"/"} />}
+        >
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Negocio />} />
             <Route path="suscripcion" element={<Suscripcion />} />

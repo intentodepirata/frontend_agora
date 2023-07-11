@@ -17,6 +17,8 @@ import {
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
 import { initialCardData, planOptions, steps, style } from "./utils/utils";
+import { useUserContext } from "../../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -25,7 +27,8 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const [couponData, setCouponData] = useState({});
   const [loading, setLoading] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
-
+  const { user, login } = useUserContext();
+  const navigate = useNavigate();
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
@@ -60,19 +63,41 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
     }));
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     handleNext();
-    setLoading(true);
 
-    // Simular proceso de carga
-    setTimeout(() => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}user/payments`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + user.token,
+          },
+          body: JSON.stringify({
+            plan: userPlan,
+            card: cardData,
+            coupon: couponData,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        setLoading(false);
+        throw new Error(data.error);
+      }
+
+      login({ ...user, role: data });
       setLoading(false);
       setPaymentComplete(true);
-
-      // Cerrar el modal después de un breve retraso
-      setTimeout(() => {}, 1500);
-      enqueueSnackbar("Pago realizado", { variant: "success" });
-    }, 2000);
+      enqueueSnackbar("Pago Realizado, Muchas Gracias", { variant: "success" });
+      navigate("/home");
+    } catch (error) {
+      setLoading(false);
+      console.error(error.message);
+    }
   };
 
   const renderStepContent = (step) => {
