@@ -22,11 +22,13 @@ export const steps = [
 export const planOptions = [
   {
     label: "Básico Mensual",
+    value: "month",
     description: "Tu plan se renovará automáticamente cada mes",
     price: "19.99€/mes",
   },
   {
     label: "Básico Anual",
+    value: "year",
     description: "Un solo pago cada año",
     price: "179.99€/año",
   },

@@ -10,7 +10,7 @@ import { useUserContext } from "../../contexts/UserContext";
 
 const HeaderBarAdmin = ({ handleOpenCloseDrawer }) => {
   const navigate = useNavigate();
-  const { user } = useUserContext();
+  const { user, logout } = useUserContext();
 
   return (
     <Box sx={{ flexGrow: 1, backgroundColor: "white" }}>
@@ -41,15 +41,22 @@ const HeaderBarAdmin = ({ handleOpenCloseDrawer }) => {
           <Typography color="grey.700" variant="h5">
             Panel de Administración
           </Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={() => {
-              navigate("/home");
-            }}
-          >
-            Volver a Inicio
-          </Button>
+
+          {user.role !== 4 ? (
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => {
+                navigate("/home");
+              }}
+            >
+              Volver a Inicio
+            </Button>
+          ) : (
+            <Button size="small" variant="outlined" onClick={logout}>
+              Cerrar sesion
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
