@@ -3,7 +3,7 @@ export const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: "500px",
+  width: "900px",
   bgcolor: "background.paper",
   borderRadius: 1,
   boxShadow: 24,
@@ -14,7 +14,7 @@ export const style = {
 
 export const steps = [
   { label: "Productos" },
-  { label: "Tarjetas" },
+  { label: "Metodo de Pago" },
   { label: "Cupones" },
   { label: "Resumen" },
 ];
@@ -25,12 +25,14 @@ export const planOptions = [
     value: "month",
     description: "Tu plan se renovará automáticamente cada mes",
     price: "19.99€/mes",
+    amount: "19.99",
   },
   {
     label: "Básico Anual",
     value: "year",
     description: "Un solo pago cada año",
     price: "179.99€/año",
+    amount: "179.99",
   },
 ];
 export const initialCardData = {
@@ -39,4 +41,9 @@ export const initialCardData = {
   cardYear: "",
   cardMonth: "",
   cardName: "",
+};
+
+export const PAYMENT_METHOD = {
+  creditCard: 1,
+  paypal: 2,
 };

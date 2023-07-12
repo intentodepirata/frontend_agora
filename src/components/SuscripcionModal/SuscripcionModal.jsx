@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Paper,
@@ -14,11 +14,24 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  Divider,
 } from "@mui/material";
 import { enqueueSnackbar } from "notistack";
-import { initialCardData, planOptions, steps, style } from "./utils/utils";
+import {
+  PAYMENT_METHOD,
+  initialCardData,
+  planOptions,
+  steps,
+  style,
+} from "./utils/utils";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+
+import {
+  PayPalButtons,
+  PayPalScriptProvider,
+  usePayPalScriptReducer,
+} from "@paypal/react-paypal-js";
 
 const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -27,8 +40,10 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const [couponData, setCouponData] = useState({});
   const [loading, setLoading] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [selectedPaymentType, setSelectedPaymentType] = useState(0);
   const { user, login } = useUserContext();
   const navigate = useNavigate();
+
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
@@ -40,7 +55,7 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const handleReset = () => {
     setActiveStep(0);
     setUserPlan("");
-    setCardData({});
+    setCardData(initialCardData);
     setCouponData({});
     closeModal();
   };
@@ -100,6 +115,60 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
     }
   };
 
+  const currency = "EUR";
+  const ButtonWrapper = ({ currency, showSpinner }) => {
+    const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
+    const style = {
+      layout: "horizontal",
+      size: "responsive",
+      color: "gold",
+      tagline: false,
+    };
+
+    useEffect(() => {
+      dispatch({
+        type: "resetOptions",
+        value: {
+          ...options,
+          currency: currency,
+        },
+      });
+    }, [currency, showSpinner]);
+
+    return (
+      <>
+        {showSpinner && isPending && <div className="spinner" />}
+        <PayPalButtons
+          style={style}
+          disabled={false}
+          forceReRender={[userPlan.amount, currency, style]}
+          fundingSource={undefined}
+          createOrder={(data, actions) => {
+            return actions.order
+              .create({
+                purchase_units: [
+                  {
+                    amount: {
+                      currency_code: currency,
+                      value: userPlan.amount,
+                    },
+                  },
+                ],
+              })
+              .then((orderId) => {
+                // Your code here after create the order
+                return orderId;
+              });
+          }}
+          onApprove={function (data, actions) {
+            return actions.order.capture().then(function () {
+              // Your code here after capture the order
+            });
+          }}
+        />
+      </>
+    );
+  };
   const renderStepContent = (step) => {
     switch (step) {
       case 0:
@@ -141,66 +210,195 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
       case 1:
         return (
           <Box>
-            <Typography variant="body1" mb={1}>
-              Agrega una tarjeta de crédito
+            <Typography
+              variant="h5"
+              color="initial"
+              textAlign={"center"}
+              mt={2}
+              mb={5}
+            >
+              Selecciona un método de pago
             </Typography>
-            <Typography variant="body2">Tarjeta:</Typography>
-            <FormControl fullWidth sx={{ mt: 2 }}>
-              <TextField
-                label="Nombre del titular"
-                name="cardName"
-                size="small"
-                onChange={handleCardChange}
-                value={cardData.cardName || ""}
-                sx={{ mb: 2, bgcolor: "grey.100" }}
-              />
-              <TextField
-                label="Número de tarjeta"
-                name="cardNumber"
-                size="small"
-                onChange={handleCardChange}
-                value={cardData.cardNumber || ""}
-                sx={{ mb: 2, bgcolor: "grey.100" }}
-              />
-              <Box sx={{ display: "flex", gap: 2 }}>
-                <TextField
-                  label="MM"
-                  name="cardMonth"
-                  size="small"
-                  onChange={handleCardChange}
-                  value={cardData.cardMonth || ""}
-                  sx={{ mb: 2, bgcolor: "grey.100" }}
-                />
-                <TextField
-                  label="AA"
-                  name="cardYear"
-                  size="small"
-                  onChange={handleCardChange}
-                  value={cardData.cardYear || ""}
-                  sx={{ mb: 2, bgcolor: "grey.100" }}
-                />
-                <FormControl size="small" fullWidth sx={{ mb: 2 }}>
-                  <InputLabel id="tarjeta-credito-label">
-                    Tarjeta de crédito
-                  </InputLabel>
-                  <Select
-                    name="cardType"
-                    labelId="tarjeta-credito-label"
-                    id="tarjeta-credito-select"
-                    value={cardData.cardType}
-                    onChange={handleCardChange}
-                    size="small"
-                    label="Tarjeta de crédito"
-                  >
-                    <MenuItem defaultValue={"Visa"} value="VISA">
-                      Visa
-                    </MenuItem>
-                    <MenuItem value="MASTERCARD">Mastercard</MenuItem>
-                    <MenuItem value="AMEX">American Express</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
+            <FormControl fullWidth>
+              <InputLabel id="select-method-Payment">Metodo de Pago</InputLabel>
+              <Select
+                labelId="select-method-Payment"
+                id="select-method-Payment"
+                value={selectedPaymentType}
+                label="Metodo de Pago"
+                onChange={(e) => setSelectedPaymentType(e.target.value)}
+              >
+                <MenuItem value={0}>Selecciona uno</MenuItem>
+                <MenuItem value={PAYMENT_METHOD.creditCard}>
+                  Tarjeta de credito
+                </MenuItem>
+                <MenuItem value={PAYMENT_METHOD.paypal}>PayPal</MenuItem>
+              </Select>
             </FormControl>
+            <Divider sx={{ my: 2 }} />
+            {selectedPaymentType === PAYMENT_METHOD.creditCard && (
+              <>
+                {/* <Typography variant="body1" mb={1}>
+                  Tarjeta de Credito
+                </Typography> */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <FormControl fullWidth sx={{ mt: 2, mr: 2 }}>
+                    <TextField
+                      label="Nombre del titular"
+                      name="cardName"
+                      size="small"
+                      onChange={handleCardChange}
+                      value={cardData.cardName || ""}
+                      sx={{ mb: 2, bgcolor: "grey.100" }}
+                    />
+                    <TextField
+                      label="Número de tarjeta"
+                      name="cardNumber"
+                      size="small"
+                      onChange={handleCardChange}
+                      value={cardData.cardNumber || ""}
+                      sx={{ mb: 2, bgcolor: "grey.100" }}
+                    />
+                    <Box sx={{ display: "flex", gap: 2 }}>
+                      <TextField
+                        label="MM"
+                        name="cardMonth"
+                        size="small"
+                        onChange={handleCardChange}
+                        value={cardData.cardMonth || ""}
+                        sx={{ mb: 2, bgcolor: "grey.100" }}
+                      />
+                      <TextField
+                        label="AA"
+                        name="cardYear"
+                        size="small"
+                        onChange={handleCardChange}
+                        value={cardData.cardYear || ""}
+                        sx={{ mb: 2, bgcolor: "grey.100" }}
+                      />
+                      <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+                        <InputLabel id="tarjeta-credito-label">
+                          Tarjeta de crédito
+                        </InputLabel>
+                        <Select
+                          name="cardType"
+                          labelId="tarjeta-credito-label"
+                          id="tarjeta-credito-select"
+                          value={cardData.cardType}
+                          onChange={handleCardChange}
+                          size="small"
+                          label="Tarjeta de crédito"
+                        >
+                          <MenuItem defaultValue={"Visa"} value="VISA">
+                            Visa
+                          </MenuItem>
+                          <MenuItem value="MASTERCARD">Mastercard</MenuItem>
+                          <MenuItem value="AMEX">American Express</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </FormControl>
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: "4px",
+                      backgroundColor: "#1565C0",
+                      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                      width: "100%",
+                      height: "160px",
+                      position: "relative",
+
+                      mx: 2,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        color: "#ccc",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: "20px",
+                          marginBottom: "8px",
+                          textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
+                        }}
+                        variant="body2"
+                      >
+                        {cardData.type}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: "20px",
+                          marginBottom: "8px",
+                          textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
+                        }}
+                        color={"#ccc"}
+                        variant="body1"
+                      >
+                        {cardData.cardName}
+                      </Typography>
+                      <Typography
+                        color={"#ccc"}
+                        variant="body1"
+                        sx={{
+                          marginBottom: "8px",
+                          textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
+                        }}
+                      >{`${cardData.cardYear}/${cardData.cardMonth}`}</Typography>
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontSize: "20px",
+                        marginBottom: "8px",
+                        textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
+                      }}
+                      color={"#ccc"}
+                      variant="body1"
+                    >
+                      {cardData.cardNumber
+                        ? cardData.cardNumber.replace(/\d(?=\d{4})/g, "*")
+                        : "**** **** **** ****"}
+                    </Typography>
+                    <Typography color={"#ccc"} variant="body1">
+                      {cardData.cardType}
+                    </Typography>
+                  </Box>
+                </Box>
+              </>
+            )}
+
+            {selectedPaymentType === PAYMENT_METHOD.paypal && (
+              <>
+                <Box sx={{ maxWidth: 400 }} ml={23} mt={6}>
+                  <PayPalScriptProvider
+                    options={{
+                      clientId: "test",
+                      components: "buttons",
+                      currency: "Euro",
+                    }}
+                  >
+                    <ButtonWrapper currency={currency} showSpinner={false} />
+                  </PayPalScriptProvider>
+                </Box>
+              </>
+            )}
           </Box>
         );
       case 2:
@@ -233,84 +431,9 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
               </Typography>
             </Box>
             <Box sx={{ mt: 2 }}>
-              <Typography mb={2} variant="h6">
+              {/* <Typography mb={2} variant="h6">
                 Tarjeta de Crédito:
-              </Typography>
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: "4px",
-                  backgroundColor: "#1565C0",
-                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                  maxWidth: "400px",
-                  position: "relative",
-                  mb: 2,
-                  mx: 2,
-                }}
-              >
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    color: "#ccc",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "20px",
-                      marginBottom: "8px",
-                      textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
-                    }}
-                    variant="body2"
-                  >
-                    {cardData.type}
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "20px",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "20px",
-                      marginBottom: "8px",
-                      textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
-                    }}
-                    color={"#ccc"}
-                    variant="body1"
-                  >
-                    {cardData.cardName}
-                  </Typography>
-                  <Typography
-                    color={"#ccc"}
-                    variant="body1"
-                    sx={{
-                      marginBottom: "8px",
-                      textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
-                    }}
-                  >{`${cardData.cardYear}/${cardData.cardMonth}`}</Typography>
-                </Box>
-                <Typography
-                  sx={{
-                    fontSize: "20px",
-                    marginBottom: "8px",
-                    textShadow: "2px 2px 2px rgba(0, 0, 0, 0.3)",
-                  }}
-                  color={"#ccc"}
-                  variant="body1"
-                >
-                  {cardData.cardNumber
-                    ? cardData.cardNumber.replace(/\d(?=\d{4})/g, "*")
-                    : "**** **** **** ****"}
-                </Typography>
-                <Typography color={"#ccc"} variant="body1">
-                  {cardData.cardType}
-                </Typography>
-              </Box>
+              </Typography> */}
             </Box>
 
             <Typography variant="body1">

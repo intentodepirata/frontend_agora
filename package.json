@@ -18,6 +18,7 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
     "@mui/x-data-grid": "^6.2.1",
+    "@paypal/react-paypal-js": "^8.1.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.9",
     "formik": "^2.4.0",
