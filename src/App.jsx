@@ -1,18 +1,16 @@
 import { UserContextProvider } from "./contexts/UserContext";
 import { Route, Routes, useLocation } from "react-router-dom";
-
-import ChatBox from "./components/ChatBox/ChatBox";
-import LandingLayout from "./Layout/LandingLayout/LandingLayout";
+import { ChatBox } from "./components/ChatBox";
+import { LandingLayout } from "./Layout/LandingLayout";
+import { AdminLayout } from "./Layout/AdminLayout";
+import { HomeLayout } from "./Layout/HomeLayout";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Forgot from "./pages/Forgot";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./router/ProtectedRoutes";
-
-import HomeLayout from "./Layout/HomeLayout/HomeLayout";
 import Home from "./pages/Home";
-import AdminLayout from "./Layout/AdminLayout/AdminLayout";
 import OrdersPrintSmall from "./pages/OrdersPrintSmall";
 import OrdersPrint from "./pages/OrdersPrint";
 import Orders from "./pages/Orders";

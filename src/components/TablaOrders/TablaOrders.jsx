@@ -1,22 +1,15 @@
-import { DataGrid } from "@mui/x-data-grid";
-import { Box, Button, LinearProgress, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
-import { columns } from "./utils/columnas";
 import { useNavigate } from "react-router-dom";
-import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
-import { customLocaleText } from "../../traductions/customGridLocaleText";
-import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import PrintIcon from "@mui/icons-material/Print";
+import TablaGenerica from "../TablaGenerica/TablaGenerica";
+import { columnsOrders } from "../TablaGenerica/utils/columnas";
 
 export default function TablaOrders({ rows, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const navigate = useNavigate();
-
-  const handleSelectionModelChange = (newSelection) => {
-    setSelectionModel(newSelection);
-  };
 
   function handlePrint(id) {
     window.open(`/print/${id}`, "_blank");
@@ -30,41 +23,11 @@ export default function TablaOrders({ rows, cargando }) {
 
   return (
     <Box sx={{ height: 740, width: "100%", maxWidth: "1400px" }}>
-      <DataGrid
-        sx={{
-          "& .css-t89xny-MuiDataGrid-columnHeaderTitle": {
-            fontWeight: 700,
-            color: "grey",
-          },
-          "& .MuiDataGrid-cell:hover": {
-            color: "primary.main",
-          },
-          height: 720,
-        }}
+      <TablaGenerica
+        columns={columnsOrders}
         rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-            },
-          },
-        }}
-        pageSizeOptions={[10]}
-        onRowSelectionModelChange={handleSelectionModelChange}
-        slots={{
-          toolbar: CustomGridToolbar,
-          loadingOverlay: LinearProgress,
-          footer: CustomGridFooter,
-        }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-          },
-        }}
-        loading={Boolean(cargando)}
-        localeText={customLocaleText}
+        cargando={cargando}
+        setSelectionModel={setSelectionModel}
       />
       <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
         <Button

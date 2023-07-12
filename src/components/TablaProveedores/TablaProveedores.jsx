@@ -1,25 +1,17 @@
-import { Box, Button, LinearProgress, Stack } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { columns } from "./utils/columnas";
+import { Box, Button, Stack } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
-import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
-import { customLocaleText } from "../../traductions/customGridLocaleText";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
+import TablaGenerica from "../TablaGenerica/TablaGenerica";
+import { columnsProveedores } from "../TablaGenerica/utils/columnas";
 
 export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
-
   const { user } = useUserContext();
   const navigate = useNavigate();
-
-  const handleSelectionModelChange = (newSelection) => {
-    setSelectionModel(newSelection);
-  };
 
   function handleEditar(id) {
     navigate("/home/suppliers/edit/" + id[0]);
@@ -81,41 +73,11 @@ export default function TablaProveedores({ rows, fetchProveedores, cargando }) {
 
   return (
     <Box sx={{ height: 740, width: "100%", maxWidth: "1400px" }}>
-      <DataGrid
-        sx={{
-          "& .css-mf4goe-MuiDataGrid-root": {
-            fontWeight: 700,
-            color: "grey",
-          },
-          "& .MuiDataGrid-cell:hover": {
-            color: "primary.main",
-          },
-          height: 720,
-        }}
+      <TablaGenerica
+        columns={columnsProveedores}
         rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-            },
-          },
-        }}
-        pageSizeOptions={[10]}
-        onRowSelectionModelChange={handleSelectionModelChange}
-        slots={{
-          toolbar: CustomGridToolbar,
-          loadingOverlay: LinearProgress,
-          footer: CustomGridFooter,
-        }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-          },
-        }}
-        loading={Boolean(cargando)}
-        localeText={customLocaleText}
+        cargando={cargando}
+        setSelectionModel={setSelectionModel}
       />
       <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
         <Button

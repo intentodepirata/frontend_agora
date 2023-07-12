@@ -1,17 +1,12 @@
-import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { columns } from "./utils/columnas";
+import { Box, Button, Stack, TextField } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
-import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
-import { customLocaleText } from "../../traductions/customGridLocaleText";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { enqueueSnackbar } from "notistack";
-
+import TablaGenerica from "../TablaGenerica/TablaGenerica";
+import { columnsServicios } from "../TablaGenerica/utils/columnas";
 export default function TablaServicios({ cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const [servicioActualizado, setServicioActualizado] = useState(null);
@@ -19,13 +14,10 @@ export default function TablaServicios({ cargando }) {
   const [precio, setPrecio] = useState("");
   const [rows, setRows] = useState([]);
   const { user } = useUserContext();
-  const navigate = useNavigate();
+
   useEffect(() => {
     fetchServicios();
   }, []);
-  const handleSelectionModelChange = (newSelection) => {
-    setSelectionModel(newSelection);
-  };
 
   async function handleSubmit() {
     if (servicio === "" || precio === "") {
@@ -122,7 +114,7 @@ export default function TablaServicios({ cargando }) {
         enqueueSnackbar("Servicio eliminado correctamente", {
           variant: "success",
         });
-        fetchProveedores(); // Obtener los datos actualizados
+        fetchProveedores();
       } catch (error) {
         enqueueSnackbar(error.message, {
           variant: "error",
@@ -176,41 +168,11 @@ export default function TablaServicios({ cargando }) {
           {servicioActualizado ? "Actualizar" : "Agregar"}
         </Button>
       </Stack>
-      <DataGrid
-        sx={{
-          "& .css-mf4goe-MuiDataGrid-root": {
-            fontWeight: 700,
-            color: "grey",
-          },
-          "& .MuiDataGrid-cell:hover": {
-            color: "primary.main",
-          },
-          height: 720,
-        }}
+      <TablaGenerica
+        columns={columnsServicios}
         rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-            },
-          },
-        }}
-        pageSizeOptions={[10]}
-        onRowSelectionModelChange={handleSelectionModelChange}
-        slots={{
-          toolbar: CustomGridToolbar,
-          loadingOverlay: LinearProgress,
-          footer: CustomGridFooter,
-        }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-          },
-        }}
-        loading={Boolean(cargando)}
-        localeText={customLocaleText}
+        cargando={cargando}
+        setSelectionModel={setSelectionModel}
       />
     </Box>
   );

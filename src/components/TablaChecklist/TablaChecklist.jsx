@@ -1,21 +1,16 @@
-import { Box, Button, LinearProgress, Stack, TextField } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { columns } from "./utils/columnas";
+import { Box, Button, Stack, TextField } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { customLocaleText } from "../../traductions/customGridLocaleText";
 import { useState } from "react";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import TablaGenerica from "../TablaGenerica/TablaGenerica";
+import { columnsChecklist } from "../TablaGenerica/utils/columnas";
 
 export default function TablaChecklist({ cargando }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const [servicioActualizado, setServicioActualizado] = useState(null);
   const [nombre, setNombre] = useState("");
   const [rows, setRows] = useState([]);
-
-  const handleSelectionModelChange = (newSelection) => {
-    setSelectionModel(newSelection);
-  };
 
   return (
     <Box sx={{ height: 740, width: "100%", maxWidth: "1400px" }}>
@@ -57,33 +52,12 @@ export default function TablaChecklist({ cargando }) {
           {servicioActualizado ? "Actualizar" : "Agregar"}
         </Button>
       </Stack>
-      <DataGrid
-        sx={{
-          "& .css-mf4goe-MuiDataGrid-root": {
-            fontWeight: 700,
-            color: "grey",
-          },
-          "& .MuiDataGrid-cell:hover": {
-            color: "primary.main",
-          },
-          height: 420,
-        }}
+
+      <TablaGenerica
+        columns={columnsChecklist}
         rows={rows}
-        columns={columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
-            },
-          },
-        }}
-        pageSizeOptions={[5]}
-        onRowSelectionModelChange={handleSelectionModelChange}
-        slots={{
-          loadingOverlay: LinearProgress,
-        }}
-        loading={Boolean(cargando)}
-        localeText={customLocaleText}
+        cargando={cargando}
+        setSelectionModel={setSelectionModel}
       />
     </Box>
   );
