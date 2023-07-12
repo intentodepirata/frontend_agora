@@ -81,7 +81,7 @@ const FormLogin = () => {
         >
           Iniciar sesión
         </Typography>
-        <Typography variant="h6" color="initial" sx={{ mb: 2 }}>
+        <Typography component="h2" variant="h6" color="initial" sx={{ mb: 2 }}>
           Inicia sesión con tus datos anteriores
         </Typography>
         <Box

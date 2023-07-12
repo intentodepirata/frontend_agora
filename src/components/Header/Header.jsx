@@ -30,7 +30,8 @@ const Header = () => {
           component={"img"}
           src={logo}
           alt="Agora Tech solutions"
-          sx={{ width: "160px" }}
+          width={"160px"}
+          height={"59px"}
         />
       </Link>
 

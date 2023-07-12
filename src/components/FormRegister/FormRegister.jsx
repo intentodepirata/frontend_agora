@@ -89,7 +89,7 @@ const FormRegister = () => {
         >
           Registra tu cuenta
         </Typography>
-        <Typography variant="h6" color="initial" sx={{ mb: 2 }}>
+        <Typography component="h2" variant="h6" color="initial" sx={{ mb: 2 }}>
           Rellena todos los campos para crear una cuenta
         </Typography>
         <Box

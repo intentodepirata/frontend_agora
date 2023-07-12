@@ -80,7 +80,7 @@ const FormResetpassword = () => {
         >
           Nueva contraseña
         </Typography>
-        <Typography variant="h6" color="initial" sx={{ mb: 2 }}>
+        <Typography component="h2" variant="h6" color="initial" sx={{ mb: 2 }}>
           Elije una nueva contraseña
         </Typography>
         <Box
