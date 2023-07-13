@@ -11,9 +11,8 @@ export default function TablaCarrito({
   rowsCarrito,
   cargando,
   handleCellEditStop,
+  setSelectionModel,
 }) {
-  const [selectionModel, setSelectionModel] = useState(null);
-
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);
   };

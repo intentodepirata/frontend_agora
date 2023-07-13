@@ -7,7 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -118,7 +118,12 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
             color="grey.700"
             variant="h6"
             component="div"
-            sx={{ mr: 2, maxWidth: 250, width: "100%" }}
+            sx={{
+              mr: 2,
+              maxWidth: 250,
+              width: "100%",
+              display: { xs: "none", sm: "block" },
+            }}
           >
             {user.negocio?.nombre
               ? user.negocio?.nombre
@@ -167,7 +172,11 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
           >
             <NotificationsNoneIcon />
           </IconButton>
-          <Typography variant="body1" color="initial" sx={{ marginRight: 2 }}>
+          <Typography
+            variant="body1"
+            color="initial"
+            sx={{ marginRight: 2, display: { xs: "none", sm: "block" } }}
+          >
             {user?.nombre}
           </Typography>
           <IconButton
@@ -254,7 +263,7 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
                 },
                 right: 0,
                 maxWidth: "1300px",
-                width: { lg: "55.5%", xl: "100%", xxl: "100%" },
+                width: { xs: "100%", lg: "55.5%", xl: "100%", xxl: "100%" },
                 bgcolor: "#F3F4F6",
                 height: "auto",
                 zIndex: 2,

@@ -1,7 +1,7 @@
 import ListBar from "../../components/ListBar/ListBar";
 import { useLocation } from "react-router-dom";
 import HeaderBar from "../../components/HeaderBar/HeaderBar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Container } from "@mui/material";
 import useScrollUp from "../../hooks/useScrollUp";
 import Footer from "../../components/Footer/Footer";
@@ -11,17 +11,35 @@ import { AnimatedOutlet } from "../../components/AnimatedOutlet/AnimatedOutlet";
 
 const HomeLayout = () => {
   const [showDrawer, setShowDrawer] = useState(true);
+  const [isXsScreen, setIsXsScreen] = useState(false);
+
   useScrollUp();
 
   const handleOpenCloseDrawer = () => {
     setShowDrawer((currentStatus) => !currentStatus);
   };
+
+  // Verificar el tamaño de la pantalla al cargar la página
+  useEffect(() => {
+    function handleResize() {
+      setShowDrawer(window.innerWidth > 600);
+      setIsXsScreen(window.innerWidth > 600);
+    }
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   const nodeRef = useRef(null);
   const location = useLocation();
   return (
     <>
       <HeaderBar handleOpenCloseDrawer={handleOpenCloseDrawer} />
       <ListBar showDrawer={showDrawer} />
+
       <Box
         component="main"
         sx={{

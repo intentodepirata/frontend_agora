@@ -191,7 +191,7 @@ const Products = () => {
               onClick={() => handleEliminar(selectionModel)}
               color="error"
               variant="contained"
-              startIcon={<DeleteIcon />}
+              endIcon={<DeleteIcon />}
             >
               Eliminar
             </Button>
@@ -227,6 +227,7 @@ const Products = () => {
             rowsCarrito={rowsCarrito}
             cargando={cargando}
             handleCellEditStop={handleCellEditStop}
+            setSelectionModel={setSelectionModel}
           />
 
           <Stack
@@ -238,7 +239,7 @@ const Products = () => {
               onClick={() => handleDelete(selectionModel)}
               color="error"
               variant="contained"
-              startIcon={<DeleteIcon />}
+              endIcon={<DeleteIcon />}
             >
               Eliminar
             </Button>
