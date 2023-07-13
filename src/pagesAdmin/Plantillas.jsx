@@ -3,20 +3,26 @@ import {
   Paper,
   Typography,
   Button,
-  List,
-  ListItem,
-  ListItemText,
   TextField,
+  Stack,
 } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
-
-import TablaChecklist from "../components/TablaChecklist/TablaChecklist";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import useScrollUp from "../hooks/useScrollUp";
 import { useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
+import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
+import { columnsChecklist } from "../components/TablaGenerica/utils/columnas";
 
 const Plantillas = () => {
+  const [selectionModel, setSelectionModel] = useState(null);
+  const [servicioActualizado, setServicioActualizado] = useState(null);
+  const [nombre, setNombre] = useState("");
+  const [rows, setRows] = useState([]);
   const [plantilla, setPlantilla] = useState("");
+  const [cargando, setCargando] = useState(false);
   useScrollUp();
   const { user } = useUserContext();
   const handleSubmit = () => {
@@ -113,18 +119,65 @@ const Plantillas = () => {
           value={plantilla}
           onChange={(e) => setPlantilla(e.target.value)}
           multiline
-          // rows={20}
           variant="filled"
         />
       </Paper>
 
-      <Typography mt={2} component="h1" variant="h6" color="initial">
+      <Typography mt={5} mb={3} component="h1" variant="h6" color="initial">
         Checklist de revision
       </Typography>
 
-      <Typography textAlign={"center"} variant="h6" color="grey"></Typography>
+      <Box sx={{ height: 740, width: "100%", maxWidth: "1400px" }}>
+        <Stack
+          sx={{ my: 2, justifyContent: "end" }}
+          direction="row"
+          spacing={2}
+        >
+          <TextField
+            fullWidth
+            id="checlist"
+            label="Agrega nuevos test"
+            value={nombre}
+            size="small"
+            onChange={(e) => setNombre(e.target.value)}
+            mr={2}
+          />
 
-      <TablaChecklist />
+          <Button
+            onClick={() => handleEliminar(selectionModel)}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+            sx={{ minWidth: 120 }}
+          >
+            Eliminar
+          </Button>
+          <Button
+            onClick={() => handleEditar(selectionModel)}
+            variant="contained"
+            startIcon={<EditNoteIcon />}
+            sx={{ minWidth: 120 }}
+          >
+            Editar
+          </Button>
+          <Button
+            onClick={() => handleSubmit()}
+            variant="contained"
+            startIcon={<AddBoxIcon />}
+            color="success"
+            sx={{ minWidth: 140 }}
+          >
+            {servicioActualizado ? "Actualizar" : "Agregar"}
+          </Button>
+        </Stack>
+
+        <TablaGenerica
+          columns={columnsChecklist}
+          rows={rows}
+          cargando={cargando}
+          setSelectionModel={setSelectionModel}
+        />
+      </Box>
     </>
   );
 };

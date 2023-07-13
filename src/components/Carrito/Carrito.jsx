@@ -60,7 +60,6 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     setRowsCarrito([]);
     enqueueSnackbar("Pedido Realizado por WhatsApp", {
       variant: "success",
-      persist: true,
     });
   };
   const solicitarPorEmail = (proveedor) => {
@@ -74,7 +73,6 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     closeModal();
     enqueueSnackbar("Pedido Realizado por Email", {
       variant: "success",
-      persist: true,
     });
   };
   return (

@@ -1,16 +1,21 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
-import TablaProveedores from "../components/TablaProveedores/TablaProveedores";
 import useScrollUp from "../hooks/useScrollUp";
-
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate } from "react-router-dom";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
+import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
+import { columnsProveedores } from "../components/TablaGenerica/utils/columnas";
 export default function Suppliers() {
   const [rows, setRows] = useState([]);
+  const [selectionModel, setSelectionModel] = useState(null);
   const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
   useScrollUp();
-
+  const navigate = useNavigate();
   const fetchProveedores = async () => {
     try {
       setCargando(true);
@@ -34,6 +39,64 @@ export default function Suppliers() {
   useEffect(() => {
     fetchProveedores();
   }, []);
+
+  function handleEditar(id) {
+    navigate("/home/suppliers/edit/" + id[0]);
+  }
+  const handleDeleteProveedores = (id) => {
+    enqueueSnackbar("Desear eliminar al proveedor?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => handleEliminar(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
+
+  async function handleEliminar([id]) {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}proveedores/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + user.token,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar el elemento");
+      }
+
+      enqueueSnackbar("Proveedor eliminado correctamente", {
+        variant: "success",
+      });
+      fetchProveedores();
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
   return (
     <>
       <Box
@@ -60,12 +123,42 @@ export default function Suppliers() {
       <Typography textAlign={"center"} variant="h6" color="grey">
         Listado de proveedores
       </Typography>
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <TablaProveedores
+      <Box
+        sx={{
+          p: 2,
+          height: 740,
+          width: "100%",
+          maxWidth: "1400px",
+          margin: "0 auto",
+        }}
+      >
+        <TablaGenerica
+          columns={columnsProveedores}
           rows={rows}
           cargando={cargando}
-          fetchProveedores={fetchProveedores}
+          setSelectionModel={setSelectionModel}
         />
+        <Stack
+          sx={{ my: 2, justifyContent: "end" }}
+          direction="row"
+          spacing={2}
+        >
+          <Button
+            onClick={() => handleDeleteProveedores(selectionModel)}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
+            Eliminar
+          </Button>
+          <Button
+            onClick={() => handleEditar(selectionModel)}
+            variant="contained"
+            endIcon={<EditNoteIcon />}
+          >
+            Editar
+          </Button>
+        </Stack>
       </Box>
     </>
   );

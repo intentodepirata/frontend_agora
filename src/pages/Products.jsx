@@ -1,21 +1,28 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
-import TablaProducts from "../components/TablaProducts/TablaProducts";
+import { Box, Typography, Button, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
 import TablaCarrito from "../components/TablaCarrito/TablaCarrito";
 import { enqueueSnackbar } from "notistack";
 import useScrollUp from "../hooks/useScrollUp";
+import { columnsProducts } from "../components/TablaGenerica/utils/columnas";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
+import { useNavigate } from "react-router-dom";
+import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
+import Carrito from "../components/Carrito/Carrito";
 
 const Products = () => {
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [selectionModel, setSelectionModel] = useState(null);
   const [rowsCarrito, setRowsCarrito] = useState(
     JSON.parse(localStorage.getItem("carritoAgora")) || []
   );
   useScrollUp();
   const { user } = useUserContext();
-
+  const navigate = useNavigate();
   useEffect(() => {
     localStorage.setItem("carritoAgora", JSON.stringify(rowsCarrito));
   }, [rowsCarrito]);
@@ -95,7 +102,42 @@ const Products = () => {
   useEffect(() => {
     fetchComponentes();
   }, []);
+  function handleEditar(id) {
+    console.log("editando", id[0]);
+    navigate("/home/products/edit/" + id[0]);
+  }
 
+  async function handleEliminar(id) {
+    const confirmacion = window.confirm(
+      "¿Estás seguro de que quieres eliminar este elemento?"
+    );
+
+    if (confirmacion) {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_API_URL + "componente/" + id,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + user.token,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Error al eliminar el elemento");
+        }
+
+        enqueueSnackbar("Elemento eliminado correctamente", {
+          variant: "success",
+        });
+        fetchComponentes();
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+  }
   return (
     <>
       <Box
@@ -128,16 +170,46 @@ const Products = () => {
           maxWidth: "1400px",
         }}
       >
-        <Box>
+        <Box sx={{ height: 740, width: "100%", maxWidth: "1000px" }}>
           <Typography mb={2} textAlign={"center"} variant="h6" color="grey">
             Stock local
           </Typography>
-          <TablaProducts
+          <TablaGenerica
+            columns={columnsProducts}
             rows={rows}
-            fetchComponentes={fetchComponentes}
             cargando={cargando}
-            agregarAlCarrito={agregarAlCarrito}
+            setSelectionModel={setSelectionModel}
           />
+
+          <Stack
+            sx={{ my: 2, justifyContent: "end" }}
+            direction="row"
+            spacing={2}
+          >
+            <Button
+              onClick={() => handleEliminar(selectionModel)}
+              color="error"
+              variant="contained"
+              startIcon={<DeleteIcon />}
+            >
+              Eliminar
+            </Button>
+            <Button
+              onClick={() => handleEditar(selectionModel)}
+              variant="contained"
+              endIcon={<EditNoteIcon />}
+            >
+              Editar
+            </Button>
+            <Button
+              onClick={() => agregarAlCarrito(selectionModel)}
+              variant="contained"
+              endIcon={<ShoppingCartCheckoutIcon />}
+              color="warning"
+            >
+              Carrito
+            </Button>
+          </Stack>
         </Box>
         <Box>
           <Typography mb={2} textAlign={"center"} variant="h6" color="grey">
@@ -147,9 +219,26 @@ const Products = () => {
             rowsCarrito={rowsCarrito}
             cargando={cargando}
             handleCellEditStop={handleCellEditStop}
-            handleDelete={handleDelete}
-            setRowsCarrito={setRowsCarrito}
           />
+          <Stack
+            sx={{ my: 2, justifyContent: "end" }}
+            direction="row"
+            spacing={2}
+          >
+            <Button
+              onClick={() => handleDelete(selectionModel)}
+              color="error"
+              variant="contained"
+              startIcon={<DeleteIcon />}
+            >
+              Eliminar
+            </Button>
+            <Carrito
+              rowsCarrito={rowsCarrito}
+              user={user}
+              setRowsCarrito={setRowsCarrito}
+            />
+          </Stack>
         </Box>
       </Box>
     </>

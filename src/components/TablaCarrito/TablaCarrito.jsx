@@ -1,21 +1,17 @@
-import { Box, Button, Stack, LinearProgress } from "@mui/material";
+import { Box, LinearProgress } from "@mui/material";
 import { columnas } from "./utils/columnas";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
-import Carrito from "../Carrito/Carrito";
 import CustomNoRowsOverlay2 from "../CustomNoRowsOverlay2/CustomNoRowsOverlay2";
 
 export default function TablaCarrito({
   rowsCarrito,
   cargando,
   handleCellEditStop,
-  handleDelete,
-  setRowsCarrito,
 }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const { user } = useUserContext();
@@ -70,21 +66,6 @@ export default function TablaCarrito({
         loading={Boolean(cargando)}
         localeText={customLocaleText}
       />
-      <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
-        <Button
-          onClick={() => handleDelete(selectionModel)}
-          color="error"
-          variant="contained"
-          startIcon={<DeleteIcon />}
-        >
-          Eliminar
-        </Button>
-        <Carrito
-          rowsCarrito={rowsCarrito}
-          user={user}
-          setRowsCarrito={setRowsCarrito}
-        />
-      </Stack>
     </Box>
   );
 }
