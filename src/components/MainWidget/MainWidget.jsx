@@ -84,6 +84,7 @@ const MainWidget = ({
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", md: "row" },
             justifyContent: "center",
             alignItems: "center",
             pt: 2,
@@ -190,11 +191,14 @@ const MainWidget = ({
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", md: "row" },
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <Box sx={{ pt: 2, maxWidth: "600px", width: "50%" }}>
+          <Box
+            sx={{ pt: 2, maxWidth: "600px", width: { xs: "100%", md: "50%" } }}
+          >
             <HighchartsReact
               key={chartKey}
               highcharts={Highcharts}
@@ -214,6 +218,7 @@ const MainWidget = ({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-evenly",
+                gap: 2,
               }}
             >
               <Box textAlign={"center"}>

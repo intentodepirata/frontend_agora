@@ -5,7 +5,6 @@ import CustomGridToolbar from "../CutomGridToolbar/CutomGridToolbar";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
-import { useUserContext } from "../../contexts/UserContext";
 import CustomNoRowsOverlay2 from "../CustomNoRowsOverlay2/CustomNoRowsOverlay2";
 
 export default function TablaCarrito({
@@ -14,58 +13,50 @@ export default function TablaCarrito({
   handleCellEditStop,
 }) {
   const [selectionModel, setSelectionModel] = useState(null);
-  const { user } = useUserContext();
 
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);
   };
+
   return (
-    <Box
+    <DataGrid
       sx={{
-        width: "100%",
-        maxWidth: "400px",
-        height: 740,
+        "& .css-mf4goe-MuiDataGrid-root": {
+          fontWeight: 700,
+          color: "grey",
+        },
+        "& .MuiDataGrid-cell:hover": {
+          color: "primary.main",
+        },
+        height: 720,
       }}
-    >
-      <DataGrid
-        sx={{
-          "& .css-mf4goe-MuiDataGrid-root": {
-            fontWeight: 700,
-            color: "grey",
+      rows={rowsCarrito}
+      columns={columnas}
+      initialState={{
+        pagination: {
+          paginationModel: {
+            pageSize: 10,
           },
-          "& .MuiDataGrid-cell:hover": {
-            color: "primary.main",
-          },
-          height: 720,
-        }}
-        rows={rowsCarrito}
-        columns={columnas}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 10,
-            },
-          },
-        }}
-        pageSizeOptions={[10]}
-        onRowSelectionModelChange={handleSelectionModelChange}
-        editMode="cell"
-        onCellEditStop={handleCellEditStop}
-        slots={{
-          toolbar: CustomGridToolbar,
-          loadingOverlay: LinearProgress,
-          footer: CustomGridFooter,
-          noRowsOverlay: CustomNoRowsOverlay2,
-        }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-          },
-        }}
-        loading={Boolean(cargando)}
-        localeText={customLocaleText}
-      />
-    </Box>
+        },
+      }}
+      pageSizeOptions={[10]}
+      onRowSelectionModelChange={handleSelectionModelChange}
+      editMode="cell"
+      onCellEditStop={handleCellEditStop}
+      slots={{
+        toolbar: CustomGridToolbar,
+        loadingOverlay: LinearProgress,
+        footer: CustomGridFooter,
+        noRowsOverlay: CustomNoRowsOverlay2,
+      }}
+      slotProps={{
+        toolbar: {
+          showQuickFilter: true,
+          quickFilterProps: { debounceMs: 500 },
+        },
+      }}
+      loading={Boolean(cargando)}
+      localeText={customLocaleText}
+    />
   );
 }

@@ -90,7 +90,7 @@ const Orders = () => {
         />
         <Stack
           sx={{ my: 2, justifyContent: "end" }}
-          direction="row"
+          direction={{ xs: "column", sm: "row" }}
           spacing={2}
         >
           <Button

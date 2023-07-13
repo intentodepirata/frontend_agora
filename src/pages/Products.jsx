@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Stack } from "@mui/material";
+import { Box, Typography, Button, Stack, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
@@ -165,12 +165,13 @@ const Products = () => {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", md: "row" },
           mx: "auto",
           gap: 4,
           maxWidth: "1400px",
         }}
       >
-        <Box sx={{ height: 740, width: "100%", maxWidth: "1000px" }}>
+        <Box sx={{ minHeight: 740, width: "100%", maxWidth: "1000px" }}>
           <Typography mb={2} textAlign={"center"} variant="h6" color="grey">
             Stock local
           </Typography>
@@ -183,7 +184,7 @@ const Products = () => {
 
           <Stack
             sx={{ my: 2, justifyContent: "end" }}
-            direction="row"
+            direction={{ xs: "column", md: "row" }}
             spacing={2}
           >
             <Button
@@ -211,18 +212,26 @@ const Products = () => {
             </Button>
           </Stack>
         </Box>
-        <Box>
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "420px",
+            minHeight: 740,
+          }}
+        >
           <Typography mb={2} textAlign={"center"} variant="h6" color="grey">
             Carrito
           </Typography>
+
           <TablaCarrito
             rowsCarrito={rowsCarrito}
             cargando={cargando}
             handleCellEditStop={handleCellEditStop}
           />
+
           <Stack
             sx={{ my: 2, justifyContent: "end" }}
-            direction="row"
+            direction={{ xs: "column", md: "row" }}
             spacing={2}
           >
             <Button

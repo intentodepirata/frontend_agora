@@ -60,12 +60,19 @@ export default function TablaHome({ rows, cargando, opcionesFiltro }) {
         filterModel={opcionesFiltro ? opcionesFiltro : undefined}
       />
 
-      <Stack sx={{ my: 2, justifyContent: "end" }} direction="row" spacing={2}>
+      <Stack
+        sx={{
+          my: 2,
+          justifyContent: "end",
+        }}
+        direction={{ xs: "column", md: "row" }}
+        spacing={2}
+      >
         <Button
           onClick={() => handleEliminar(selectionModel)}
           color="error"
           variant="contained"
-          startIcon={<DeleteIcon />}
+          endIcon={<DeleteIcon />}
         >
           Eliminar
         </Button>

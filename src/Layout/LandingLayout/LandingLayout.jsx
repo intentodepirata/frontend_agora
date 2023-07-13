@@ -30,9 +30,9 @@ const LandingLayout = () => {
               classNames="page-transition"
               timeout={200}
             >
-              <div ref={nodeRef}>
+              <Box mb={10} ref={nodeRef}>
                 <AnimatedOutlet />
-              </div>
+              </Box>
             </CSSTransition>
           </SwitchTransition>
           <Footer />

@@ -1,6 +1,6 @@
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useState, useEffect } from "react";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import ProveedoresModal from "../ProveedoresModal/ProveedoresModal";
 import { enqueueSnackbar } from "notistack";
 
@@ -67,7 +67,6 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     const asunto = encodeURIComponent("Solicitud de pedido");
     const cuerpo = encodeURIComponent(generarMensajeCarrito());
     const url = `mailto:${email}?subject=${asunto}&body=${cuerpo}`;
-    // window.location.href = url;
     window.open(url, "_blank");
     setRowsCarrito([]);
     closeModal();
@@ -76,12 +75,13 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     });
   };
   return (
-    <>
+    <Box>
       <Button
         onClick={abrirModalProveedores}
         color="success"
         variant="contained"
         endIcon={<LocalShippingIcon />}
+        sx={{ width: { xs: "100%", md: "auto" } }}
       >
         Solicitar
       </Button>
@@ -95,7 +95,7 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
         solicitarPorEmail={solicitarPorEmail}
         closeModal={closeModal}
       />
-    </>
+    </Box>
   );
 };
 export default Carrito;
