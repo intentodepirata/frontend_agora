@@ -42,13 +42,20 @@ export const columnsProducts = [
   { field: "modelo", headerName: "Modelo", width: 180 },
   { field: "marca", headerName: "Marca", width: 80 },
   { field: "fechaRegistro", headerName: "Fecha de Entrada", width: 160 },
-  { field: "existencias", headerName: "Existencias", width: 140 },
+  {
+    field: "existencias",
+    headerName: "Existencias",
+    align: "center",
+    width: 140,
+  },
+  { field: "precio", headerName: "Precio Ud.", align: "center", width: 140 },
 ];
 
 export const columnsServicios = [
   { field: "id", headerName: "ID", width: 40 },
-  { field: "servicio", headerName: "Servicio", width: 200 },
+  { field: "servicio", headerName: "Servicio", width: 400 },
   { field: "precio", headerName: "Precio", width: 100 },
+  { field: "e", headerName: " ", width: 460 },
 ];
 
 export const columnsChecklist = [
@@ -57,11 +64,17 @@ export const columnsChecklist = [
 ];
 
 export const columnsClientes = [
-  { field: "id", headerName: "ID", width: 100 },
-  { field: "nombre", headerName: "Nombre completo", width: 180 },
+  { field: "id", headerName: "ID", width: 60 },
+  { field: "nombre", headerName: "Nombre completo", width: 200 },
   { field: "dni", headerName: "DNI", width: 100 },
-  { field: "email", headerName: "Email", width: 280 },
-  { field: "telefono", headerName: "Telefono", width: 180 },
-  { field: "totalOts", headerName: "Total de Reparaciones", width: 180 },
-  { field: "fechaUltimaOt", headerName: "fecha ultima Reparacion", width: 180 },
+  { field: "email", headerName: "Email", width: 260 },
+  { field: "direccion", headerName: "Direccion", width: 285 },
+  { field: "telefono", headerName: "Telefono", width: 160 },
+  {
+    field: "totalOts",
+    headerName: "Reparaciones",
+    width: 120,
+    align: "center",
+  },
+  { field: "fechaUltimaOt", headerName: "Última Reparación", width: 180 },
 ];

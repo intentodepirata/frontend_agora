@@ -69,7 +69,12 @@ export default function Treasury() {
           p: 2,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <Typography
             component="h1"
             variant="h6"

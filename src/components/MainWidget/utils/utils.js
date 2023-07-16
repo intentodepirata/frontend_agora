@@ -54,28 +54,6 @@ export const formattedDate = today.toLocaleDateString("es-ES", {
   year: "numeric",
 });
 
-// export const updateHighcharts = (rows) => {
-//   const estados = {};
-//   rows.forEach((reparacion) => {
-//     if (reparacion.estado in estados) {
-//       estados[reparacion.estado]++;
-//     } else {
-//       estados[reparacion.estado] = 1;
-//     }
-//   });
-
-//   // Calcular el porcentaje de cada estado
-//   const totalReparaciones = rows.length;
-//   const data = Object.keys(estados).map((estado) => {
-//     const porcentaje = (estados[estado] / totalReparaciones) * 100;
-//     return {
-//       name: estado,
-//       y: porcentaje,
-//       color: obtenerColorEstado(estado),
-//     };
-//   });
-//   return data;
-// };
 export const updateHighcharts = (rows) => {
   const estados = {};
   rows.forEach((reparacion) => {

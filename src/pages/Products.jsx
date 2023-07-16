@@ -12,6 +12,7 @@ import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import { useNavigate } from "react-router-dom";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import Carrito from "../components/Carrito/Carrito";
+import MenuClickDerechoProductos from "../components/MenuClickDerechoProductos/MenuClickDerechoProductos";
 
 const Products = () => {
   const [rows, setRows] = useState([]);
@@ -20,6 +21,8 @@ const Products = () => {
   const [rowsCarrito, setRowsCarrito] = useState(
     JSON.parse(localStorage.getItem("carritoAgora")) || []
   );
+  const [contextMenu, setContextMenu] = useState(null);
+  const [selectedRow, setSelectedRow] = useState();
   useScrollUp();
   const { user } = useUserContext();
   const navigate = useNavigate();
@@ -60,6 +63,7 @@ const Products = () => {
         variant: "success",
       });
     }
+    handleClose();
   };
 
   const handleCellEditStop = (params) => {
@@ -102,12 +106,26 @@ const Products = () => {
   useEffect(() => {
     fetchComponentes();
   }, []);
+
+  const handleDoubleClickModelChange = (row) => {
+    navigate("/home/products/edit/" + row.id);
+  };
+
   function handleEditar(id) {
     console.log("editando", id[0]);
     navigate("/home/products/edit/" + id[0]);
   }
+  function editar() {
+    console.log("editando", selectedRow);
+    navigate("/home/products/edit/" + selectedRow);
+  }
+
+  const handleClose = () => {
+    setContextMenu(null);
+  };
 
   async function handleEliminar(id) {
+    handleClose();
     const confirmacion = window.confirm(
       "¿Estás seguro de que quieres eliminar este elemento?"
     );
@@ -180,6 +198,17 @@ const Products = () => {
             rows={rows}
             cargando={cargando}
             setSelectionModel={setSelectionModel}
+            handleDoubleClickModelChange={handleDoubleClickModelChange}
+            setSelectedRow={setSelectedRow}
+            setContextMenu={setContextMenu}
+            contextMenu={contextMenu}
+          />
+          <MenuClickDerechoProductos
+            contextMenu={contextMenu}
+            handleClose={handleClose}
+            eliminar={() => handleEliminar(selectedRow)}
+            editar={editar}
+            carrito={() => agregarAlCarrito([selectedRow])}
           />
 
           <Stack

@@ -12,7 +12,12 @@ export const columns = [
   {
     field: "modelo",
     headerName: "Modelo",
-    width: 180,
+    width: 172,
+  },
+  {
+    field: "imei",
+    headerName: "IMEI",
+    width: 135,
   },
   {
     field: "cliente",

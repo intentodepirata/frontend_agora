@@ -179,7 +179,7 @@ export default function FormInvitar() {
             Invita a tu equipo
           </Typography>
           <Typography variant="subtitle1" color="grey" mb={2}>
-            Envia una invitación a los miembros de tu equipo
+            Agrega rellenando el formulario a los miembros de tu equipo
           </Typography>
           <Box sx={{ display: "flex" }}>
             <FormControl
@@ -437,7 +437,7 @@ export default function FormInvitar() {
               <ListItemText sx={{ width: "100%", p: 1 }}>
                 {user.email}
               </ListItemText>
-              <ListItemText sx={{ width: "100%", p: 1 }}>
+              <ListItemText sx={{ width: "100%", p: 1, ml: 10 }}>
                 {user.confirmado == 1 ? "Si" : "No"}
               </ListItemText>
               <FormControl sx={{ mb: 2, width: "100%" }}>
@@ -449,7 +449,7 @@ export default function FormInvitar() {
                   id={`rol-${user.id}`}
                   value={user.role}
                   size="small"
-                  disabled={user.role == "1"} // Desactivar el Select para el propietario
+                  disabled={user.role == "1"}
                   label="Rol"
                   sx={{ width: "100%" }}
                 >

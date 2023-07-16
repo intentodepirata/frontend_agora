@@ -9,13 +9,17 @@ import { columnsOrders } from "../components/TablaGenerica/utils/columnas";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PrintIcon from "@mui/icons-material/Print";
+import MenuClickDerechoMain from "../components/MenuClickDerechoMain/MenuClickDerechoMain";
 const Orders = () => {
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [selectionModel, setSelectionModel] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [selectedRow, setSelectedRow] = useState();
   const { user } = useUserContext();
-  useScrollUp();
   const navigate = useNavigate();
+  useScrollUp();
+
   useEffect(() => {
     const fetchOts = async () => {
       try {
@@ -37,6 +41,10 @@ const Orders = () => {
     };
     fetchOts();
   }, []);
+  const handleDoubleClickModelChange = (row) => {
+    navigate("/home/orders/edit/" + row.id);
+  };
+
   function handlePrint(id) {
     window.open(`/print/${id}`, "_blank");
   }
@@ -47,6 +55,31 @@ const Orders = () => {
     console.log("eliminando", id[0]);
   }
 
+  const handleClose = () => {
+    setContextMenu(null);
+  };
+
+  //Funciones para el menu del click derecho
+  function entregar() {
+    console.log("entregar", selectedRow);
+  }
+  function avisarWhatsApp() {
+    console.log("avisarWhatsApp", selectedRow);
+  }
+  function avisarEmail() {
+    console.log("avisarEmail", selectedRow);
+  }
+  function imprimir() {
+    window.open(`/print/${selectedRow}`, "_blank");
+    handleClose();
+  }
+  function editar() {
+    navigate("/home/orders/edit/" + selectedRow);
+    handleClose();
+  }
+  function eliminar() {
+    console.log("eliminando", selectedRow);
+  }
   return (
     <>
       <Box
@@ -87,6 +120,20 @@ const Orders = () => {
           rows={rows}
           cargando={cargando}
           setSelectionModel={setSelectionModel}
+          handleDoubleClickModelChange={handleDoubleClickModelChange}
+          setSelectedRow={setSelectedRow}
+          setContextMenu={setContextMenu}
+          contextMenu={contextMenu}
+        />
+        <MenuClickDerechoMain
+          contextMenu={contextMenu}
+          handleClose={handleClose}
+          entregar={entregar}
+          avisarWhatsApp={avisarWhatsApp}
+          avisarEmail={avisarEmail}
+          imprimir={imprimir}
+          editar={editar}
+          eliminar={eliminar}
         />
         <Stack
           sx={{ my: 2, justifyContent: "end" }}

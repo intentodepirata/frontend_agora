@@ -20,6 +20,9 @@ export default function TablaCarrito({
   return (
     <DataGrid
       sx={{
+        "& .MuiDataGrid-columnHeaders": {
+          backgroundColor: "#F3F4F6",
+        },
         "& .css-mf4goe-MuiDataGrid-root": {
           fontWeight: 700,
           color: "grey",

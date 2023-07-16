@@ -225,7 +225,7 @@ export default function ModalCierreCaja({
             disabled={!estadoCaja}
             fullWidth
           >
-            Cerrar caja
+            Realizar el cierre de caja
           </Button>
         </Box>
       </Modal>

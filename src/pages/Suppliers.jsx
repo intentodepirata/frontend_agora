@@ -39,6 +39,9 @@ export default function Suppliers() {
   useEffect(() => {
     fetchProveedores();
   }, []);
+  const handleDoubleClickModelChange = (row) => {
+    navigate("/home/suppliers/edit/" + row.id);
+  };
 
   function handleEditar(id) {
     navigate("/home/suppliers/edit/" + id[0]);
@@ -137,6 +140,7 @@ export default function Suppliers() {
           rows={rows}
           cargando={cargando}
           setSelectionModel={setSelectionModel}
+          handleDoubleClickModelChange={handleDoubleClickModelChange}
         />
         <Stack
           sx={{ my: 2, justifyContent: "end" }}

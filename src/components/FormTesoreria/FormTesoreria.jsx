@@ -26,7 +26,14 @@ export default function FormTesoreria({
   };
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", gap: 4 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" },
+        justifyContent: "center",
+        gap: 4,
+      }}
+    >
       <Paper
         component={"form"}
         onSubmit={handleGasto}

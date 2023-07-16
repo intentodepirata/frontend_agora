@@ -16,6 +16,10 @@ const Clientes = () => {
   useScrollUp();
   const navigate = useNavigate();
 
+  const handleDoubleClickModelChange = (row) => {
+    navigate("/home/clientes/edit/" + row.id);
+  };
+
   function handleEditar(id) {
     navigate("/home/clientes/edit/" + id[0]);
   }
@@ -90,6 +94,7 @@ const Clientes = () => {
           rows={rows}
           cargando={cargando}
           setSelectionModel={setSelectionModel}
+          handleDoubleClickModelChange={handleDoubleClickModelChange}
         />
         <Stack
           sx={{ my: 2, justifyContent: "end" }}

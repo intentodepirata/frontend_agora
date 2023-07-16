@@ -72,6 +72,11 @@ export default function Services() {
     }
     setRows(data);
   }
+  const handleDoubleClickModelChange = (row) => {
+    setPrecio(row.row.precio);
+    setServicio(row.row.servicio);
+    setServicioActualizado(row.id);
+  };
   async function handleEditar([id]) {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}servicios/${id}`,
@@ -131,6 +136,7 @@ export default function Services() {
       <Box
         sx={{
           display: "flex",
+
           alignItems: "center",
           justifyContent: "space-between",
           p: 2,
@@ -155,7 +161,7 @@ export default function Services() {
       >
         <Stack
           sx={{ my: 2, justifyContent: "end" }}
-          direction="row"
+          direction={{ xs: "column", md: "row" }}
           spacing={2}
         >
           <TextField
@@ -206,6 +212,7 @@ export default function Services() {
           rows={rows}
           cargando={cargando}
           setSelectionModel={setSelectionModel}
+          handleDoubleClickModelChange={handleDoubleClickModelChange}
         />
       </Box>
     </>

@@ -23,7 +23,7 @@ const OrdersEdit = () => {
   useEffect(() => {
     fetchCliente();
     fetchIsEntregada();
-  }, [id]);
+  }, [id, fetchData]);
 
   const fetchCliente = async () => {
     try {
@@ -40,6 +40,7 @@ const OrdersEdit = () => {
       const data = await response.json();
 
       setCliente(data);
+      setFetchData(false);
     } catch (error) {
       console.error("Error al obtener al cliente");
     }
