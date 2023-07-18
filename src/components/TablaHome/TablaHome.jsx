@@ -9,12 +9,24 @@ import { columns } from "./utils/columns";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
 import MenuClickDerechoMain from "../MenuClickDerechoMain/MenuClickDerechoMain";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
+import {
+  notificarPorEmail,
+  notificarPorWhatsApp,
+} from "../BotonNotificar/utils/generarMensaje";
+import { useUserContext } from "../../contexts/UserContext";
 
-export default function TablaHome({ rows, cargando, opcionesFiltro }) {
+export default function TablaHome({
+  rows,
+  cargando,
+  opcionesFiltro,
+  fetchEntregar,
+  fetchCliente,
+}) {
   const [selectionModel, setSelectionModel] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRow, setSelectedRow] = useState();
-
+  const { user } = useUserContext();
   const navigate = useNavigate();
 
   const handleContextMenu = (event) => {
@@ -36,38 +48,108 @@ export default function TablaHome({ rows, cargando, opcionesFiltro }) {
     setContextMenu(null);
   };
   function handlePrint(id) {
+    handleClose();
     window.open(`/print/${id}`, "_blank");
   }
 
   function handleEditar(id) {
+    handleClose();
     navigate("/home/orders/edit/" + id[0]);
   }
 
-  function handleEliminar(id) {
-    console.log("eliminando", id[0]);
+  //Funciones para el menu del click derecho
+  async function avisarWhatsApp() {
+    const cliente = await fetchCliente(selectedRow);
+    notificarPorWhatsApp(cliente, user);
+    handleClose();
+  }
+  async function avisarEmail() {
+    const cliente = await fetchCliente(selectedRow);
+    notificarPorEmail(cliente, user);
+    handleClose();
   }
 
-  //Funciones para el menu del click derecho
-  function entregar() {
-    console.log("entregar", selectedRow);
-  }
-  function avisarWhatsApp() {
-    console.log("avisarWhatsApp", selectedRow);
-  }
-  function avisarEmail() {
-    console.log("avisarEmail", selectedRow);
-  }
-  function imprimir() {
-    window.open(`/print/${selectedRow}`, "_blank");
+  const handleEntregar = (id) => {
     handleClose();
+    enqueueSnackbar("Desear entregar el terminal al Cliente?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => fetchEntregar(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
+  async function handleEliminarOts([id]) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}ots/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + user.token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar el elemento");
+      }
+
+      enqueueSnackbar("Proveedor eliminado correctamente", {
+        variant: "success",
+      });
+      // fetchOts();
+    } catch (error) {
+      console.error(error.message);
+    }
   }
-  function editar() {
-    navigate("/home/orders/edit/" + selectedRow);
+
+  const handleDeleteOts = (id) => {
     handleClose();
-  }
-  function eliminar() {
-    console.log("eliminando", selectedRow);
-  }
+    enqueueSnackbar("Desear eliminar la OT?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => handleEliminarOts(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
   return (
     <Box sx={{ width: "100%", maxWidth: "1400px" }}>
       <DataGrid
@@ -114,12 +196,12 @@ export default function TablaHome({ rows, cargando, opcionesFiltro }) {
       <MenuClickDerechoMain
         contextMenu={contextMenu}
         handleClose={handleClose}
-        entregar={entregar}
+        entregar={() => handleEntregar(selectedRow)}
         avisarWhatsApp={avisarWhatsApp}
         avisarEmail={avisarEmail}
-        imprimir={imprimir}
-        editar={editar}
-        eliminar={eliminar}
+        imprimir={() => handlePrint([selectedRow])}
+        editar={() => handleEditar([selectedRow])}
+        eliminar={() => handleDeleteOts([selectedRow])}
       />
 
       <Stack
@@ -131,7 +213,7 @@ export default function TablaHome({ rows, cargando, opcionesFiltro }) {
         spacing={2}
       >
         <Button
-          onClick={() => handleEliminar(selectionModel)}
+          onClick={() => handleDeleteOts(selectionModel)}
           color="error"
           variant="contained"
           endIcon={<DeleteIcon />}

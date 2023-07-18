@@ -73,12 +73,6 @@ export default function TablaGenerica({
         loading={Boolean(cargando)}
         localeText={customLocaleText}
       />
-
-      {/* <MenuClickDerechoGenerico
-        contextMenu={contextMenu}
-        handleClose={handleClose}
-        entregar={entregar}
-      /> */}
     </>
   );
 }

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import TablaHome from "../components/TablaHome/TablaHome";
 import MainWidget from "../components/MainWidget/MainWidget";
 import { useUserContext } from "../contexts/UserContext";
-import { enqueueSnackbar } from "notistack";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 import useScrollUp from "../hooks/useScrollUp";
 
 const Home = () => {
@@ -12,8 +12,8 @@ const Home = () => {
   const [opcionesFiltro, setOpcionesFiltro] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("");
   const [totalFacturado, setTotalFacturado] = useState(0);
-  const { user } = useUserContext();
 
+  const { user } = useUserContext();
   useScrollUp();
 
   useEffect(() => {
@@ -32,6 +32,7 @@ const Home = () => {
   useEffect(() => {
     fetchOtsByTime("mes");
   }, []);
+
   const fetchOtsByTime = async (time) => {
     try {
       setCargando(true);
@@ -69,6 +70,52 @@ const Home = () => {
       console.error(`Error al obtener las ots de ${time}:`, error);
     }
   };
+  const fetchCliente = async (id) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/print/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error al obtener al cliente");
+    }
+  };
+  const fetchEntregar = async (id, snackbarId) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/deliver/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data) {
+        throw new Error("Error al entregar la Orden");
+      }
+
+      fetchOtsByTime("mes");
+      closeSnackbar(snackbarId);
+      enqueueSnackbar("Orden entregada correctamente", {
+        variant: "success",
+      });
+    } catch (error) {
+      closeSnackbar(snackbarId);
+      console.error("Error al entregar la Orden:");
+    }
+  };
 
   return (
     <>
@@ -84,6 +131,8 @@ const Home = () => {
           rows={rows}
           cargando={cargando}
           opcionesFiltro={opcionesFiltro}
+          fetchEntregar={fetchEntregar}
+          fetchCliente={fetchCliente}
         />
       </Box>
     </>

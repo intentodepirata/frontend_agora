@@ -2,30 +2,35 @@ import { Box, Typography, Button, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { Link, useNavigate } from "react-router-dom";
-import { enqueueSnackbar } from "notistack";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 import useScrollUp from "../hooks/useScrollUp";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import { columnsClientes } from "../components/TablaGenerica/utils/columnas";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
+import MenuClickDerechoGenerico from "../components/MenuClickDerechoGenerico/MenuClickDerechoGenerico";
 const Clientes = () => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [selectedRow, setSelectedRow] = useState();
   const { user } = useUserContext();
   useScrollUp();
   const navigate = useNavigate();
 
+  const handleClose = () => {
+    setContextMenu(null);
+  };
   const handleDoubleClickModelChange = (row) => {
     navigate("/home/clientes/edit/" + row.id);
   };
 
   function handleEditar(id) {
     navigate("/home/clientes/edit/" + id[0]);
+    handleClose();
   }
-  function handleEliminar(id) {
-    console.log("eliminando", id[0]);
-  }
+
   useEffect(() => {
     const fetchClientes = async () => {
       try {
@@ -54,6 +59,61 @@ const Clientes = () => {
     };
     fetchClientes();
   }, []);
+
+  const handleDeleteClientes = (id) => {
+    handleClose();
+    enqueueSnackbar("Desear eliminar al Cliente?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => handleEliminar(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
+  async function handleEliminar([id]) {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}clientes/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + user.token,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar el elemento");
+      }
+
+      enqueueSnackbar("Proveedor eliminado correctamente", {
+        variant: "success",
+      });
+      fetchClientes();
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
   return (
     <>
       <Box
@@ -95,6 +155,15 @@ const Clientes = () => {
           cargando={cargando}
           setSelectionModel={setSelectionModel}
           handleDoubleClickModelChange={handleDoubleClickModelChange}
+          setSelectedRow={setSelectedRow}
+          setContextMenu={setContextMenu}
+          contextMenu={contextMenu}
+        />
+        <MenuClickDerechoGenerico
+          contextMenu={contextMenu}
+          handleClose={handleClose}
+          editar={() => handleEditar([selectedRow])}
+          eliminar={() => handleDeleteClientes([selectedRow])}
         />
         <Stack
           sx={{ my: 2, justifyContent: "end" }}
@@ -102,7 +171,7 @@ const Clientes = () => {
           spacing={2}
         >
           <Button
-            onClick={() => handleEliminar(selectionModel)}
+            onClick={() => handleDeleteClientes(selectionModel)}
             color="error"
             variant="contained"
             startIcon={<DeleteIcon />}

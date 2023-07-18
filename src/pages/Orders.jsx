@@ -1,5 +1,4 @@
 import { Box, Typography, Button, Stack } from "@mui/material";
-
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
@@ -10,12 +9,18 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PrintIcon from "@mui/icons-material/Print";
 import MenuClickDerechoMain from "../components/MenuClickDerechoMain/MenuClickDerechoMain";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
+import {
+  notificarPorEmail,
+  notificarPorWhatsApp,
+} from "../components/BotonNotificar/utils/generarMensaje";
 const Orders = () => {
   const [rows, setRows] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [selectionModel, setSelectionModel] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRow, setSelectedRow] = useState();
+  const [updateClientes, setUpdateClientes] = useState(false);
   const { user } = useUserContext();
   const navigate = useNavigate();
   useScrollUp();
@@ -40,43 +45,117 @@ const Orders = () => {
       }
     };
     fetchOts();
-  }, []);
+  }, [updateClientes]);
+  const fetchEntregar = async (id, snackbarId) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/deliver/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data) {
+        throw new Error("Error al entregar la Orden");
+      }
+      setUpdateClientes(() => !updateClientes);
+      closeSnackbar(snackbarId);
+      enqueueSnackbar("Orden entregada correctamente", {
+        variant: "success",
+      });
+    } catch (error) {
+      closeSnackbar(snackbarId);
+      console.error("Error al entregar la Orden:");
+    }
+  };
+  const fetchCliente = async (id) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}ot/print/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error al obtener al cliente");
+    }
+  };
   const handleDoubleClickModelChange = (row) => {
     navigate("/home/orders/edit/" + row.id);
   };
 
   function handlePrint(id) {
     window.open(`/print/${id}`, "_blank");
+    handleClose();
   }
   function handleEditar(id) {
     navigate("/home/orders/edit/" + id[0]);
+    handleClose();
   }
   function handleEliminar(id) {
     console.log("eliminando", id[0]);
+    handleClose();
   }
 
   const handleClose = () => {
     setContextMenu(null);
   };
 
+  const handleEntregar = (id) => {
+    handleClose();
+    console.log(id);
+    enqueueSnackbar("Desear entregar el terminal al Cliente?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <Stack direction="row" spacing={2}>
+          <Button
+            sx={{ textTransform: "none" }}
+            size="small"
+            variant="contained"
+            onClick={() => fetchEntregar(id, snackbarId)}
+            color="primary"
+          >
+            Confirmar
+          </Button>
+          <Button
+            sx={{ textTransform: "none" }}
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => closeSnackbar(snackbarId)}
+          >
+            Cancelar
+          </Button>
+        </Stack>
+      ),
+    });
+  };
+
   //Funciones para el menu del click derecho
-  function entregar() {
-    console.log("entregar", selectedRow);
-  }
-  function avisarWhatsApp() {
-    console.log("avisarWhatsApp", selectedRow);
-  }
-  function avisarEmail() {
-    console.log("avisarEmail", selectedRow);
-  }
-  function imprimir() {
-    window.open(`/print/${selectedRow}`, "_blank");
+
+  async function avisarWhatsApp() {
+    const cliente = await fetchCliente(selectedRow);
+    notificarPorWhatsApp(cliente, user);
     handleClose();
   }
-  function editar() {
-    navigate("/home/orders/edit/" + selectedRow);
+  async function avisarEmail() {
+    const cliente = await fetchCliente(selectedRow);
+    notificarPorEmail(cliente, user);
     handleClose();
   }
+
   function eliminar() {
     console.log("eliminando", selectedRow);
   }
@@ -128,11 +207,11 @@ const Orders = () => {
         <MenuClickDerechoMain
           contextMenu={contextMenu}
           handleClose={handleClose}
-          entregar={entregar}
+          entregar={() => handleEntregar(selectedRow)}
           avisarWhatsApp={avisarWhatsApp}
           avisarEmail={avisarEmail}
-          imprimir={imprimir}
-          editar={editar}
+          imprimir={() => handlePrint(selectedRow)}
+          editar={() => handleEditar([selectedRow])}
           eliminar={eliminar}
         />
         <Stack

@@ -9,13 +9,17 @@ import { useNavigate } from "react-router-dom";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import { columnsProveedores } from "../components/TablaGenerica/utils/columnas";
+import MenuClickDerechoGenerico from "../components/MenuClickDerechoGenerico/MenuClickDerechoGenerico";
 export default function Suppliers() {
   const [rows, setRows] = useState([]);
   const [selectionModel, setSelectionModel] = useState(null);
   const [cargando, setCargando] = useState(false);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [selectedRow, setSelectedRow] = useState();
   const { user } = useUserContext();
-  useScrollUp();
   const navigate = useNavigate();
+  useScrollUp();
+
   const fetchProveedores = async () => {
     try {
       setCargando(true);
@@ -46,7 +50,9 @@ export default function Suppliers() {
   function handleEditar(id) {
     navigate("/home/suppliers/edit/" + id[0]);
   }
+
   const handleDeleteProveedores = (id) => {
+    handleClose();
     enqueueSnackbar("Desear eliminar al proveedor?", {
       variant: "success",
       persist: true,
@@ -74,7 +80,9 @@ export default function Suppliers() {
       ),
     });
   };
-
+  const handleClose = () => {
+    setContextMenu(null);
+  };
   async function handleEliminar([id]) {
     try {
       const response = await fetch(
@@ -141,6 +149,15 @@ export default function Suppliers() {
           cargando={cargando}
           setSelectionModel={setSelectionModel}
           handleDoubleClickModelChange={handleDoubleClickModelChange}
+          setSelectedRow={setSelectedRow}
+          setContextMenu={setContextMenu}
+          contextMenu={contextMenu}
+        />
+        <MenuClickDerechoGenerico
+          contextMenu={contextMenu}
+          handleClose={handleClose}
+          editar={() => handleEditar([selectedRow])}
+          eliminar={() => handleDeleteProveedores([selectedRow])}
         />
         <Stack
           sx={{ my: 2, justifyContent: "end" }}
