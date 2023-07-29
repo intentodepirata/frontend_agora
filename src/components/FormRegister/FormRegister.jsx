@@ -12,6 +12,7 @@ import {
   Checkbox,
   FormGroup,
   FormHelperText,
+  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -44,7 +45,6 @@ const FormRegister = () => {
     validationSchema: FormRegisterSchema,
     onSubmit: async function (values, actions) {
       try {
-        actions.setSubmitting(true);
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}user/register`,
           {
@@ -53,12 +53,8 @@ const FormRegister = () => {
             headers: { "Content-Type": "application/json" },
           }
         );
-
+        const data = await response.json();
         if (!response.ok) {
-          const data = await response.json();
-          enqueueSnackbar(data.error, { variant: "error" });
-          actions.resetForm();
-          actions.setSubmitting(false);
           throw new Error(data.error);
         }
 
@@ -68,10 +64,9 @@ const FormRegister = () => {
           { variant: "success", persist: true }
         );
         actions.resetForm();
-        actions.setSubmitting(false);
         navigate("/login");
       } catch (error) {
-        console.error(error.message);
+        enqueueSnackbar(error.message, { variant: "error" });
       }
     },
   });
@@ -307,10 +302,16 @@ const FormRegister = () => {
             size="large"
             sx={{ textTransform: "none", fontSize: "14px", py: "14", mb: 4 }}
           >
-            Crear Cuenta
+            {isSubmitting ? (
+              <>
+                Creando cuenta
+                <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />
+              </>
+            ) : (
+              "Crear cuenta"
+            )}
           </Button>
           <Typography textAlign={"center"} variant="body1" color="initial">
-            {" "}
             ¿Ya tienes cuenta?{" "}
             <Typography
               component={Link}

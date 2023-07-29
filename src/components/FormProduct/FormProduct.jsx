@@ -43,7 +43,6 @@ const FormProduct = ({ producto }) => {
         : `${import.meta.env.VITE_API_URL}componente/`;
 
       try {
-        actions.setSubmitting(true);
         const response = await fetch(url, {
           method: producto ? "PUT" : "POST",
           body: JSON.stringify(values),
@@ -70,7 +69,6 @@ const FormProduct = ({ producto }) => {
           });
           actions.resetForm();
         }
-        actions.setSubmitting(false);
       } catch (error) {
         console.error(error.message);
       }

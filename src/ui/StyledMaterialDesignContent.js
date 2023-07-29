@@ -19,6 +19,8 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(
     },
     "&.notistack-MuiContent-default": {
       padding: "12px 14px 12px 14px",
+      backgroundColor: "#43A047",
+      fontSize: "16px",
     },
   })
 );

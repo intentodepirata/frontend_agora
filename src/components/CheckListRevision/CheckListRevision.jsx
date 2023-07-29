@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import { useUserContext } from "../../contexts/UserContext";
 import { enqueueSnackbar } from "notistack";
+import { initialState } from "./utils/initialState";
 
 export default function CheckListRevision({
   checklist,
@@ -16,18 +17,6 @@ export default function CheckListRevision({
   updatedDispositivo_id,
   entregada,
 }) {
-  const initialState = {
-    encendido: false,
-    cobertura: false,
-    pantalla: false,
-    tapa: false,
-    camaras: false,
-    sonido: false,
-    carga: false,
-    microfono: false,
-    huella: false,
-  };
-
   const [state, setState] = useState(initialState);
 
   const { user } = useUserContext();
@@ -73,7 +62,7 @@ export default function CheckListRevision({
       });
       setChecklist_id(data);
     } catch (error) {
-      // Manejo del error
+      console.error(error);
     }
   };
 

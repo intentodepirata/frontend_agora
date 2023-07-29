@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   FormControl,
   FormHelperText,
   IconButton,
@@ -22,6 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { FormInvitarSchema } from "./FormInvitarSchema";
 import { useUserContext } from "../../contexts/UserContext";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 
 export default function FormInvitar() {
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +48,6 @@ export default function FormInvitar() {
     validationSchema: FormInvitarSchema,
     onSubmit: async function (values, actions) {
       try {
-        actions.setSubmitting(true);
         const invitado = {
           ...values,
           superior_id: user.id,
@@ -63,9 +64,6 @@ export default function FormInvitar() {
 
         const data = await response.json();
         if (!response.ok) {
-          enqueueSnackbar("Error al enviar invitacion", { variant: "error" });
-          actions.resetForm();
-          actions.setSubmitting(false);
           throw new Error(data.error);
         }
 
@@ -73,10 +71,9 @@ export default function FormInvitar() {
           variant: "success",
         });
         actions.resetForm();
-        actions.setSubmitting(false);
         getEmployees();
       } catch (error) {
-        console.error(error.message);
+        enqueueSnackbar(error.message, { variant: "error" });
       }
     },
   });
@@ -135,7 +132,7 @@ export default function FormInvitar() {
       variant: "success",
       persist: true,
       action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={1}>
           <Button
             sx={{ textTransform: "none" }}
             size="small"
@@ -363,7 +360,14 @@ export default function FormInvitar() {
             color="primary"
             sx={{ textTransform: "none", fontSize: "16px" }}
           >
-            Enviar
+            {isSubmitting ? (
+              <>
+                Enviando Invitación...
+                <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />
+              </>
+            ) : (
+              "Enviar Invitación"
+            )}
           </Button>
         </Box>
 

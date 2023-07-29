@@ -9,6 +9,7 @@ import {
   IconButton,
   FormControl,
   FormHelperText,
+  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
@@ -41,30 +42,30 @@ const FormLogin = () => {
     initialValues,
     validationSchema: FormLoginSchema,
     onSubmit: async function (values, actions) {
-      actions.setSubmitting(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}user/login`,
-        {
-          method: "POST",
-          body: JSON.stringify(values),
-          headers: { "Content-Type": "application/json" },
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}user/login`,
+          {
+            method: "POST",
+            body: JSON.stringify(values),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data);
         }
-      );
-      const data = await response.json();
-      if (response.status !== 200) {
-        enqueueSnackbar(`${data}`, {
-          variant: "error",
-        });
-      } else {
         login(data);
-
         navigate("/home");
-        actions.resetForm();
         enqueueSnackbar(`Bienvenido ${data.nombre} ${data.apellidos}`, {
           variant: "success",
         });
+        actions.resetForm();
+      } catch (error) {
+        enqueueSnackbar(`${error.message}`, {
+          variant: "error",
+        });
       }
-      actions.setSubmitting(false);
     },
   });
 
@@ -192,7 +193,14 @@ const FormLogin = () => {
             size="large"
             sx={{ textTransform: "none", fontSize: "14px", py: "14" }}
           >
-            Iniciar sesion
+            {isSubmitting ? (
+              <>
+                Iniciando Sesión...
+                <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />
+              </>
+            ) : (
+              "Iniciar Sesión"
+            )}
           </Button>
           <Typography
             component={"div"}

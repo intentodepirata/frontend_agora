@@ -4,7 +4,7 @@ import { initialValues } from "./utils/initialValues";
 import { FormClientesSchema } from "./FormClientesSchema";
 import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
 
 const FormClientes = ({ setCliente_id, cliente }) => {

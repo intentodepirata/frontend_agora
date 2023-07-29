@@ -39,8 +39,8 @@ const FormForgot = () => {
           }
         );
 
+        const data = await response.json();
         if (!response.ok) {
-          const data = await response.json();
           throw new Error(data.error);
         }
 
@@ -51,7 +51,7 @@ const FormForgot = () => {
           }
         );
         actions.resetForm();
-        actions.setSubmitting(false);
+
         navigate("/login");
       } catch (error) {
         enqueueSnackbar("Error al restablecer su password", {

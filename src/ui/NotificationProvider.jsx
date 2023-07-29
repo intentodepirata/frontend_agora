@@ -20,6 +20,7 @@ export const NotificationProvider = ({ children }) => {
       classes={{
         containerRoot: "notification-container",
       }}
+      disableWindowBlurListener={true}
       ref={myRef}
       action={(snackbarId) => (
         <IconButton
