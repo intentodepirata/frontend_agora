@@ -54,7 +54,7 @@ const FormForgot = () => {
 
         navigate("/login");
       } catch (error) {
-        enqueueSnackbar("Error al restablecer su password", {
+        enqueueSnackbar(`${error.message}`, {
           variant: "error",
         });
       }
