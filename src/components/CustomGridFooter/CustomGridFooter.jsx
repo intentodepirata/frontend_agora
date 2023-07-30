@@ -9,7 +9,13 @@ export default function CustomGridFooter() {
     <GridToolbarContainer
       sx={{ display: "flex", justifyContent: "space-between" }}
     >
-      <GridToolbarExport />
+      <GridToolbarExport
+        csvOptions={{
+          fileName: "customerDataBase",
+          delimiter: ";",
+          utf8WithBom: true,
+        }}
+      />
       <GridPagination />
     </GridToolbarContainer>
   );
