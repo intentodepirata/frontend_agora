@@ -2,13 +2,16 @@ import { Box, Typography, Button, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { Link, useNavigate } from "react-router-dom";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import useScrollUp from "../hooks/useScrollUp";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import { columnsClientes } from "../components/TablaGenerica/utils/columnas";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuClickDerechoGenerico from "../components/MenuClickDerechoGenerico/MenuClickDerechoGenerico";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
+import { useQuery } from "@tanstack/react-query";
+import { fetchClientes, getCustomers } from "../api/clientes";
 const Clientes = () => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [rows, setRows] = useState([]);
@@ -31,34 +34,44 @@ const Clientes = () => {
     handleClose();
   }
 
-  useEffect(() => {
-    const fetchClientes = async () => {
-      try {
-        setCargando(true);
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}cliente/`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
+  const query = useQuery(["clientes"], () => getCustomers(), {
+    onSuccess: (data) => setRows(data),
 
-        const data = await response.json();
-        if (data.length === 0) {
-          enqueueSnackbar("No hay clientes registrados", {
-            variant: "info",
-          });
-        }
-        setCargando(false);
-        setRows(data);
-      } catch (error) {
-        console.error("Error al obtener las ots:", error);
-      }
-    };
-    fetchClientes();
-  }, []);
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
+
+  // useEffect(() => {
+  //   const fetchClientes = async () => {
+  //     try {
+  //       setCargando(true);
+  //       const response = await fetch(
+  //         `${import.meta.env.VITE_API_URL}cliente/`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${user.token}`,
+  //           },
+  //         }
+  //       );
+
+  //       const data = await response.json();
+  //       if (data.length === 0) {
+  //         enqueueSnackbar("No hay clientes registrados", {
+  //           variant: "info",
+  //         });
+  //       }
+  //       setCargando(false);
+  //       setRows(data);
+  //     } catch (error) {
+  //       console.error("Error al obtener las ots:", error);
+  //     }
+  //   };
+  //   fetchClientes();
+  // }, []);
 
   const handleDeleteClientes = (id) => {
     handleClose();
@@ -66,30 +79,16 @@ const Clientes = () => {
       variant: "success",
       persist: true,
       action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => handleEliminar(id, snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={fetchDelete}
+        />
       ),
     });
   };
-  async function handleEliminar([id]) {
+
+  async function fetchDelete([id]) {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}clientes/${id}`,
@@ -114,6 +113,7 @@ const Clientes = () => {
       console.error(error.message);
     }
   }
+
   return (
     <>
       <Box
@@ -152,7 +152,7 @@ const Clientes = () => {
         <TablaGenerica
           columns={columnsClientes}
           rows={rows}
-          cargando={cargando}
+          cargando={query.isFetching}
           setSelectionModel={setSelectionModel}
           handleDoubleClickModelChange={handleDoubleClickModelChange}
           setSelectedRow={setSelectedRow}

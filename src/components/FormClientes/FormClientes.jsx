@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import { useMutation } from "@tanstack/react-query";
+import { createCustomer } from "../../api/clientes";
 
 const FormClientes = ({ setCliente_id, cliente }) => {
   const { user } = useUserContext();
@@ -13,6 +15,15 @@ const FormClientes = ({ setCliente_id, cliente }) => {
   const urlCompleta = window.location.href;
 
   const navigate = useNavigate();
+
+  const createCustomerMutation = useMutation({
+    mutationFn: createCustomer,
+    onSuccess: () => {
+      enqueueSnackbar("Cliente creado correctamente", {
+        variant: "success",
+      });
+    },
+  });
   const {
     isSubmitting,
     values,
@@ -26,46 +37,50 @@ const FormClientes = ({ setCliente_id, cliente }) => {
     initialValues: cliente ? cliente : initialValues,
     validationSchema: FormClientesSchema,
     onSubmit: async function (values, actions) {
-      try {
-        const token = user.token;
-        const url = cliente
-          ? `${import.meta.env.VITE_API_URL}cliente/${cliente.id}`
-          : `${import.meta.env.VITE_API_URL}cliente/`;
+      //   try {
+      //     const token = user.token;
+      //     const url = cliente
+      //       ? `${import.meta.env.VITE_API_URL}cliente/${cliente.id}`
+      //       : `${import.meta.env.VITE_API_URL}cliente/`;
 
-        const response = await fetch(url, {
-          method: cliente ? "PUT" : "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
+      //     const response = await fetch(url, {
+      //       method: cliente ? "PUT" : "POST",
+      //       body: JSON.stringify(values),
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //         Authorization: `Bearer ${token}`,
+      //       },
+      //     });
+      //     const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
+      //     if (!response.ok) {
+      //       throw new Error(data.error);
+      //     }
 
-        if (cliente) {
-          enqueueSnackbar("Cliente actualizado correctamente", {
-            variant: "info",
-          });
-          actions.resetForm();
-          navigate("/home/clientes");
-        } else {
-          enqueueSnackbar("Cliente Guardado Correctamente", {
-            variant: "success",
-          });
-          setGuardado(true);
+      //     if (cliente) {
+      //       enqueueSnackbar("Cliente actualizado correctamente", {
+      //         variant: "info",
+      //       });
+      //       actions.resetForm();
+      //       navigate("/home/clientes");
+      //     } else {
+      //       enqueueSnackbar("Cliente Guardado Correctamente", {
+      //         variant: "success",
+      //       });
+      //       setGuardado(true);
 
-          urlCompleta === `${import.meta.env.VITE_URL}home/clientes/create` &&
-            navigate("/home/clientes");
-          setCliente_id(data);
-        }
-      } catch (error) {}
-      actions.setSubmitting(false);
+      //       urlCompleta === `${import.meta.env.VITE_URL}home/clientes/create` &&
+      //         navigate("/home/clientes");
+      //       setCliente_id(data);
+      //     }
+      //   } catch (error) {}
+      //   actions.setSubmitting(false);
+
+      createCustomerMutation.mutate(values);
+      actions.resetForm();
     },
   });
+
   return (
     <>
       <Paper
