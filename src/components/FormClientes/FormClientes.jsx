@@ -6,8 +6,8 @@ import { useState } from "react";
 import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
-import { useMutation } from "@tanstack/react-query";
-import { createCustomer } from "../../api/clientes";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addCustomer } from "../../api/clientes";
 
 const FormClientes = ({ setCliente_id, cliente }) => {
   const { user } = useUserContext();
@@ -15,13 +15,14 @@ const FormClientes = ({ setCliente_id, cliente }) => {
   const urlCompleta = window.location.href;
 
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
   const createCustomerMutation = useMutation({
-    mutationFn: createCustomer,
+    mutationFn: addCustomer,
     onSuccess: () => {
       enqueueSnackbar("Cliente creado correctamente", {
         variant: "success",
       });
+      queryClient.invalidateQueries(["customers"]);
     },
   });
   const {

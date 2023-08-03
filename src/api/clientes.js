@@ -2,60 +2,55 @@ import axios from "axios";
 
 const user = JSON.parse(sessionStorage.getItem("user"));
 
-const customers = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+const customersApi = axios.create({
+  baseURL: `${import.meta.env.VITE_API_URL}cliente/`,
   headers: {
-    Authorization: `Bearer ${user.token}`,
+    Authorization: user?.token ? `Bearer ${user.token}` : undefined,
   },
 });
 
-export const getCustomers = async () => {
-  try {
-    const res = await customers.get("cliente");
-    return res.data;
-  } catch (error) {
-    console.error(error.message);
-    throw error;
-  }
-};
-export const createCustomer = async (data) => {
-  try {
-    const res = await customers.post("cliente", data);
-    return res.data;
-  } catch (error) {
-    console.error(error.message);
-    throw error;
-  }
-};
+export const getCustomers = () => customersApi.get();
+export const addCustomer = (customer) => customersApi.post(customer);
+export const deleteCustomer = (id) => customersApi.delete(`${id}`);
 
-export const fetchClientes = async (token) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}cliente/`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return await res.json();
-  } catch (error) {
-    console.error(error.message);
-    throw error;
-  }
-};
+// export const deleteCustomer = async (id) => {
+//   try {
+//     const res = await customersApi.delete("/", id);
+//     return res.data;
+//   } catch (error) {
+//     console.error(error.message);
+//     throw error;
+//   }
+// };
 
-export const fetchDelete = async ([id], token) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}clientes/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-    });
+// export const fetchClientes = async (token) => {
+//   try {
+//     const res = await fetch(`${import.meta.env.VITE_API_URL}cliente/`, {
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     return await res.json();
+//   } catch (error) {
+//     console.error(error.message);
+//     throw error;
+//   }
+// };
 
-    return await res.json();
-  } catch (error) {
-    console.error(error.message);
-    throw error;
-  }
-};
+// export const fetchDelete = async ([id], token) => {
+//   try {
+//     const res = await fetch(`${import.meta.env.VITE_API_URL}clientes/${id}`, {
+//       method: "DELETE",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: "Bearer " + token,
+//       },
+//     });
+
+//     return await res.json();
+//   } catch (error) {
+//     console.error(error.message);
+//     throw error;
+//   }
+// };

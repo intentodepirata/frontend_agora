@@ -8,7 +8,9 @@ export default function HandleConfirmNotification({ id, snackbarId, fetch }) {
         sx={{ textTransform: "none" }}
         size="small"
         variant="contained"
-        onClick={() => fetch(id, snackbarId)}
+        onClick={() =>
+          fetch.mutate(id, { onSuccess: closeSnackbar(snackbarId) })
+        }
         color="primary"
       >
         Confirmar

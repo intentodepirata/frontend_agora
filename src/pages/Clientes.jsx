@@ -1,5 +1,5 @@
 import { Box, Typography, Button, Stack } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { Link, useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
@@ -10,18 +10,17 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuClickDerechoGenerico from "../components/MenuClickDerechoGenerico/MenuClickDerechoGenerico";
 import HandleConfirmNotification from "../ui/HandleConfirmNotification";
-import { useQuery } from "@tanstack/react-query";
-import { fetchClientes, getCustomers } from "../api/clientes";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteCustomer, getCustomers } from "../api/clientes";
 const Clientes = () => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [rows, setRows] = useState([]);
-  const [cargando, setCargando] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRow, setSelectedRow] = useState();
   const { user } = useUserContext();
   useScrollUp();
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
   const handleClose = () => {
     setContextMenu(null);
   };
@@ -34,13 +33,34 @@ const Clientes = () => {
     handleClose();
   }
 
-  const query = useQuery(["clientes"], () => getCustomers(), {
-    onSuccess: (data) => setRows(data),
+  // const query = useQuery(["customers"], () => getCustomers(), {
+  //   onSuccess: (data) => setRows(data),
 
+  //   onError: (error) => {
+  //     enqueueSnackbar(error.message, {
+  //       variant: "error",
+  //     });
+  //   },
+  // });
+
+  const query = useQuery({
+    queryKey: ["customers"],
+    queryFn: getCustomers,
+    onSuccess: (data) => setRows(data.data),
     onError: (error) => {
       enqueueSnackbar(error.message, {
         variant: "error",
       });
+    },
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: deleteCustomer,
+    onSuccess: () => {
+      enqueueSnackbar("Cliente eliminado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["customers"]);
     },
   });
 
@@ -82,37 +102,37 @@ const Clientes = () => {
         <HandleConfirmNotification
           id={id}
           snackbarId={snackbarId}
-          fetch={fetchDelete}
+          fetch={deleteCustomerMutation}
         />
       ),
     });
   };
 
-  async function fetchDelete([id]) {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}clientes/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + user.token,
-          },
-        }
-      );
+  // async function fetchDelete([id]) {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}clientes/${id}`,
+  //       {
+  //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: "Bearer " + user.token,
+  //         },
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Error al eliminar el elemento");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Error al eliminar el elemento");
+  //     }
 
-      enqueueSnackbar("Proveedor eliminado correctamente", {
-        variant: "success",
-      });
-      fetchClientes();
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
+  //     enqueueSnackbar("Proveedor eliminado correctamente", {
+  //       variant: "success",
+  //     });
+  //     fetchClientes();
+  //   } catch (error) {
+  //     console.error(error.message);
+  //   }
+  // }
 
   return (
     <>
