@@ -1,39 +1,45 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useUserContext } from "../contexts/UserContext";
 import FormClientes from "../components/FormClientes/FormClientes";
 import useScrollUp from "../hooks/useScrollUp";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { findCustomer, updateCustomer } from "../api/clientes";
+import { enqueueSnackbar } from "notistack";
 
 const ClientesEdit = () => {
   const [cliente, setCliente] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   useScrollUp();
 
-  useEffect(() => {
-    const fetchCliente = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}cliente/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
+  useQuery({
+    queryKey: ["customer"],
+    queryFn: () => findCustomer(id, user.token),
 
-        const [data] = await response.json();
+    onSuccess: (data) => setCliente(...data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
 
-        setCliente(data);
-      } catch (error) {
-        console.error("Error al obtener los Clientes:", error);
-      }
-    };
-    fetchCliente();
-  }, [id]);
+  const updateCustomerMutation = useMutation({
+    mutationFn: (values) => updateCustomer(id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Cliente actualizado correctamente", {
+        variant: "success",
+      });
+      navigate("/home/clientes");
+      queryClient.invalidateQueries(["customer"]);
+    },
+  });
+
   return (
     <Box
       component="section"
@@ -64,17 +70,13 @@ const ClientesEdit = () => {
             Editar Cliente
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
-        >
-          Guardar Cliente
-        </Button>
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormClientes cliente={cliente} />
+        <FormClientes
+          cliente={cliente}
+          updateCustomerMutation={updateCustomerMutation}
+        />
       </Box>
     </Box>
   );

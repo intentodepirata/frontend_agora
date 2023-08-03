@@ -1,62 +1,24 @@
 import axios from "axios";
 
-const getToken = () => {
-  const user = JSON.parse(sessionStorage.getItem("user"));
-  return user?.token ? `Bearer ${user?.token}` : undefined;
-};
-
 const customersApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}cliente/`,
-  headers: {
-    Authorization: getToken(),
-  },
+  baseURL: `${import.meta.env.VITE_API_URL}cliente`,
 });
 
-export const getCustomers = () => customersApi.get();
-export const findCustomer = (id) => customersApi.get(`${id}`);
-export const addCustomer = (customer) => customersApi.post(customer);
-export const deleteCustomer = (id) => customersApi.delete(`${id}`);
-export const updateCustomer = (id, customer) =>
-  customersApi.put(`${id}`, customer);
+const createHeaders = (token) => {
+  return { headers: { Authorization: `Bearer ${token}` } };
+};
 
-// export const deleteCustomer = async (id) => {
-//   try {
-//     const res = await customersApi.delete("/", id);
-//     return res.data;
-//   } catch (error) {
-//     console.error(error.message);
-//     throw error;
-//   }
-// };
+export const getCustomers = (token) =>
+  customersApi.get("/", createHeaders(token));
 
-// export const fetchClientes = async (token) => {
-//   try {
-//     const res = await fetch(`${import.meta.env.VITE_API_URL}cliente/`, {
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-//     return await res.json();
-//   } catch (error) {
-//     console.error(error.message);
-//     throw error;
-//   }
-// };
+export const findCustomer = (id, token) =>
+  customersApi.get(`/${id}`, createHeaders(token));
 
-// export const fetchDelete = async ([id], token) => {
-//   try {
-//     const res = await fetch(`${import.meta.env.VITE_API_URL}clientes/${id}`, {
-//       method: "DELETE",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: "Bearer " + token,
-//       },
-//     });
+export const addCustomer = (customer, token) =>
+  customersApi.post("/", customer, createHeaders(token));
 
-//     return await res.json();
-//   } catch (error) {
-//     console.error(error.message);
-//     throw error;
-//   }
-// };
+export const deleteCustomer = (id, token) =>
+  customersApi.delete(`/${id}`, createHeaders(token));
+
+export const updateCustomer = (id, customer, token) =>
+  customersApi.put(`/${id}`, customer, createHeaders(token));

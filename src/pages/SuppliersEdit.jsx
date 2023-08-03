@@ -1,38 +1,65 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Box, IconButton, Typography } from "@mui/material";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useUserContext } from "../contexts/UserContext";
 import FormProveedores from "../components/FormProveedores/FormProveedores";
 import useScrollUp from "../hooks/useScrollUp";
+import { findSupplier, updateSupplier } from "../api/suppliers";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { enqueueSnackbar } from "notistack";
 
 const SuppliersEdit = () => {
   const [proveedor, setProveedor] = useState({});
   const { id } = useParams();
+  const { user } = useUserContext();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   useScrollUp();
 
-  const { user } = useUserContext();
-  useEffect(() => {
-    const fetchProveedor = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}proveedores/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
+  useQuery({
+    queryKey: ["supplier"],
+    queryFn: () => findSupplier(id, user.token),
 
-        const data = await response.json();
-        setProveedor(data);
-      } catch (error) {
-        console.error("Error al obtener proveedores:", error);
-      }
-    };
-    fetchProveedor();
-  }, []);
+    onSuccess: (data) => setProveedor(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (values) => updateSupplier(id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Proveedor actualizado correctamente", {
+        variant: "success",
+      });
+      navigate("/home/suppliers");
+      queryClient.invalidateQueries(["supplier"]);
+    },
+  });
+  // useEffect(() => {
+  //   const fetchProveedor = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `${import.meta.env.VITE_API_URL}proveedores/${id}`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${user.token}`,
+  //           },
+  //         }
+  //       );
+
+  //       const data = await response.json();
+  //       setProveedor(data);
+  //     } catch (error) {
+  //       console.error("Error al obtener proveedores:", error);
+  //     }
+  //   };
+  //   fetchProveedor();
+  // }, []);
   return (
     <Box
       component="section"
@@ -63,17 +90,13 @@ const SuppliersEdit = () => {
             Editar Proveedor
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
-        >
-          Actualizar proveedor
-        </Button>
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormProveedores proveedor={proveedor} />
+        <FormProveedores
+          proveedor={proveedor}
+          updateMutation={updateMutation}
+        />
       </Box>
     </Box>
   );

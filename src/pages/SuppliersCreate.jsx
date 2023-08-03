@@ -1,11 +1,28 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormProveedores from "../components/FormProveedores/FormProveedores";
 import useScrollUp from "../hooks/useScrollUp";
+import { useUserContext } from "../contexts/UserContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addSupplier } from "../api/suppliers";
+import { enqueueSnackbar } from "notistack";
 
 const SuppliersCreate = () => {
+  const { user } = useUserContext();
+  const queryClient = useQueryClient();
   useScrollUp();
+
+  const createMutation = useMutation({
+    mutationFn: (values) => addSupplier(values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Proveedor creado correctamente", {
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries(["suppliers"]);
+    },
+  });
   return (
     <Box
       component="section"
@@ -36,17 +53,10 @@ const SuppliersCreate = () => {
             Agregar proveedor
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
-        >
-          Guardar proveedor
-        </Button>
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormProveedores />
+        <FormProveedores createMutation={createMutation} />
       </Box>
     </Box>
   );

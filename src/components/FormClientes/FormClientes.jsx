@@ -9,33 +9,37 @@ import { enqueueSnackbar } from "notistack";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addCustomer, updateCustomer } from "../../api/clientes";
 
-const FormClientes = ({ setCliente_id, cliente }) => {
-  const { user } = useUserContext();
-  const [guardado, setGuardado] = useState(false);
-  const urlCompleta = window.location.href;
+const FormClientes = ({
+  createCustomerMutation,
+  updateCustomerMutation,
+  setCliente_id,
+  guardado,
+  cliente,
+}) => {
+  // const { user } = useUserContext();
+  // const [guardado, setGuardado] = useState(false);
 
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const createCustomerMutation = useMutation({
-    mutationFn: addCustomer,
-    onSuccess: (data) => {
-      enqueueSnackbar("Cliente creado correctamente", {
-        variant: "success",
-      });
-      console.log(data);
+  // const queryClient = useQueryClient();
+  // const createCustomerMutation = useMutation({
+  //   mutationFn: (values) => addCustomer(values, user.token),
+  //   onSuccess: () => {
+  //     enqueueSnackbar("Cliente creado correctamente", {
+  //       variant: "success",
+  //     });
+  //     setGuardado(true);
+  //     queryClient.invalidateQueries(["customers"]);
+  //   },
+  // });
+  // const updateCustomerMutation = useMutation({
+  //   mutationFn: (values) => updateCustomer(cliente.id, values, user.token),
+  //   onSuccess: () => {
+  //     enqueueSnackbar("Cliente actualizado correctamente", {
+  //       variant: "success",
+  //     });
+  //     queryClient.invalidateQueries(["clientes"]);
+  //   },
+  // });
 
-      queryClient.invalidateQueries(["customers"]);
-    },
-  });
-  const updateCustomerMutation = useMutation({
-    mutationFn: updateCustomer,
-    onSuccess: () => {
-      enqueueSnackbar("Cliente actualizado correctamente", {
-        variant: "success",
-      });
-      queryClient.invalidateQueries(["clientes"]);
-    },
-  });
   const {
     isSubmitting,
     values,
@@ -90,9 +94,10 @@ const FormClientes = ({ setCliente_id, cliente }) => {
       if (cliente) {
         updateCustomerMutation.mutate(values);
         actions.resetForm();
+      } else {
+        createCustomerMutation.mutate(values);
+        actions.resetForm();
       }
-      createCustomerMutation.mutate(values);
-      actions.resetForm();
     },
   });
 
@@ -108,6 +113,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
           flexDirection: "column",
           maxWidth: "1308px",
           margin: "auto",
+          width: "100%",
         }}
       >
         <Typography
@@ -193,14 +199,18 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             sx={{ width: "75%", mr: 2 }}
           />
           <Button
-            disabled={isSubmitting}
+            disabled={isSubmitting || guardado}
             sx={{ width: "25%", textTransform: "none", height: "40px" }}
             variant="contained"
             color="primary"
             type="submit"
             size="small"
           >
-            {guardado ? "Cliente Guardado" : "Guardar Cliente"}
+            {guardado
+              ? "Cliente Guardado"
+              : cliente
+              ? "Actualizar"
+              : "Guardar Cliente"}
           </Button>
         </Box>
       </Paper>

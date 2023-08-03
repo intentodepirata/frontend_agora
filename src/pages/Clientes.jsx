@@ -18,9 +18,10 @@ const Clientes = () => {
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRow, setSelectedRow] = useState();
   const { user } = useUserContext();
-  useScrollUp();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  useScrollUp();
+
   const handleClose = () => {
     setContextMenu(null);
   };
@@ -33,19 +34,10 @@ const Clientes = () => {
     handleClose();
   }
 
-  // const query = useQuery(["customers"], () => getCustomers(), {
-  //   onSuccess: (data) => setRows(data),
-
-  //   onError: (error) => {
-  //     enqueueSnackbar(error.message, {
-  //       variant: "error",
-  //     });
-  //   },
-  // });
-
   const query = useQuery({
     queryKey: ["customers"],
-    queryFn: getCustomers,
+    queryFn: () => getCustomers(user.token),
+
     onSuccess: (data) => setRows(data.data),
     onError: (error) => {
       enqueueSnackbar(error.message, {
@@ -55,7 +47,7 @@ const Clientes = () => {
   });
 
   const deleteCustomerMutation = useMutation({
-    mutationFn: deleteCustomer,
+    mutationFn: (customerId) => deleteCustomer(customerId, user.token),
     onSuccess: () => {
       enqueueSnackbar("Cliente eliminado correctamente", {
         variant: "success",
@@ -63,35 +55,6 @@ const Clientes = () => {
       queryClient.invalidateQueries(["customers"]);
     },
   });
-
-  // useEffect(() => {
-  //   const fetchClientes = async () => {
-  //     try {
-  //       setCargando(true);
-  //       const response = await fetch(
-  //         `${import.meta.env.VITE_API_URL}cliente/`,
-  //         {
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             Authorization: `Bearer ${user.token}`,
-  //           },
-  //         }
-  //       );
-
-  //       const data = await response.json();
-  //       if (data.length === 0) {
-  //         enqueueSnackbar("No hay clientes registrados", {
-  //           variant: "info",
-  //         });
-  //       }
-  //       setCargando(false);
-  //       setRows(data);
-  //     } catch (error) {
-  //       console.error("Error al obtener las ots:", error);
-  //     }
-  //   };
-  //   fetchClientes();
-  // }, []);
 
   const handleDeleteClientes = (id) => {
     handleClose();
@@ -107,32 +70,6 @@ const Clientes = () => {
       ),
     });
   };
-
-  // async function fetchDelete([id]) {
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_URL}clientes/${id}`,
-  //       {
-  //         method: "DELETE",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: "Bearer " + user.token,
-  //         },
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error("Error al eliminar el elemento");
-  //     }
-
-  //     enqueueSnackbar("Proveedor eliminado correctamente", {
-  //       variant: "success",
-  //     });
-  //     fetchClientes();
-  //   } catch (error) {
-  //     console.error(error.message);
-  //   }
-  // }
 
   return (
     <>

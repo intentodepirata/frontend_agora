@@ -1,48 +1,29 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import useScrollUp from "../hooks/useScrollUp";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import { columnsProveedores } from "../components/TablaGenerica/utils/columnas";
 import MenuClickDerechoGenerico from "../components/MenuClickDerechoGenerico/MenuClickDerechoGenerico";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteSupplier, getSuppliers } from "../api/suppliers";
+
 export default function Suppliers() {
   const [rows, setRows] = useState([]);
   const [selectionModel, setSelectionModel] = useState(null);
-  const [cargando, setCargando] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRow, setSelectedRow] = useState();
   const { user } = useUserContext();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   useScrollUp();
 
-  const fetchProveedores = async () => {
-    try {
-      setCargando(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}proveedores/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-      setCargando(false);
-      setRows(data);
-    } catch (error) {
-      "Error al obtener los proveedores:", error;
-    }
-  };
-  useEffect(() => {
-    fetchProveedores();
-  }, []);
   const handleDoubleClickModelChange = (row) => {
     navigate("/home/suppliers/edit/" + row.id);
   };
@@ -50,64 +31,46 @@ export default function Suppliers() {
   function handleEditar(id) {
     navigate("/home/suppliers/edit/" + id[0]);
   }
-
-  const handleDeleteProveedores = (id) => {
-    handleClose();
-    enqueueSnackbar("Desear eliminar al proveedor?", {
-      variant: "success",
-      persist: true,
-      action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => handleEliminar(id, snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
-      ),
-    });
-  };
   const handleClose = () => {
     setContextMenu(null);
   };
-  async function handleEliminar([id]) {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}proveedores/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + user.token,
-          },
-        }
-      );
 
-      if (!response.ok) {
-        throw new Error("Error al eliminar el elemento");
-      }
+  const query = useQuery({
+    queryKey: ["suppliers"],
+    queryFn: () => getSuppliers(user.token),
 
+    onSuccess: (data) => setRows(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteSupplier(id, user.token),
+    onSuccess: () => {
       enqueueSnackbar("Proveedor eliminado correctamente", {
         variant: "success",
       });
-      fetchProveedores();
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
+      queryClient.invalidateQueries(["suppliers"]);
+    },
+  });
+  const handleDelete = (id) => {
+    handleClose();
+    enqueueSnackbar("Desear eliminar al Proveedor?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deleteMutation}
+        />
+      ),
+    });
+  };
+
   return (
     <>
       <Box
@@ -146,7 +109,7 @@ export default function Suppliers() {
         <TablaGenerica
           columns={columnsProveedores}
           rows={rows}
-          cargando={cargando}
+          cargando={query.isFetching}
           setSelectionModel={setSelectionModel}
           handleDoubleClickModelChange={handleDoubleClickModelChange}
           setSelectedRow={setSelectedRow}
@@ -157,7 +120,7 @@ export default function Suppliers() {
           contextMenu={contextMenu}
           handleClose={handleClose}
           editar={() => handleEditar([selectedRow])}
-          eliminar={() => handleDeleteProveedores([selectedRow])}
+          eliminar={() => handleDelete([selectedRow])}
         />
         <Stack
           sx={{ my: 2, justifyContent: "end" }}
@@ -165,7 +128,7 @@ export default function Suppliers() {
           spacing={2}
         >
           <Button
-            onClick={() => handleDeleteProveedores(selectionModel)}
+            onClick={() => handleDelete(selectionModel)}
             color="error"
             variant="contained"
             startIcon={<DeleteIcon />}
