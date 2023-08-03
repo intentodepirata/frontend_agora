@@ -1,17 +1,23 @@
 import axios from "axios";
 
-const user = JSON.parse(sessionStorage.getItem("user"));
+const getToken = () => {
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  return user?.token ? `Bearer ${user?.token}` : undefined;
+};
 
 const customersApi = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}cliente/`,
   headers: {
-    Authorization: user?.token ? `Bearer ${user.token}` : undefined,
+    Authorization: getToken(),
   },
 });
 
 export const getCustomers = () => customersApi.get();
+export const findCustomer = (id) => customersApi.get(`${id}`);
 export const addCustomer = (customer) => customersApi.post(customer);
 export const deleteCustomer = (id) => customersApi.delete(`${id}`);
+export const updateCustomer = (id, customer) =>
+  customersApi.put(`${id}`, customer);
 
 // export const deleteCustomer = async (id) => {
 //   try {

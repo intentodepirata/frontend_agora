@@ -7,7 +7,7 @@ import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addCustomer } from "../../api/clientes";
+import { addCustomer, updateCustomer } from "../../api/clientes";
 
 const FormClientes = ({ setCliente_id, cliente }) => {
   const { user } = useUserContext();
@@ -18,11 +18,22 @@ const FormClientes = ({ setCliente_id, cliente }) => {
   const queryClient = useQueryClient();
   const createCustomerMutation = useMutation({
     mutationFn: addCustomer,
-    onSuccess: () => {
+    onSuccess: (data) => {
       enqueueSnackbar("Cliente creado correctamente", {
         variant: "success",
       });
+      console.log(data);
+
       queryClient.invalidateQueries(["customers"]);
+    },
+  });
+  const updateCustomerMutation = useMutation({
+    mutationFn: updateCustomer,
+    onSuccess: () => {
+      enqueueSnackbar("Cliente actualizado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["clientes"]);
     },
   });
   const {
@@ -76,7 +87,10 @@ const FormClientes = ({ setCliente_id, cliente }) => {
       //     }
       //   } catch (error) {}
       //   actions.setSubmitting(false);
-
+      if (cliente) {
+        updateCustomerMutation.mutate(values);
+        actions.resetForm();
+      }
       createCustomerMutation.mutate(values);
       actions.resetForm();
     },
