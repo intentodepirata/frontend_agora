@@ -133,6 +133,7 @@ const FormProduct = ({ producto }) => {
         flexDirection: "column",
         maxWidth: "1308px",
         margin: "auto",
+        width: "100%",
       }}
     >
       <Box sx={{ mb: 2 }}>

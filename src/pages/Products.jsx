@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Stack, Grid } from "@mui/material";
+import { Box, Typography, Button, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
@@ -13,19 +13,23 @@ import { useNavigate } from "react-router-dom";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import Carrito from "../components/Carrito/Carrito";
 import MenuClickDerechoProductos from "../components/MenuClickDerechoProductos/MenuClickDerechoProductos";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteProduct, getProducts } from "../api/products";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
 
 const Products = () => {
   const [rows, setRows] = useState([]);
-  const [cargando, setCargando] = useState(false);
   const [selectionModel, setSelectionModel] = useState(null);
   const [rowsCarrito, setRowsCarrito] = useState(
     JSON.parse(localStorage.getItem("carritoAgora")) || []
   );
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRow, setSelectedRow] = useState();
-  useScrollUp();
   const { user } = useUserContext();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  useScrollUp();
+
   useEffect(() => {
     localStorage.setItem("carritoAgora", JSON.stringify(rowsCarrito));
   }, [rowsCarrito]);
@@ -45,13 +49,13 @@ const Products = () => {
     if (itemExistente) {
       // Si el elemento ya existe, actualiza la cantidad
       const nuevaCantidad = itemExistente.cantidad + 1;
-      const actualizado = {
+      const itemActualizado = {
         ...itemExistente,
         cantidad: nuevaCantidad,
       };
 
       setRowsCarrito(
-        rowsCarrito.map((row) => (row.id === item ? actualizado : row))
+        rowsCarrito.map((row) => (row.id === item ? itemActualizado : row))
       );
       enqueueSnackbar("Producto actualizado en el carrito", {
         variant: "info",
@@ -77,46 +81,30 @@ const Products = () => {
 
     setRowsCarrito(updatedRows);
   };
-  const handleDelete = ([id]) => {
-    const actualizado = rowsCarrito.filter((row) => row.id !== id);
-    setRowsCarrito(actualizado);
+  const handleDeleteCarrito = ([id]) => {
+    const carritoActualizado = rowsCarrito.filter((row) => row.id !== id);
+    setRowsCarrito(carritoActualizado);
   };
 
-  const fetchComponentes = async () => {
-    try {
-      setCargando(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}componente/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-      setCargando(false);
-      setRows(data);
-    } catch (error) {
-      console.error("Error al obtener las ots:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchComponentes();
-  }, []);
+  const query = useQuery({
+    queryKey: ["products"],
+    queryFn: () => getProducts(user.token),
+    onSuccess: (data) => setRows(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
 
   const handleDoubleClickModelChange = (row) => {
     navigate("/home/products/edit/" + row.id);
   };
 
   function handleEditar(id) {
-    console.log("editando", id[0]);
     navigate("/home/products/edit/" + id[0]);
   }
   function editar() {
-    console.log("editando", selectedRow);
     navigate("/home/products/edit/" + selectedRow);
   }
 
@@ -124,38 +112,29 @@ const Products = () => {
     setContextMenu(null);
   };
 
-  async function handleEliminar(id) {
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteProduct(id, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Producto eliminado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
+  const handleDelete = (id) => {
     handleClose();
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que quieres eliminar este elemento?"
-    );
-
-    if (confirmacion) {
-      try {
-        const response = await fetch(
-          import.meta.env.VITE_API_URL + "componente/" + id,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + user.token,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Error al eliminar el elemento");
-        }
-
-        enqueueSnackbar("Elemento eliminado correctamente", {
-          variant: "success",
-        });
-        fetchComponentes();
-      } catch (error) {
-        console.error(error.message);
-      }
-    }
-  }
+    enqueueSnackbar("Desear eliminar el Producto?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deleteMutation}
+        />
+      ),
+    });
+  };
   return (
     <>
       <Box
@@ -196,7 +175,7 @@ const Products = () => {
           <TablaGenerica
             columns={columnsProducts}
             rows={rows}
-            cargando={cargando}
+            cargando={query.isFetching}
             setSelectionModel={setSelectionModel}
             handleDoubleClickModelChange={handleDoubleClickModelChange}
             setSelectedRow={setSelectedRow}
@@ -206,7 +185,7 @@ const Products = () => {
           <MenuClickDerechoProductos
             contextMenu={contextMenu}
             handleClose={handleClose}
-            eliminar={() => handleEliminar(selectedRow)}
+            eliminar={() => handleDelete(selectedRow)}
             editar={editar}
             carrito={() => agregarAlCarrito([selectedRow])}
           />
@@ -217,7 +196,7 @@ const Products = () => {
             spacing={2}
           >
             <Button
-              onClick={() => handleEliminar(selectionModel)}
+              onClick={() => handleDelete(selectionModel)}
               color="error"
               variant="contained"
               endIcon={<DeleteIcon />}
@@ -254,7 +233,7 @@ const Products = () => {
 
           <TablaCarrito
             rowsCarrito={rowsCarrito}
-            cargando={cargando}
+            cargando={query.isFetching}
             handleCellEditStop={handleCellEditStop}
             setSelectionModel={setSelectionModel}
           />
@@ -265,7 +244,7 @@ const Products = () => {
             spacing={2}
           >
             <Button
-              onClick={() => handleDelete(selectionModel)}
+              onClick={() => handleDeleteCarrito(selectionModel)}
               color="error"
               variant="contained"
               endIcon={<DeleteIcon />}

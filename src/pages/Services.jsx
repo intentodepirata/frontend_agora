@@ -8,135 +8,109 @@ import { enqueueSnackbar } from "notistack";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { columnsServicios } from "../components/TablaGenerica/utils/columnas";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
+import {
+  addService,
+  deleteService,
+  getServices,
+  updateService,
+} from "../api/services";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
 export default function Services() {
   const [selectionModel, setSelectionModel] = useState(null);
-  const [servicioActualizado, setServicioActualizado] = useState(null);
-  const [cargando, setCargando] = useState(false);
-  const [servicio, setServicio] = useState("");
-  const [precio, setPrecio] = useState("");
+  const [servicioId, setServicioId] = useState(null);
+  const [servicio, setServicio] = useState({ servicio: "", precio: "" });
   const [rows, setRows] = useState([]);
   const { user } = useUserContext();
-
+  const queryClient = useQueryClient();
   useScrollUp();
 
-  useEffect(() => {
-    fetchServicios();
-  }, []);
+  const handleServicioChange = (e) => {
+    setServicio({ ...servicio, [e.target.name]: e.target.value });
+  };
 
-  async function handleSubmit() {
-    if (servicio === "" || precio === "") {
+  const query = useQuery({
+    queryKey: ["services"],
+    queryFn: () => getServices(user.token),
+    onSuccess: (data) => setRows(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
+  const createMutation = useMutation({
+    mutationFn: (values) => addService(values, user.token),
+    onSuccess: () => {
+      setServicio({ servicio: "", precio: "" });
+      enqueueSnackbar("Servicio creado correctamente", {
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries(["services"]);
+    },
+  });
+  const updateMutation = useMutation({
+    mutationFn: (values) => updateService(servicioId, values, user.token),
+    onSuccess: () => {
+      setServicio({ servicio: "", precio: "" });
+      setServicioId(null);
+      enqueueSnackbar("Servicio actualizado correctamente", {
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries(["services"]);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteService(id, user.token),
+    onSuccess: () => {
+      setServicio({ servicio: "", precio: "" });
+      setServicioId(null);
+      enqueueSnackbar("Servicio eliminado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["services"]);
+    },
+  });
+  const handleDelete = (id) => {
+    enqueueSnackbar("Desear eliminar el servicio?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deleteMutation}
+        />
+      ),
+    });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (servicio.servicio === "" || servicio.precio === "") {
       enqueueSnackbar("Todos los campos son obligatorios", {
         variant: "error",
       });
       return;
     }
-    const url = servicioActualizado
-      ? `${import.meta.env.VITE_API_URL}servicios/${servicioActualizado}`
-      : `${import.meta.env.VITE_API_URL}servicios`;
-    const response = await fetch(url, {
-      method: servicioActualizado ? "PUT" : "POST",
-      body: JSON.stringify({ servicio, precio }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      enqueueSnackbar(data.error, { variant: "error" });
-      throw new Error(data.error);
-    }
 
-    enqueueSnackbar(
-      `Servicio ${
-        servicioActualizado ? "actualizado" : "creado"
-      } correctamente`,
-      { variant: "success" }
-    );
-    setPrecio("");
-    setServicio("");
-    fetchServicios();
-    setServicioActualizado(null);
-  }
-  async function fetchServicios() {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}servicios`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      enqueueSnackbar(data.error, { variant: "error" });
-      throw new Error(data.error);
-    }
-    setRows(data);
-  }
-  const handleDoubleClickModelChange = (row) => {
-    setPrecio(row.row.precio);
-    setServicio(row.row.servicio);
-    setServicioActualizado(row.id);
+    servicioId
+      ? updateMutation.mutate(servicio)
+      : createMutation.mutate(servicio);
   };
-  async function handleEditar([id]) {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}servicios/${id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      }
-    );
-    const [data] = await response.json();
-    if (!response.ok) {
-      enqueueSnackbar(data.error, { variant: "error" });
-      throw new Error(data.error);
-    }
 
-    setPrecio(data.precio);
-    setServicio(data.servicio);
-    setServicioActualizado(data.id);
-  }
+  const handleDoubleClickModelChange = (row) => {
+    setServicio({ servicio: row.row.servicio, precio: row.row.precio });
+    setServicioId(row.id);
+  };
 
-  async function handleEliminar(id) {
-    const confirmacion = window.confirm(
-      "¿Estás seguro de que quieres eliminar este elemento?"
-    );
-
-    if (confirmacion) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}servicios/${id}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Error al eliminar el elemento");
-        }
-
-        enqueueSnackbar("Servicio eliminado correctamente", {
-          variant: "success",
-        });
-        fetchProveedores();
-      } catch (error) {
-        enqueueSnackbar(error.message, {
-          variant: "error",
-        });
-      }
-    }
-  }
   return (
     <>
       <Box
         sx={{
           display: "flex",
-
           alignItems: "center",
           justifyContent: "space-between",
           p: 2,
@@ -163,25 +137,29 @@ export default function Services() {
           sx={{ my: 2, justifyContent: "end" }}
           direction={{ xs: "column", md: "row" }}
           spacing={2}
+          component={"form"}
+          onSubmit={handleSubmit}
         >
           <TextField
             fullWidth
             id="servicio"
+            name="servicio"
             label="Agrega nuevos servicios"
-            value={servicio}
+            value={servicio.servicio}
             size="small"
-            onChange={(e) => setServicio(e.target.value)}
+            onChange={handleServicioChange}
             mr={2}
           />
           <TextField
             id="coste"
             label="Precio"
-            value={precio}
+            name="precio"
+            value={servicio.precio}
             size="small"
-            onChange={(e) => setPrecio(e.target.value)}
+            onChange={handleServicioChange}
           />
           <Button
-            onClick={() => handleEliminar(selectionModel)}
+            onClick={() => handleDelete(selectionModel)}
             color="error"
             variant="contained"
             startIcon={<DeleteIcon />}
@@ -198,19 +176,19 @@ export default function Services() {
             Editar
           </Button>
           <Button
-            onClick={() => handleSubmit()}
+            type="submit"
             variant="contained"
             startIcon={<AddBoxIcon />}
             color="success"
             sx={{ minWidth: 140 }}
           >
-            {servicioActualizado ? "Actualizar" : "Agregar"}
+            {servicioId ? "Actualizar" : "Agregar"}
           </Button>
         </Stack>
         <TablaGenerica
           columns={columnsServicios}
           rows={rows}
-          cargando={cargando}
+          cargando={query.isFetching}
           setSelectionModel={setSelectionModel}
           handleDoubleClickModelChange={handleDoubleClickModelChange}
         />

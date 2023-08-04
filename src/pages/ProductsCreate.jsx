@@ -3,9 +3,25 @@ import { Link } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormProduct from "../components/FormProduct/FormProduct";
 import useScrollUp from "../hooks/useScrollUp";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useUserContext } from "../contexts/UserContext";
+import { addProduct } from "../api/products";
 
 const ProductsCreate = () => {
+  const { user } = useUserContext();
+  const queryClient = useQueryClient();
   useScrollUp();
+
+  const createMutation = useMutation({
+    mutationFn: (values) => addProduct(values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Producto creado correctamente", {
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries(["suppliers"]);
+    },
+  });
   return (
     <Box
       component="section"
@@ -46,7 +62,7 @@ const ProductsCreate = () => {
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormProduct />
+        <FormProduct createMutation={createMutation} />
       </Box>
     </Box>
   );
