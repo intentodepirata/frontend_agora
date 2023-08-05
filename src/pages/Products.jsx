@@ -48,17 +48,17 @@ const Products = () => {
 
     if (itemExistente) {
       // Si el elemento ya existe, actualiza la cantidad
-      const nuevaCantidad = itemExistente.cantidad + 1;
+      // const nuevaCantidad = itemExistente.cantidad + 1;
       const itemActualizado = {
         ...itemExistente,
-        cantidad: nuevaCantidad,
+        cantidad: itemExistente.cantidad + 1,
       };
 
       setRowsCarrito(
         rowsCarrito.map((row) => (row.id === item ? itemActualizado : row))
       );
-      enqueueSnackbar("Producto actualizado en el carrito", {
-        variant: "info",
+      enqueueSnackbar("Producto actualizado en carrito", {
+        variant: "success",
       });
     } else {
       // Si el elemento no existe, agrégalo al carrito

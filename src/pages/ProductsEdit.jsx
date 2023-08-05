@@ -1,38 +1,44 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Box, IconButton, Typography } from "@mui/material";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormProduct from "../components/FormProduct/FormProduct";
 import { useUserContext } from "../contexts/UserContext";
 import useScrollUp from "../hooks/useScrollUp";
+import { findProduct, updateProduct } from "../api/products";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { enqueueSnackbar } from "notistack";
 
 const ProductsEdit = () => {
   const [producto, setProducto] = useState(null);
   const { id } = useParams();
+  const { user } = useUserContext();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   useScrollUp();
 
-  const { user } = useUserContext();
-  useEffect(() => {
-    const fetchProducto = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}componente/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
+  useQuery({
+    queryKey: ["product"],
+    queryFn: () => findProduct(id, user.token),
+    onSuccess: (data) => setProducto(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
 
-        const data = await response.json();
-        setProducto(data);
-      } catch (error) {
-        console.error("Error al obtener los productos:", error);
-      }
-    };
-    fetchProducto();
-  }, []);
+  const updateMutation = useMutation({
+    mutationFn: (values) => updateProduct(id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Producto actualizado correctamente", {
+        variant: "success",
+      });
+      navigate("/home/products");
+      queryClient.invalidateQueries(["products"]);
+    },
+  });
+
   return (
     <Box
       component="section"
@@ -63,17 +69,10 @@ const ProductsEdit = () => {
             Editar Producto
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
-        >
-          Guardar producto
-        </Button>
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormProduct producto={producto} />
+        <FormProduct producto={producto} updateMutation={updateMutation} />
       </Box>
     </Box>
   );

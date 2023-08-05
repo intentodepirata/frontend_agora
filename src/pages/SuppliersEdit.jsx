@@ -39,27 +39,7 @@ const SuppliersEdit = () => {
       queryClient.invalidateQueries(["supplier"]);
     },
   });
-  // useEffect(() => {
-  //   const fetchProveedor = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${import.meta.env.VITE_API_URL}proveedores/${id}`,
-  //         {
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             Authorization: `Bearer ${user.token}`,
-  //           },
-  //         }
-  //       );
 
-  //       const data = await response.json();
-  //       setProveedor(data);
-  //     } catch (error) {
-  //       console.error("Error al obtener proveedores:", error);
-  //     }
-  //   };
-  //   fetchProveedor();
-  // }, []);
   return (
     <Box
       component="section"

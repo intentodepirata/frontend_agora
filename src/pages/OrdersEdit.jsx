@@ -11,6 +11,11 @@ import DatosOrdenModal from "../components/DatosOrdenModal/DatosOrdenModal";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { findOrder, findOrderToPrint, updateOrderDeliver } from "../api/orders";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
+
 const OrdersEdit = () => {
   const [fetchData, setFetchData] = useState(false);
   const [modal, setModal] = useState(false);
@@ -18,103 +23,54 @@ const OrdersEdit = () => {
   const [cliente, setCliente] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
+  const queryClient = useQueryClient();
   useScrollUp();
 
-  useEffect(() => {
-    fetchCliente();
-    fetchIsEntregada();
-  }, [id, fetchData]);
+  const queryPrintData = useQuery({
+    queryKey: ["print data", id],
+    queryFn: () => findOrderToPrint(id, user.token),
 
-  const fetchCliente = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/print/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      setCliente(data);
-      setFetchData(false);
-    } catch (error) {
-      console.error("Error al obtener al cliente");
-    }
-  };
-
-  const fetchIsEntregada = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
+    onSuccess: (data) => setCliente(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
       });
-      const data = await response.json();
-      if (data.entregada === 1) {
-        setEntregada(true);
-      }
-    } catch (error) {
-      console.error("Error al entregar la Orden:");
-    }
-  };
+    },
+  });
+  const queryIsDeliver = useQuery({
+    queryKey: ["order", id],
+    queryFn: () => findOrder(id, user.token),
 
-  const fetchEntregar = async (snackbarId) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/deliver/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!data) {
-        throw new Error("Error al entregar la Orden");
-      }
+    onSuccess: (data) => data.data.entregada === 1 && setEntregada(true),
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
-      setEntregada(true);
-      closeSnackbar(snackbarId);
+  const deliverMutation = useMutation({
+    mutationFn: () => updateOrderDeliver(id, user.token),
+    onSuccess: () => {
       enqueueSnackbar("Orden entregada correctamente", {
         variant: "success",
       });
-    } catch (error) {
-      closeSnackbar(snackbarId);
-      console.error("Error al entregar la Orden:");
-    }
-  };
-  const handleEntregar = () => {
+
+      queryClient.invalidateQueries(["order", id]);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const handleDeliver = (id) => {
     enqueueSnackbar("Desear entregar el terminal al Cliente?", {
       variant: "success",
       persist: true,
       action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => fetchEntregar(snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deliverMutation}
+        />
       ),
     });
   };
@@ -177,7 +133,7 @@ const OrdersEdit = () => {
 
           {!entregada && (
             <Button
-              onClick={() => handleEntregar()}
+              onClick={() => handleDeliver()}
               variant="contained"
               endIcon={<DoneAllRoundedIcon />}
               color="success"

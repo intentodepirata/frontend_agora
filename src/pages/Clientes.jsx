@@ -91,7 +91,7 @@ const Clientes = () => {
           component={Link}
           to="/home/clientes/create"
         >
-          Crear cliente
+          Nuevo cliente
         </Button>
       </Box>
       <Typography textAlign={"center"} variant="h6" color="grey">

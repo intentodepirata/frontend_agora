@@ -1,6 +1,5 @@
 export const options = ["Avisar Whatsapp", "Avisar Email"];
 export const generarMensaje = (cliente, user, email) => {
-  console.log(cliente);
   const enlace = `${import.meta.env.VITE_URL}order-status/${cliente.uuid}`;
   const {
     cliente: clienteName,

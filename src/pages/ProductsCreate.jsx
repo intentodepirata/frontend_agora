@@ -6,6 +6,7 @@ import useScrollUp from "../hooks/useScrollUp";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserContext } from "../contexts/UserContext";
 import { addProduct } from "../api/products";
+import { enqueueSnackbar } from "notistack";
 
 const ProductsCreate = () => {
   const { user } = useUserContext();
@@ -18,8 +19,7 @@ const ProductsCreate = () => {
       enqueueSnackbar("Producto creado correctamente", {
         variant: "success",
       });
-
-      queryClient.invalidateQueries(["suppliers"]);
+      queryClient.invalidateQueries(["products"]);
     },
   });
   return (
