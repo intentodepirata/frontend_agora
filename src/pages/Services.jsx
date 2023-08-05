@@ -123,7 +123,7 @@ export default function Services() {
         enqueueSnackbar("Servicio eliminado correctamente", {
           variant: "success",
         });
-        fetchProveedores();
+        fetchServicios();
       } catch (error) {
         enqueueSnackbar(error.message, {
           variant: "error",
