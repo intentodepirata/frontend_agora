@@ -5,12 +5,10 @@ import FormClientes from "../components/FormClientes/FormClientes";
 import useScrollUp from "../hooks/useScrollUp";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addCustomer } from "../api/clientes";
-import { useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { enqueueSnackbar } from "notistack";
 
 const ClientsCreate = () => {
-  const [guardado, setGuardado] = useState(false);
   const { user } = useUserContext();
   const queryClient = useQueryClient();
   useScrollUp();
@@ -21,7 +19,7 @@ const ClientsCreate = () => {
       enqueueSnackbar("Cliente creado correctamente", {
         variant: "success",
       });
-      setGuardado(true);
+
       queryClient.invalidateQueries(["customers"]);
     },
   });
@@ -66,10 +64,7 @@ const ClientsCreate = () => {
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormClientes
-          guardado={guardado}
-          createCustomerMutation={createCustomerMutation}
-        />
+        <FormClientes createCustomerMutation={createCustomerMutation} />
       </Box>
     </Box>
   );

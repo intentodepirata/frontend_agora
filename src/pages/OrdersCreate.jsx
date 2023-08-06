@@ -7,22 +7,29 @@ import FormDispositivo from "../components/FormDispositivo/FormDispositivo";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 import OrderStatusBar from "../components/OrderStatusBar/OrderStatusBar";
 import useScrollUp from "../hooks/useScrollUp";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addCustomer } from "../api/clientes";
+import { enqueueSnackbar } from "notistack";
+import { useUserContext } from "../contexts/UserContext";
+import { addDevice } from "../api/devices";
 const OrdersCreate = () => {
   const [cliente_id, setCliente_id] = useState(null);
   const [estado, setEstado] = useState(-1);
   const [dispositivo_id, setDispositivo_id] = useState(null);
   const [recepcionado, setRecepcionado] = useState(false);
+  const queryClient = useQueryClient();
+  const { user } = useUserContext();
   useScrollUp();
-  useEffect(() => {
-    if (cliente_id) {
-      setEstado((currentStatus) => currentStatus + 1);
-    }
-  }, [cliente_id]);
-  useEffect(() => {
-    if (dispositivo_id) {
-      setEstado((currentStatus) => currentStatus + 1);
-    }
-  }, [dispositivo_id]);
+  // useEffect(() => {
+  //   if (cliente_id) {
+  //     setEstado((currentStatus) => currentStatus + 1);
+  //   }
+  // }, [cliente_id]);
+  // useEffect(() => {
+  //   if (dispositivo_id) {
+  //     setEstado((currentStatus) => currentStatus + 1);
+  //   }
+  // }, [dispositivo_id]);
 
   useEffect(() => {
     if (cliente_id && dispositivo_id) {
@@ -30,6 +37,36 @@ const OrdersCreate = () => {
       setEstado((currentStatus) => currentStatus + 1);
     }
   }, [dispositivo_id, cliente_id]);
+
+  const createCustomerMutation = useMutation({
+    mutationFn: (values) => addCustomer(values, user.token),
+    onSuccess: (data) => {
+      setEstado(0);
+      setCliente_id(data.data);
+      enqueueSnackbar("Cliente agregado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["customers"]);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const createDeviceMutation = useMutation({
+    mutationFn: (values) => addDevice(values, user.token),
+    onSuccess: (data) => {
+      setEstado(1);
+      setDispositivo_id(data.data);
+      enqueueSnackbar("Dispositivo agregado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["devices"]);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
   return (
     <Box
@@ -74,10 +111,10 @@ const OrdersCreate = () => {
       </Box>
 
       <Box sx={{ py: 1, px: 2, my: 5 }}>
-        <FormClientes setCliente_id={setCliente_id} />
+        <FormClientes createCustomerMutation={createCustomerMutation} />
       </Box>
       <Box sx={{ py: 1, px: 2, my: 5 }}>
-        <FormDispositivo setDispositivo_id={setDispositivo_id} />
+        <FormDispositivo createDeviceMutation={createDeviceMutation} />
       </Box>
       {recepcionado && (
         <Box sx={{ py: 1, px: 2, mx: "auto", my: 5 }}>

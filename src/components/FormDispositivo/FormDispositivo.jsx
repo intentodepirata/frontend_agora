@@ -16,12 +16,15 @@ import { FormDispositivoSchema } from "./FormDispositivoSchema";
 import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
 import { enqueueSnackbar } from "notistack";
+import { useQuery } from "@tanstack/react-query";
+import { findBrandModels, getBrands } from "../../api/brands";
 
-const FormDispositivo = ({ setDispositivo_id }) => {
+const FormDispositivo = ({ createDeviceMutation }) => {
   const [marcas, setMarcas] = useState([]);
   const [modelos, setModelos] = useState([]);
   const [guardado, setGuardado] = useState(false);
   const { user } = useUserContext();
+
   const {
     isSubmitting,
     values,
@@ -34,80 +37,104 @@ const FormDispositivo = ({ setDispositivo_id }) => {
     initialValues,
     validationSchema: FormDispositivoSchema,
     onSubmit: async function (values, actions) {
-      try {
-        const token = user.token;
+      // try {
+      //   const token = user.token;
 
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}dispositivo/`,
-          {
-            method: "POST",
-            body: JSON.stringify(values),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      //   const response = await fetch(
+      //     `${import.meta.env.VITE_API_URL}dispositivo/`,
+      //     {
+      //       method: "POST",
+      //       body: JSON.stringify(values),
+      //       headers: {
+      //         "Content-Type": "application/json",
+      //         Authorization: `Bearer ${token}`,
+      //       },
+      //     }
+      //   );
 
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
-        enqueueSnackbar("Dispositivo Guardado Correctamente", {
-          variant: "success",
-        });
-        setDispositivo_id(data);
-        setGuardado(true);
-        actions.setSubmitting(false);
-      } catch (error) {
-        throw new Error(error.message);
-      }
+      //   const data = await response.json();
+      //   if (!response.ok) {
+      //     throw new Error(data.error);
+      //   }
+      //   enqueueSnackbar("Dispositivo Guardado Correctamente", {
+      //     variant: "success",
+      //   });
+      //   setDispositivo_id(data);
+      //   setGuardado(true);
+      //   actions.setSubmitting(false);
+      // } catch (error) {
+      //   throw new Error(error.message);
+      // }
+      createDeviceMutation.mutate(values);
     },
   });
 
-  useEffect(() => {
-    const fetchMarcas = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}marca/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+  useQuery({
+    queryKey: ["brands"],
+    queryFn: () => getBrands(user.token),
+    onSuccess: (data) => setMarcas(data.data),
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
-        const data = await response.json();
-        setMarcas(data);
-      } catch (error) {
-        console.error("Error al obtener las marcas:");
+  useQuery({
+    queryKey: ["models", values.marca],
+    queryFn: () => {
+      if (values.marca) {
+        return findBrandModels(values.marca, user.token);
       }
-    };
-    fetchMarcas();
-  }, []);
+    },
+    onSuccess: (data) => setModelos(data.data),
+    onError: (error) => {
+      console.error(error.message);
+    },
+    // Habilitar la llamada solo si values.marca tiene un valor
+    enabled: Boolean(values.marca),
+  });
+  // useEffect(() => {
+  //   const fetchMarcas = async () => {
+  //     try {
+  //       const response = await fetch(`${import.meta.env.VITE_API_URL}marca/`, {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${user.token}`,
+  //         },
+  //       });
 
-  useEffect(() => {
-    const fetchModelos = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}marca/modelo/${values.marca}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
+  //       const data = await response.json();
+  //       setMarcas(data);
+  //     } catch (error) {
+  //       console.error("Error al obtener las marcas:");
+  //     }
+  //   };
+  //   fetchMarcas();
+  // }, []);
 
-        const data = await response.json();
-        setModelos(data);
-      } catch (error) {
-        console.error("Error al obtener los Modelos:");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchModelos = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `${import.meta.env.VITE_API_URL}marca/modelo/${values.marca}`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${user.token}`,
+  //           },
+  //         }
+  //       );
 
-    if (values.marca !== "") {
-      fetchModelos();
-    }
-  }, [values.marca]);
+  //       const data = await response.json();
+  //       setModelos(data);
+  //     } catch (error) {
+  //       console.error("Error al obtener los Modelos:");
+  //     }
+  //   };
+
+  //   if (values.marca !== "") {
+  //     fetchModelos();
+  //   }
+  // }, [values.marca]);
 
   return (
     <Paper
@@ -126,7 +153,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
         sx={{ textAlign: "left", mb: 1 }}
         fontWeight={"bold"}
         variant="h6"
-        color={guardado ? "primary" : "grey"}
+        color={createDeviceMutation?.isSuccess ? "primary" : "grey"}
       >
         Datos Dispositivo
       </Typography>
@@ -139,7 +166,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           size="small"
           name="imei"
           label="IMEI"
-          disabled={guardado}
+          disabled={createDeviceMutation?.isSuccess}
           value={values.imei}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -150,7 +177,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
 
         <FormControl
           size="small"
-          disabled={guardado}
+          disabled={createDeviceMutation?.isSuccess}
           error={touched.marca && Boolean(errors.marca)}
           sx={{ mr: 2, width: "33%" }}
         >
@@ -177,7 +204,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
 
         <FormControl
           size="small"
-          disabled={guardado}
+          disabled={createDeviceMutation?.isSuccess}
           error={touched.modelos_id && Boolean(errors.modelos_id)}
           sx={{ width: "33%" }}
         >
@@ -208,7 +235,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           size="small"
           name="cosmetica"
           label="Estado cosmetico del dispositivo"
-          disabled={guardado}
+          disabled={createDeviceMutation?.isSuccess}
           value={values.cosmetica}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -221,7 +248,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           size="small"
           name="color"
           label="Color del dispositivo"
-          disabled={guardado}
+          disabled={createDeviceMutation?.isSuccess}
           value={values.color}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -235,7 +262,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           size="small"
           name="averia"
           label="Sintoma detectado por el cliente"
-          disabled={guardado}
+          disabled={createDeviceMutation?.isSuccess}
           value={values.averia}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -252,7 +279,7 @@ const FormDispositivo = ({ setDispositivo_id }) => {
           name="fechaCompra"
           type="date"
           InputLabelProps={{ shrink: true }}
-          disabled={guardado}
+          disabled={createDeviceMutation?.isSuccess}
           value={values.fechaCompra}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -261,14 +288,16 @@ const FormDispositivo = ({ setDispositivo_id }) => {
         />
 
         <Button
-          disabled={isSubmitting}
+          disabled={isSubmitting || createDeviceMutation?.isSuccess}
           sx={{ width: "25%", textTransform: "none", height: "40px" }}
           variant="contained"
           color="primary"
           type="submit"
           size="small"
         >
-          {guardado ? "Dispositivo Guardado" : "Guardar Dispositivo"}
+          {createDeviceMutation?.isSuccess
+            ? "Dispositivo Guardado"
+            : "Guardar dispositivo"}
         </Button>
       </Box>
     </Paper>

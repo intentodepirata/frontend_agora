@@ -7,7 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -30,15 +30,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../../contexts/UserContext";
 import { useDebounce } from "use-debounce";
 import useScrollUp from "../../hooks/useScrollUp";
+import { useQuery } from "@tanstack/react-query";
+import { findOrderByQuery } from "../../api/orders";
 
 const HeaderBar = ({ handleOpenCloseDrawer }) => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [value] = useDebounce(searchText, 1000);
+  const [value] = useDebounce(searchText, 700);
   const [searchResults, setSearchResults] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   useScrollUp();
 
@@ -55,37 +56,21 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
     setAnchorEl(null);
   };
 
-  useEffect(() => {
-    if (value !== "") {
-      handleSearch();
-    }
-  }, [value]);
-  const handleSearch = async () => {
-    const url = `${import.meta.env.VITE_API_URL}ot/search/${value}`;
-    try {
-      setIsLoading(true);
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-
-      const data = await response.json();
-      if (data.length === 0) {
-        searchResults([]);
-        setIsLoading(false);
-        return;
-      }
-      setSearchResults(data);
-      setIsLoading(false);
-    } catch (error) {
+  const query = useQuery({
+    queryKey: ["search", value],
+    queryFn: () => findOrderByQuery(value, user.token),
+    onSuccess: (data) => {
+      setSearchResults(data.data);
+      setDialogOpen(true);
+    },
+    onError: (error) => {
       console.error(error.message);
-    }
+    },
+    keepPreviousData: true,
+    staleTime: 700,
+    enabled: !!value,
+  });
 
-    setDialogOpen(true);
-  };
   const handleClick = (id) => {
     navigate(`/home/orders/edit/${id}`);
     setDialogOpen(false);
@@ -286,7 +271,7 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
                   : "No hay resultados"}
               </Typography>
 
-              {isLoading ? (
+              {query.isFetching ? (
                 <CircularProgress sx={{ mt: 5, mb: 5 }} />
               ) : (
                 <List>

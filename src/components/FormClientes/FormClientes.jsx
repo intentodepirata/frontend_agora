@@ -12,12 +12,11 @@ import { addCustomer, updateCustomer } from "../../api/clientes";
 const FormClientes = ({
   createCustomerMutation,
   updateCustomerMutation,
-  setCliente_id,
-  guardado,
   cliente,
 }) => {
   // const { user } = useUserContext();
   // const [guardado, setGuardado] = useState(false);
+  const navigate = useNavigate();
 
   // const queryClient = useQueryClient();
   // const createCustomerMutation = useMutation({
@@ -92,11 +91,14 @@ const FormClientes = ({
       //   } catch (error) {}
       //   actions.setSubmitting(false);
       if (cliente) {
-        updateCustomerMutation.mutate(values);
+        updateCustomerMutation?.mutate(values);
         actions.resetForm();
       } else {
-        createCustomerMutation.mutate(values);
-        actions.resetForm();
+        createCustomerMutation?.mutate(values);
+        window.location.href ===
+          `${import.meta.env.VITE_URL}home/clientes/create` &&
+          navigate("/home/clientes");
+        // actions.resetForm();
       }
     },
   });
@@ -120,7 +122,7 @@ const FormClientes = ({
           sx={{ textAlign: "left", mb: 1 }}
           fontWeight={"bold"}
           variant="h6"
-          color={guardado ? "primary" : "grey"}
+          color={createCustomerMutation?.isSuccess ? "primary" : "grey"}
         >
           Datos Cliente
         </Typography>
@@ -133,7 +135,7 @@ const FormClientes = ({
             name="dni"
             label="DNI"
             InputLabelProps={{ shrink: cliente?.dni && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.dni}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -146,7 +148,7 @@ const FormClientes = ({
             label="Nombre completo"
             name="nombre"
             InputLabelProps={{ shrink: cliente?.nombre && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.nombre}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -162,7 +164,7 @@ const FormClientes = ({
             autoComplete="email"
             label="Correo electronico"
             InputLabelProps={{ shrink: cliente?.email && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.email}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -175,7 +177,7 @@ const FormClientes = ({
             name="telefono"
             label="Telefono de contacto"
             InputLabelProps={{ shrink: cliente?.telefono && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.telefono}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -190,7 +192,7 @@ const FormClientes = ({
             name="direccion"
             label="Direccion completa"
             InputLabelProps={{ shrink: cliente?.direccion && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.direccion}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -199,14 +201,14 @@ const FormClientes = ({
             sx={{ width: "75%", mr: 2 }}
           />
           <Button
-            disabled={isSubmitting || guardado}
+            disabled={isSubmitting || createCustomerMutation?.isSuccess}
             sx={{ width: "25%", textTransform: "none", height: "40px" }}
             variant="contained"
             color="primary"
             type="submit"
             size="small"
           >
-            {guardado
+            {createCustomerMutation?.isSuccess
               ? "Cliente Guardado"
               : cliente
               ? "Actualizar"

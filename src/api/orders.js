@@ -16,8 +16,8 @@ export const getOrdersByTime = (time, token) =>
 export const getOrdersPriceByTime = (time, token) =>
   ordersApi.get(`/total-price/${time}`, createHeaders(token));
 
-export const findOrderByQuery = (query, token) =>
-  ordersApi.get(`/search/${query}`, createHeaders(token));
+export const findOrderByQuery = (searchKey, token) =>
+  ordersApi.get(`/search/${searchKey}`, createHeaders(token));
 
 export const findOrder = (id, token) =>
   ordersApi.get(`/${id}`, createHeaders(token));
@@ -37,7 +37,7 @@ export const addOrder = (order, token) =>
 export const updateOrder = (id, token) =>
   ordersApi.put(`/${id}`, createHeaders(token));
 
-//Los comandos put siempre llevan un body, por eso le ponemos null
+//Los comandos put en axios llevan un body, y como nuestro put no tiene body, le ponemos null
 export const updateOrderDeliver = (id, token) =>
   ordersApi.put(`/deliver/${id}`, null, createHeaders(token));
 

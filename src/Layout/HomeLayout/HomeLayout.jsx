@@ -12,7 +12,8 @@ import { AnimatedOutlet } from "../../components/AnimatedOutlet/AnimatedOutlet";
 const HomeLayout = () => {
   const [showDrawer, setShowDrawer] = useState(true);
   const [isXsScreen, setIsXsScreen] = useState(false);
-
+  const nodeRef = useRef(null);
+  const location = useLocation();
   useScrollUp();
 
   const handleOpenCloseDrawer = () => {
@@ -33,8 +34,7 @@ const HomeLayout = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  const nodeRef = useRef(null);
-  const location = useLocation();
+
   return (
     <>
       <HeaderBar handleOpenCloseDrawer={handleOpenCloseDrawer} />
