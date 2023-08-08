@@ -315,13 +315,23 @@ const FormOperacionesTecnicas = ({
               disabled={entregada}
             />
             <TextField
+              // sx={{ mt: 2 }}
+              // fullWidth
+              // name="observaciones"
+              // label="Observaciones Tecnicas"
+              // multiline
+              // rows={2}
+              // variant="standard"
+              // value={values.observaciones}
+              // onChange={handleChange}
+              // disabled={entregada}
               sx={{ mt: 2 }}
-              fullWidth
               name="observaciones"
+              fullWidth
               label="Observaciones Tecnicas"
               multiline
               rows={2}
-              variant="standard"
+              variant="filled"
               value={values.observaciones}
               onChange={handleChange}
               disabled={entregada}
