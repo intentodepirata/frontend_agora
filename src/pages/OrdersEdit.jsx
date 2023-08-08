@@ -14,6 +14,7 @@ import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  addOrder,
   findOrder,
   findOrderToPrint,
   updateOrder,
@@ -21,6 +22,9 @@ import {
 } from "../api/orders";
 import HandleConfirmNotification from "../ui/HandleConfirmNotification";
 import { initialValues } from "../components/FormOperacionesTecnicas/utils/initialValues";
+import { useFormik } from "formik";
+import { FormOrderSchema } from "../components/FormOperacionesTecnicas/utils/FormOrderSchema";
+import { findChecklist, updateChecklist } from "../api/checklist";
 
 const OrdersEdit = () => {
   const [fetchData, setFetchData] = useState(false);
@@ -28,63 +32,12 @@ const OrdersEdit = () => {
   const [entregada, setEntregada] = useState(false);
   const [cliente, setCliente] = useState(null);
   const [order, setOrder] = useState(null);
-
+  // const [checklist, setChecklist] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
   const queryClient = useQueryClient();
 
   useScrollUp();
-
-  // const fetchOt = async () => {
-  //   try {
-  //     const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${user.token}`,
-  //       },
-  //     });
-
-  //     if (response.ok) {
-  //       const otData = await response.json();
-  //       setUpdateCliente_id(otData.cliente_id);
-  //       setAveria(otData.averia);
-  //       setDescripcion(otData.descripcion);
-  //       setObservaciones(otData.observaciones);
-  //       setEstado_id(otData.estado_id);
-  //       setChecklist_id(otData.checklist_id);
-  //       setTipoGarantia(otData.tipoGarantia);
-  //       setPrecio(otData.precio);
-  //       setUpdatedDispositivo_id(otData.dispositivo_id);
-  //     } else {
-  //       console.error("Error al obtener los datos de la OT:", response.status);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al obtener los datos de la OT:", error);
-  //   }
-  // };
-  // const fetchChecklist = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_URL}checklist/${checklist_id}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${user.token}`,
-  //         },
-  //       }
-  //     );
-
-  //     const data = await response.json();
-  //     if (!response.ok) {
-  //       console.error("Error al obtener el checklist:");
-  //       return;
-  //     }
-
-  //     setChecklist(data);
-  //   } catch (error) {
-  //     console.error("Error al obtener los estados:");
-  //   }
-  // };
 
   const queryPrintData = useQuery({
     queryKey: ["print data", id],
@@ -99,7 +52,7 @@ const OrdersEdit = () => {
   });
 
   const queryOrder = useQuery({
-    queryKey: ["order", id],
+    queryKey: ["order"],
     queryFn: () => findOrder(id, user.token),
 
     onSuccess: (data) => {
@@ -111,7 +64,7 @@ const OrdersEdit = () => {
     },
   });
 
-  const orderUpdateMutation = useMutation({
+  const updateOrderMutation = useMutation({
     mutationFn: (order) => updateOrder(id, order, user.token),
     onSuccess: () => {
       enqueueSnackbar("Orden actualizada correctamente", {
@@ -137,6 +90,16 @@ const OrdersEdit = () => {
       console.error(error.message);
     },
   });
+  const updateChecklistMutation = useMutation({
+    mutationFn: (values) =>
+      updateChecklist(order?.order.checklist_id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Checklist actualizado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["order"]);
+    },
+  });
 
   const handleDeliver = (id) => {
     enqueueSnackbar("Desear entregar el terminal al Cliente?", {
@@ -151,18 +114,12 @@ const OrdersEdit = () => {
       ),
     });
   };
-  // const handleGuardar = () => {
-  //   setFetchData(true);
-  // };
+
   function handlePrint() {
     window.open(`/print/${id}`);
   }
   const handleModal = () => {
     setModal((value) => !value);
-  };
-
-  const handleSubmit = (values) => {
-    orderUpdateMutation.mutate(values);
   };
 
   return (
@@ -233,14 +190,6 @@ const OrdersEdit = () => {
           >
             Imprimir
           </Button>
-          <Button
-            onClick={handleSubmit}
-            variant="contained"
-            color="primary"
-            sx={{ textTransform: "none", fontSize: "16px" }}
-          >
-            Guardar Orden
-          </Button>
         </Stack>
       </Box>
       {modal && (
@@ -249,11 +198,10 @@ const OrdersEdit = () => {
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <FormOperacionesTecnicas
-          fetchData={fetchData}
-          setFetchData={setFetchData}
-          entregada={entregada}
           order={order}
-          orderUpdateMutation={orderUpdateMutation}
+          updateOrderMutation={updateOrderMutation}
+          updateChecklistMutation={updateChecklistMutation}
+          entregada={entregada}
         />
       </Box>
     </Box>

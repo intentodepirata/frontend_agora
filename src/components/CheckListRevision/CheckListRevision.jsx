@@ -12,65 +12,41 @@ import { initialState } from "./utils/initialState";
 
 export default function CheckListRevision({
   checklist,
-  setChecklist_id,
-  dispositivo_id,
-  updatedDispositivo_id,
+  createChecklistMutation,
+  updateChecklistMutation,
   entregada,
 }) {
   const [state, setState] = useState(initialState);
 
-  const { user } = useUserContext();
-
   useEffect(() => {
     if (checklist) {
-      const convertedChecklist = {};
-      //Cambiar el estado de todos los checkbox a boolean
-      for (const key in checklist) {
-        convertedChecklist[key] = Boolean(checklist[key]);
-      }
+      const convertedChecklist = checklist.map((item) => {
+        const { id, ...rest } = item;
+        const convertedValues = {};
 
-      setState(convertedChecklist);
+        for (const key in rest) {
+          if (rest[key] !== null) {
+            convertedValues[key] = Boolean(rest[key]);
+          }
+        }
+        return { ...convertedValues };
+      });
+
+      setState(...convertedChecklist);
     }
   }, [checklist]);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const token = user.token;
-      const checklistWithDispositivoId = {
-        ...state,
-        dispositivo_id: updatedDispositivo_id || dispositivo_id,
-      };
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}checklist/`,
-        {
-          method: "POST",
-          body: JSON.stringify(checklistWithDispositivoId),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error);
-      }
-      enqueueSnackbar("Checklist Guardado Correctamente", {
-        variant: "info",
-      });
-      setChecklist_id(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const handleChange = (event) => {
     setState((prevState) => ({
       ...prevState,
       [event.target.name]: event.target.checked,
     }));
+  };
+
+  const handleSubmit = () => {
+    checklist
+      ? updateChecklistMutation.mutate(state)
+      : createChecklistMutation.mutate({ state });
   };
 
   return (

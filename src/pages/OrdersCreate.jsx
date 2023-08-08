@@ -12,36 +12,33 @@ import { addCustomer } from "../api/clientes";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import { addDevice } from "../api/devices";
+import { addOrder } from "../api/orders";
+import { useFormik } from "formik";
+
+import { FormOrderSchema } from "../components/FormOperacionesTecnicas/utils/FormOrderSchema";
+import { initialValues } from "../components/FormOperacionesTecnicas/utils/initialValues";
+import { addChecklist, updateChecklist } from "../api/checklist";
 const OrdersCreate = () => {
-  const [cliente_id, setCliente_id] = useState(null);
-  const [estado, setEstado] = useState(-1);
+  const [step, setStep] = useState(-1);
   const [dispositivo_id, setDispositivo_id] = useState(null);
+  const [cliente_id, setCliente_id] = useState(null);
+  const [checklist_id, setChecklist_id] = useState(null);
   const [recepcionado, setRecepcionado] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserContext();
   useScrollUp();
-  // useEffect(() => {
-  //   if (cliente_id) {
-  //     setEstado((currentStatus) => currentStatus + 1);
-  //   }
-  // }, [cliente_id]);
-  // useEffect(() => {
-  //   if (dispositivo_id) {
-  //     setEstado((currentStatus) => currentStatus + 1);
-  //   }
-  // }, [dispositivo_id]);
 
   useEffect(() => {
     if (cliente_id && dispositivo_id) {
       setRecepcionado(true);
-      setEstado((currentStatus) => currentStatus + 1);
+      setStep((currentStatus) => currentStatus + 1);
     }
   }, [dispositivo_id, cliente_id]);
 
   const createCustomerMutation = useMutation({
     mutationFn: (values) => addCustomer(values, user.token),
     onSuccess: (data) => {
-      setEstado(0);
+      setStep(0);
       setCliente_id(data.data);
       enqueueSnackbar("Cliente agregado correctamente", {
         variant: "success",
@@ -56,7 +53,7 @@ const OrdersCreate = () => {
   const createDeviceMutation = useMutation({
     mutationFn: (values) => addDevice(values, user.token),
     onSuccess: (data) => {
-      setEstado(1);
+      setStep(1);
       setDispositivo_id(data.data);
       enqueueSnackbar("Dispositivo agregado correctamente", {
         variant: "success",
@@ -65,6 +62,44 @@ const OrdersCreate = () => {
     },
     onError: (error) => {
       console.error(error.message);
+    },
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: (order) =>
+      addOrder(
+        { ...order, cliente_id, dispositivo_id, checklist_id },
+        user.token
+      ),
+    onSuccess: () => {
+      enqueueSnackbar("Orden creada correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["order"]);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const createChecklistMutation = useMutation({
+    mutationFn: (values) => addChecklist(values, user.token),
+    onSuccess: (data) => {
+      setChecklist_id(data.data);
+      enqueueSnackbar("Checklist creado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["order"]);
+    },
+  });
+
+  const updateChecklistMutation = useMutation({
+    mutationFn: (values) => updateChecklist(checklist_id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Checklist actualizado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["order"]);
     },
   });
 
@@ -98,16 +133,9 @@ const OrdersCreate = () => {
             Orden de trabajo
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
-        >
-          Guardar
-        </Button>
       </Box>
       <Box sx={{ px: 2, my: 2, maxWidth: "1308px", mx: "auto" }}>
-        <OrderStatusBar estado={estado} />
+        <OrderStatusBar estado={step} />
       </Box>
 
       <Box sx={{ py: 1, px: 2, my: 5 }}>
@@ -119,9 +147,9 @@ const OrdersCreate = () => {
       {recepcionado && (
         <Box sx={{ py: 1, px: 2, mx: "auto", my: 5 }}>
           <FormOperacionesTecnicas
-            cliente_id={cliente_id}
-            dispositivo_id={dispositivo_id}
-            setEstado={setEstado}
+            createOrderMutation={createOrderMutation}
+            createChecklistMutation={createChecklistMutation}
+            updateChecklistMutation={updateChecklistMutation}
           />
         </Box>
       )}

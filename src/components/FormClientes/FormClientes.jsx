@@ -14,30 +14,7 @@ const FormClientes = ({
   updateCustomerMutation,
   cliente,
 }) => {
-  // const { user } = useUserContext();
-  // const [guardado, setGuardado] = useState(false);
   const navigate = useNavigate();
-
-  // const queryClient = useQueryClient();
-  // const createCustomerMutation = useMutation({
-  //   mutationFn: (values) => addCustomer(values, user.token),
-  //   onSuccess: () => {
-  //     enqueueSnackbar("Cliente creado correctamente", {
-  //       variant: "success",
-  //     });
-  //     setGuardado(true);
-  //     queryClient.invalidateQueries(["customers"]);
-  //   },
-  // });
-  // const updateCustomerMutation = useMutation({
-  //   mutationFn: (values) => updateCustomer(cliente.id, values, user.token),
-  //   onSuccess: () => {
-  //     enqueueSnackbar("Cliente actualizado correctamente", {
-  //       variant: "success",
-  //     });
-  //     queryClient.invalidateQueries(["clientes"]);
-  //   },
-  // });
 
   const {
     isSubmitting,
@@ -52,44 +29,6 @@ const FormClientes = ({
     initialValues: cliente ? cliente : initialValues,
     validationSchema: FormClientesSchema,
     onSubmit: async function (values, actions) {
-      //   try {
-      //     const token = user.token;
-      //     const url = cliente
-      //       ? `${import.meta.env.VITE_API_URL}cliente/${cliente.id}`
-      //       : `${import.meta.env.VITE_API_URL}cliente/`;
-
-      //     const response = await fetch(url, {
-      //       method: cliente ? "PUT" : "POST",
-      //       body: JSON.stringify(values),
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //         Authorization: `Bearer ${token}`,
-      //       },
-      //     });
-      //     const data = await response.json();
-
-      //     if (!response.ok) {
-      //       throw new Error(data.error);
-      //     }
-
-      //     if (cliente) {
-      //       enqueueSnackbar("Cliente actualizado correctamente", {
-      //         variant: "info",
-      //       });
-      //       actions.resetForm();
-      //       navigate("/home/clientes");
-      //     } else {
-      //       enqueueSnackbar("Cliente Guardado Correctamente", {
-      //         variant: "success",
-      //       });
-      //       setGuardado(true);
-
-      //       urlCompleta === `${import.meta.env.VITE_URL}home/clientes/create` &&
-      //         navigate("/home/clientes");
-      //       setCliente_id(data);
-      //     }
-      //   } catch (error) {}
-      //   actions.setSubmitting(false);
       if (cliente) {
         updateCustomerMutation?.mutate(values);
         actions.resetForm();
@@ -98,7 +37,6 @@ const FormClientes = ({
         window.location.href ===
           `${import.meta.env.VITE_URL}home/clientes/create` &&
           navigate("/home/clientes");
-        // actions.resetForm();
       }
     },
   });

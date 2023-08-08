@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
 import { useEffect, useState } from "react";
 import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
@@ -23,6 +24,8 @@ const TablaReparacion = ({
   updatedDispositivo_id,
   setPrecio,
   entregada,
+  order,
+  handleSubmit,
 }) => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [componentes, setComponentes] = useState([]);
@@ -208,7 +211,7 @@ const TablaReparacion = ({
     closeSnackbar(snackbarId);
   };
 
-  function handleSubmit(e) {
+  function handleSubmitOperacion(e) {
     e.preventDefault();
     fetchOperaciones();
     fetchPrecio();
@@ -217,7 +220,7 @@ const TablaReparacion = ({
   return (
     <Box>
       <Box
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmitOperacion}
         component={"form"}
         sx={{ display: "flex", gap: 2, pt: 1 }}
       >
@@ -328,7 +331,7 @@ const TablaReparacion = ({
           onClick={() => handleDeleteOperaciones(selectionModel)}
           color="error"
           variant="contained"
-          startIcon={<DeleteIcon />}
+          endIcon={<DeleteIcon />}
           disabled={entregada}
         >
           Eliminar
@@ -340,6 +343,14 @@ const TablaReparacion = ({
           disabled={entregada}
         >
           Editar
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="success"
+          endIcon={<SaveIcon />}
+        >
+          Guardar
         </Button>
       </Stack>
     </Box>

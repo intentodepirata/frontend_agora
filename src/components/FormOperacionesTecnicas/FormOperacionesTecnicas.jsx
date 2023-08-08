@@ -7,6 +7,7 @@ import {
   FormControl,
   MenuItem,
   Select,
+  FormHelperText,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import CheckListRevision from "../CheckListRevision/CheckListRevision";
@@ -16,157 +17,24 @@ import { useUserContext } from "../../contexts/UserContext";
 import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
 import { initialValues } from "./utils/initialValues";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getStates } from "../../api/states";
 import { FormOrderSchema } from "./utils/FormOrderSchema";
 import { useFormik } from "formik";
+import { addChecklist, updateChecklist } from "../../api/checklist";
 
 const FormOperacionesTecnicas = ({
-  cliente_id,
-  dispositivo_id,
-  fetchData,
-  setFetchData,
-  setEstado,
-  entregada,
   order,
-
-  orderUpdateMutation,
+  createOrderMutation,
+  updateOrderMutation,
+  createChecklistMutation,
+  updateChecklistMutation,
+  entregada,
 }) => {
-  const { id } = useParams();
-  // const [averia, setAveria] = useState("");
-  // const [descripcion, setDescripcion] = useState("");
-  // const [observaciones, setObservaciones] = useState("");
-  // const [tipoGarantia, setTipoGarantia] = useState("");
-  // const [updateCliente_id, setUpdateCliente_id] = useState(null);
-  const [estado_id, setEstado_id] = useState("");
-  const [checklist_id, setChecklist_id] = useState(undefined);
-  const [checklist, setChecklist] = useState(null);
   const [estados, setEstados] = useState([]);
-  const [precio, setPrecio] = useState(0);
-  const [numeroOt, setNumeroOt] = useState(null);
-  const [updatedDispositivo_id, setUpdatedDispositivo_id] = useState(null);
-  const [ots_id, setOts_id] = useState(id || null);
+
   const { user } = useUserContext();
-
-  // const handleTipoGarantia = (event) => {
-  //   setTipoGarantia(event.target.value);
-  // };
-
-  // const handleObservaciones = (event) => {
-  //   setObservaciones(event.target.value);
-  // };
-  // const handleDescripcion = (event) => {
-  //   setDescripcion(event.target.value);
-  // };
-
-  // const handleAveria = (event) => {
-  //   setAveria(event.target.value);
-  // };
-
-  // const fetchOt = async () => {
-  //   try {
-  //     const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${user.token}`,
-  //       },
-  //     });
-
-  //     if (response.ok) {
-  //       const otData = await response.json();
-  //       setUpdateCliente_id(otData.cliente_id);
-  //       setAveria(otData.averia);
-  //       setDescripcion(otData.descripcion);
-  //       setObservaciones(otData.observaciones);
-  //       setEstado_id(otData.estado_id);
-  //       setChecklist_id(otData.checklist_id);
-  //       setTipoGarantia(otData.tipoGarantia);
-  //       setPrecio(otData.precio);
-  //       setUpdatedDispositivo_id(otData.dispositivo_id);
-  //     } else {
-  //       console.error("Error al obtener los datos de la OT:", response.status);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al obtener los datos de la OT:", error);
-  //   }
-  // };
-  // const fetchChecklist = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${import.meta.env.VITE_API_URL}checklist/${checklist_id}`,
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${user.token}`,
-  //         },
-  //       }
-  //     );
-
-  //     const data = await response.json();
-  //     if (!response.ok) {
-  //       console.error("Error al obtener el checklist:");
-  //       return;
-  //     }
-
-  //     setChecklist(data);
-  //   } catch (error) {
-  //     console.error("Error al obtener los estados:");
-  //   }
-  // };
-  // const crearOt = async () => {
-  //   try {
-  //     const token = user.token;
-
-  //     const ot = {
-  //       averia,
-  //       descripcion,
-  //       observaciones,
-  //       tipoGarantia,
-  //       estado_id,
-  //       cliente_id: updateCliente_id ? updateCliente_id : cliente_id,
-  //       checklist_id,
-  //       dispositivo_id: updatedDispositivo_id
-  //         ? updatedDispositivo_id
-  //         : dispositivo_id,
-  //     };
-
-  //     const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
-  //       method: "POST",
-  //       body: JSON.stringify(ot),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     const data = await response.json();
-
-  //     if (!response.ok) {
-  //       throw new Error(data.error);
-  //     }
-  //     if (response.status === 201) {
-  //       enqueueSnackbar("Datos Guardados Correctamente", {
-  //         variant: "success",
-  //       });
-  //       setOts_id(data);
-  //       setNumeroOt(data);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (id) {
-  //     fetchOt();
-  //   }
-  // }, [id]);
-
-  // useEffect(() => {
-  //   if (checklist_id !== undefined) {
-  //     fetchChecklist();
-  //   }
-  // }, [checklist_id]);
-
+  const queryClient = useQueryClient();
   const queryStates = useQuery({
     queryKey: ["states"],
     queryFn: () => getStates(user.token),
@@ -178,46 +46,27 @@ const FormOperacionesTecnicas = ({
     },
   });
 
-  // useEffect(() => {
-  //   if (
-  //     averia &&
-  //     cliente_id &&
-  //     estado_id &&
-  //     descripcion &&
-  //     checklist_id &&
-  //     dispositivo_id
-  //   ) {
-  //     console.log("hay ot");
-
-  //     if (!id) {
-  //       crearOt();
-  //     }
-  //   }
-  // }, [
-  //   cliente_id,
-  //   dispositivo_id,
-  //   checklist_id,
-  //   tipoGarantia,
-  //   averia,
-  //   estado_id,
-  //   observaciones,
-  //   descripcion,
-  // ]);
-
-  // useEffect(() => {
-  //   if (fetchData) {
-  //     crearOt();
-  //     enqueueSnackbar("Datos Actualizados Correctamente", {
+  // const createChecklistMutation = useMutation({
+  //   mutationFn: (values) => addChecklist(values, user.token),
+  //   onSuccess: () => {
+  //     setCheclist_id(data.data);
+  //     enqueueSnackbar("Checklist creado correctamente", {
   //       variant: "success",
   //     });
-  //     setFetchData(false);
-  //   }
-  // }, [fetchData]);
-  const handleEstado = (event) => {
-    setEstado_id(event.target.value);
-    setEstado && setEstado(event.target.value + 1);
-  };
+  //     queryClient.invalidateQueries(["order"]);
+  //   },
+  // });
 
+  // const updateChecklistMutation = useMutation({
+  //   mutationFn: (values) =>
+  //     updateChecklist(order.checklist_id, values, user.token),
+  //   onSuccess: () => {
+  //     enqueueSnackbar("Checklist actualizado correctamente", {
+  //       variant: "success",
+  //     });
+  //     queryClient.invalidateQueries(["order"]);
+  //   },
+  // });
   const {
     isSubmitting,
     values,
@@ -228,11 +77,12 @@ const FormOperacionesTecnicas = ({
     handleBlur,
   } = useFormik({
     enableReinitialize: true,
-    initialValues: order ? order : initialValues,
+    initialValues: order ? order.order : initialValues,
     validationSchema: FormOrderSchema,
     onSubmit: async function (values, actions) {
-      order ? updateMutation.mutate(values) : createMutation.mutate(values);
-      // actions.resetForm();
+      order
+        ? updateOrderMutation.mutate(values)
+        : createOrderMutation.mutate(values);
     },
   });
 
@@ -253,7 +103,7 @@ const FormOperacionesTecnicas = ({
         >
           <Box sx={{ display: "flex", alignItems: "end" }}>
             <Typography variant="h4" color="primary" fontWeight={"bold"}>
-              OT000{id || numeroOt}
+              {`OT000${values.id}`}
             </Typography>
             {entregada ? (
               <Typography ml={2} variant="h6" color="primary">
@@ -262,7 +112,8 @@ const FormOperacionesTecnicas = ({
             ) : (
               <Typography ml={2} variant="h6" color="primary">
                 {estados &&
-                  estados.find((estado) => estado.id === estado_id)?.nombre}
+                  estados.find((estado) => estado.id === values.estado_id)
+                    ?.nombre}
               </Typography>
             )}
           </Box>
@@ -286,7 +137,11 @@ const FormOperacionesTecnicas = ({
               htmlFor="averia"
               sx={{ mb: 2, mt: 0.5, width: "100%" }}
             >
-              <InputLabel size="small" id="averia">
+              <InputLabel
+                error={touched.averia && Boolean(errors.averia)}
+                size="small"
+                id="averia"
+              >
                 Averia principal
               </InputLabel>
               <Select
@@ -295,8 +150,10 @@ const FormOperacionesTecnicas = ({
                 name="averia"
                 value={values.averia}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 size="small"
                 disabled={entregada}
+                error={touched.averia && Boolean(errors.averia)}
               >
                 <MenuItem value="">Seleccionar Averia</MenuItem>
                 {nombreAverias.map((name) => (
@@ -305,6 +162,13 @@ const FormOperacionesTecnicas = ({
                   </MenuItem>
                 ))}
               </Select>
+              {touched.averia && errors.averia && (
+                <FormHelperText
+                  error={touched.averia && Boolean(errors.averia)}
+                >
+                  {errors.averia}
+                </FormHelperText>
+              )}
             </FormControl>
             <TextField
               size="small"
@@ -312,19 +176,12 @@ const FormOperacionesTecnicas = ({
               name="descripcion"
               value={values.descripcion}
               onChange={handleChange}
+              onBlur={handleBlur}
+              helperText={touched.descripcion && errors.descripcion}
+              error={touched.descripcion && Boolean(errors.descripcion)}
               disabled={entregada}
             />
             <TextField
-              // sx={{ mt: 2 }}
-              // fullWidth
-              // name="observaciones"
-              // label="Observaciones Tecnicas"
-              // multiline
-              // rows={2}
-              // variant="standard"
-              // value={values.observaciones}
-              // onChange={handleChange}
-              // disabled={entregada}
               sx={{ mt: 2 }}
               name="observaciones"
               fullWidth
@@ -334,6 +191,9 @@ const FormOperacionesTecnicas = ({
               variant="filled"
               value={values.observaciones}
               onChange={handleChange}
+              onBlur={handleBlur}
+              helperText={touched.observaciones && errors.observaciones}
+              error={touched.observaciones && Boolean(errors.observaciones)}
               disabled={entregada}
             />
           </Box>
@@ -349,12 +209,14 @@ const FormOperacionesTecnicas = ({
           Operaciones Servicio Tecnico
         </Typography>
         <TablaReparacion
-          ots_id={ots_id}
-          dispositivo_id={dispositivo_id}
-          updatedDispositivo_id={updatedDispositivo_id}
-          setPrecio={setPrecio}
+          ots_id={values.id}
+          dispositivo_id={values.dispositivo_id}
+          updatedDispositivo_id={values.id}
+          setPrecio={values.precio}
           entregada={entregada}
-          numeroOt={numeroOt}
+          numeroOt={values.id}
+          handleSubmit={handleSubmit}
+          // order={values}
         />
       </Box>
       <Box sx={{ ml: 4 }}>
@@ -370,7 +232,7 @@ const FormOperacionesTecnicas = ({
               Total a Facturar
             </Typography>
             <Typography variant="h6" color="initial">
-              {precio} €
+              {values.precio} €
             </Typography>
           </Box>
         </Paper>
@@ -389,10 +251,10 @@ const FormOperacionesTecnicas = ({
               <Select
                 labelId="estado"
                 value={getSelectedValue(estados, values.estado_id, "id")}
-                onChange={handleEstado}
+                onChange={handleChange}
                 autoWidth
                 label="Estado"
-                name="estado"
+                name="estado_id"
                 disabled={entregada}
               >
                 {estados?.map((estado) => (
@@ -403,13 +265,13 @@ const FormOperacionesTecnicas = ({
               </Select>
             </FormControl>
             <FormControl sx={{ m: 1, width: 220 }}>
-              <InputLabel id="tipoGarantia">Garantia</InputLabel>
+              <InputLabel id="tipoGarantia">Tipo de Garantia</InputLabel>
               <Select
                 labelId="tipoGarantia"
                 value={values.tipoGarantia}
                 onChange={handleChange}
                 autoWidth
-                label="Garantia"
+                label="Tipo de Garantia"
                 name="tipoGarantia"
                 disabled={entregada}
               >
@@ -426,13 +288,14 @@ const FormOperacionesTecnicas = ({
             </FormControl>
           </Box>
           <CheckListRevision
-            checklist={checklist}
-            setChecklist_id={setChecklist_id}
-            dispositivo_id={dispositivo_id}
-            updatedDispositivo_id={updatedDispositivo_id}
+            checklist={order?.checklist}
+            createChecklistMutation={createChecklistMutation}
+            s
+            updateChecklistMutation={updateChecklistMutation}
             entregada={entregada}
           />
         </Paper>
+        {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
       </Box>
     </Paper>
   );
