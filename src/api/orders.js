@@ -34,8 +34,8 @@ export const findOrderPrice = (id, token) =>
 export const addOrder = (order, token) =>
   ordersApi.post("/", order, createHeaders(token));
 
-export const updateOrder = (id, token) =>
-  ordersApi.put(`/${id}`, createHeaders(token));
+export const updateOrder = (id, order, token) =>
+  ordersApi.put(`/${id}`, order, createHeaders(token));
 
 //Los comandos put en axios llevan un body, y como nuestro put no tiene body, le ponemos null
 export const updateOrderDeliver = (id, token) =>

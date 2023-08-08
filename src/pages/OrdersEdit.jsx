@@ -13,18 +13,78 @@ import { useUserContext } from "../contexts/UserContext";
 import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { findOrder, findOrderToPrint, updateOrderDeliver } from "../api/orders";
+import {
+  findOrder,
+  findOrderToPrint,
+  updateOrder,
+  updateOrderDeliver,
+} from "../api/orders";
 import HandleConfirmNotification from "../ui/HandleConfirmNotification";
+import { initialValues } from "../components/FormOperacionesTecnicas/utils/initialValues";
 
 const OrdersEdit = () => {
   const [fetchData, setFetchData] = useState(false);
   const [modal, setModal] = useState(false);
   const [entregada, setEntregada] = useState(false);
   const [cliente, setCliente] = useState(null);
+  const [order, setOrder] = useState(null);
+
   const { id } = useParams();
   const { user } = useUserContext();
   const queryClient = useQueryClient();
+
   useScrollUp();
+
+  // const fetchOt = async () => {
+  //   try {
+  //     const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${user.token}`,
+  //       },
+  //     });
+
+  //     if (response.ok) {
+  //       const otData = await response.json();
+  //       setUpdateCliente_id(otData.cliente_id);
+  //       setAveria(otData.averia);
+  //       setDescripcion(otData.descripcion);
+  //       setObservaciones(otData.observaciones);
+  //       setEstado_id(otData.estado_id);
+  //       setChecklist_id(otData.checklist_id);
+  //       setTipoGarantia(otData.tipoGarantia);
+  //       setPrecio(otData.precio);
+  //       setUpdatedDispositivo_id(otData.dispositivo_id);
+  //     } else {
+  //       console.error("Error al obtener los datos de la OT:", response.status);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al obtener los datos de la OT:", error);
+  //   }
+  // };
+  // const fetchChecklist = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}checklist/${checklist_id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${user.token}`,
+  //         },
+  //       }
+  //     );
+
+  //     const data = await response.json();
+  //     if (!response.ok) {
+  //       console.error("Error al obtener el checklist:");
+  //       return;
+  //     }
+
+  //     setChecklist(data);
+  //   } catch (error) {
+  //     console.error("Error al obtener los estados:");
+  //   }
+  // };
 
   const queryPrintData = useQuery({
     queryKey: ["print data", id],
@@ -37,11 +97,28 @@ const OrdersEdit = () => {
       });
     },
   });
-  const queryIsDeliver = useQuery({
+
+  const queryOrder = useQuery({
     queryKey: ["order", id],
     queryFn: () => findOrder(id, user.token),
 
-    onSuccess: (data) => data.data.entregada === 1 && setEntregada(true),
+    onSuccess: (data) => {
+      setOrder(data.data);
+      data.data.entregada === 1 && setEntregada(true);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const orderUpdateMutation = useMutation({
+    mutationFn: (order) => updateOrder(id, order, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Orden actualizada correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["order", id]);
+    },
     onError: (error) => {
       console.error(error.message);
     },
@@ -74,14 +151,18 @@ const OrdersEdit = () => {
       ),
     });
   };
-  const handleGuardar = () => {
-    setFetchData(true);
-  };
+  // const handleGuardar = () => {
+  //   setFetchData(true);
+  // };
   function handlePrint() {
     window.open(`/print/${id}`);
   }
   const handleModal = () => {
     setModal((value) => !value);
+  };
+
+  const handleSubmit = (values) => {
+    orderUpdateMutation.mutate(values);
   };
 
   return (
@@ -153,7 +234,7 @@ const OrdersEdit = () => {
             Imprimir
           </Button>
           <Button
-            onClick={handleGuardar}
+            onClick={handleSubmit}
             variant="contained"
             color="primary"
             sx={{ textTransform: "none", fontSize: "16px" }}
@@ -171,6 +252,8 @@ const OrdersEdit = () => {
           fetchData={fetchData}
           setFetchData={setFetchData}
           entregada={entregada}
+          order={order}
+          orderUpdateMutation={orderUpdateMutation}
         />
       </Box>
     </Box>

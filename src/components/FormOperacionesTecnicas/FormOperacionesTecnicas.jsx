@@ -15,6 +15,11 @@ import { nombreAverias } from "./utils/nombreAverias";
 import { useUserContext } from "../../contexts/UserContext";
 import { useParams } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
+import { initialValues } from "./utils/initialValues";
+import { useQuery } from "@tanstack/react-query";
+import { getStates } from "../../api/states";
+import { FormOrderSchema } from "./utils/FormOrderSchema";
+import { useFormik } from "formik";
 
 const FormOperacionesTecnicas = ({
   cliente_id,
@@ -23,204 +28,217 @@ const FormOperacionesTecnicas = ({
   setFetchData,
   setEstado,
   entregada,
+  order,
+
+  orderUpdateMutation,
 }) => {
   const { id } = useParams();
-  const [averia, setAveria] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [observaciones, setObservaciones] = useState("");
+  // const [averia, setAveria] = useState("");
+  // const [descripcion, setDescripcion] = useState("");
+  // const [observaciones, setObservaciones] = useState("");
+  // const [tipoGarantia, setTipoGarantia] = useState("");
+  // const [updateCliente_id, setUpdateCliente_id] = useState(null);
   const [estado_id, setEstado_id] = useState("");
   const [checklist_id, setChecklist_id] = useState(undefined);
   const [checklist, setChecklist] = useState(null);
   const [estados, setEstados] = useState([]);
-  const [tipoGarantia, setTipoGarantia] = useState("");
   const [precio, setPrecio] = useState(0);
   const [numeroOt, setNumeroOt] = useState(null);
   const [updatedDispositivo_id, setUpdatedDispositivo_id] = useState(null);
-  const [updateCliente_id, setUpdateCliente_id] = useState(null);
   const [ots_id, setOts_id] = useState(id || null);
   const { user } = useUserContext();
 
-  const fetchOt = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+  // const handleTipoGarantia = (event) => {
+  //   setTipoGarantia(event.target.value);
+  // };
 
-      if (response.ok) {
-        const otData = await response.json();
-        setUpdateCliente_id(otData.cliente_id);
-        setAveria(otData.averia);
-        setDescripcion(otData.descripcion);
-        setObservaciones(otData.observaciones);
-        setEstado_id(otData.estado_id);
-        setChecklist_id(otData.checklist_id);
-        setTipoGarantia(otData.tipoGarantia);
-        setPrecio(otData.precio);
-        setUpdatedDispositivo_id(otData.dispositivo_id);
-      } else {
-        console.error("Error al obtener los datos de la OT:", response.status);
-      }
-    } catch (error) {
-      console.error("Error al obtener los datos de la OT:", error);
-    }
-  };
-  const fetchChecklist = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}checklist/${checklist_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
+  // const handleObservaciones = (event) => {
+  //   setObservaciones(event.target.value);
+  // };
+  // const handleDescripcion = (event) => {
+  //   setDescripcion(event.target.value);
+  // };
 
-      const data = await response.json();
-      if (!response.ok) {
-        console.error("Error al obtener el checklist:");
-        return;
-      }
+  // const handleAveria = (event) => {
+  //   setAveria(event.target.value);
+  // };
 
-      setChecklist(data);
-    } catch (error) {
-      console.error("Error al obtener los estados:");
-    }
-  };
-  const crearOt = async () => {
-    try {
-      const token = user.token;
+  // const fetchOt = async () => {
+  //   try {
+  //     const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${user.token}`,
+  //       },
+  //     });
 
-      const ot = {
-        averia,
-        descripcion,
-        observaciones,
-        tipoGarantia,
-        estado_id,
-        cliente_id: updateCliente_id ? updateCliente_id : cliente_id,
-        checklist_id,
-        dispositivo_id: updatedDispositivo_id
-          ? updatedDispositivo_id
-          : dispositivo_id,
-      };
+  //     if (response.ok) {
+  //       const otData = await response.json();
+  //       setUpdateCliente_id(otData.cliente_id);
+  //       setAveria(otData.averia);
+  //       setDescripcion(otData.descripcion);
+  //       setObservaciones(otData.observaciones);
+  //       setEstado_id(otData.estado_id);
+  //       setChecklist_id(otData.checklist_id);
+  //       setTipoGarantia(otData.tipoGarantia);
+  //       setPrecio(otData.precio);
+  //       setUpdatedDispositivo_id(otData.dispositivo_id);
+  //     } else {
+  //       console.error("Error al obtener los datos de la OT:", response.status);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al obtener los datos de la OT:", error);
+  //   }
+  // };
+  // const fetchChecklist = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}checklist/${checklist_id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${user.token}`,
+  //         },
+  //       }
+  //     );
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
-        method: "POST",
-        body: JSON.stringify(ot),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
+  //     const data = await response.json();
+  //     if (!response.ok) {
+  //       console.error("Error al obtener el checklist:");
+  //       return;
+  //     }
 
-      if (!response.ok) {
-        throw new Error(data.error);
-      }
-      if (response.status === 201) {
-        enqueueSnackbar("Datos Guardados Correctamente", {
-          variant: "success",
-        });
-        setOts_id(data);
-        setNumeroOt(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     setChecklist(data);
+  //   } catch (error) {
+  //     console.error("Error al obtener los estados:");
+  //   }
+  // };
+  // const crearOt = async () => {
+  //   try {
+  //     const token = user.token;
 
-  useEffect(() => {
-    if (id) {
-      fetchOt();
-    }
-  }, [id]);
+  //     const ot = {
+  //       averia,
+  //       descripcion,
+  //       observaciones,
+  //       tipoGarantia,
+  //       estado_id,
+  //       cliente_id: updateCliente_id ? updateCliente_id : cliente_id,
+  //       checklist_id,
+  //       dispositivo_id: updatedDispositivo_id
+  //         ? updatedDispositivo_id
+  //         : dispositivo_id,
+  //     };
 
-  useEffect(() => {
-    if (checklist_id !== undefined) {
-      fetchChecklist();
-    }
-  }, [checklist_id]);
+  //     const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
+  //       method: "POST",
+  //       body: JSON.stringify(ot),
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     const data = await response.json();
 
-  // console.log(estadoId);
-  useEffect(() => {
-    const fetchEstados = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}estado/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+  //     if (!response.ok) {
+  //       throw new Error(data.error);
+  //     }
+  //     if (response.status === 201) {
+  //       enqueueSnackbar("Datos Guardados Correctamente", {
+  //         variant: "success",
+  //       });
+  //       setOts_id(data);
+  //       setNumeroOt(data);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
-        const data = await response.json();
-        setEstados(data);
-      } catch (error) {
-        console.error("Error al obtener los estados:", error);
-      }
-    };
+  // useEffect(() => {
+  //   if (id) {
+  //     fetchOt();
+  //   }
+  // }, [id]);
 
-    fetchEstados();
-  }, []);
+  // useEffect(() => {
+  //   if (checklist_id !== undefined) {
+  //     fetchChecklist();
+  //   }
+  // }, [checklist_id]);
 
-  useEffect(() => {
-    if (
-      averia &&
-      cliente_id &&
-      estado_id &&
-      descripcion &&
-      checklist_id &&
-      dispositivo_id
-    ) {
-      console.log("hay ot");
+  const queryStates = useQuery({
+    queryKey: ["states"],
+    queryFn: () => getStates(user.token),
+    onSuccess: (data) => {
+      setEstados(data.data);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
-      if (!id) {
-        crearOt();
-      }
-    }
-  }, [
-    cliente_id,
-    dispositivo_id,
-    checklist_id,
-    tipoGarantia,
-    averia,
-    estado_id,
-    observaciones,
-    descripcion,
-  ]);
+  // useEffect(() => {
+  //   if (
+  //     averia &&
+  //     cliente_id &&
+  //     estado_id &&
+  //     descripcion &&
+  //     checklist_id &&
+  //     dispositivo_id
+  //   ) {
+  //     console.log("hay ot");
 
-  useEffect(() => {
-    if (fetchData) {
-      crearOt();
-      enqueueSnackbar("Datos Actualizados Correctamente", {
-        variant: "success",
-      });
-      setFetchData(false);
-    }
-  }, [fetchData]);
+  //     if (!id) {
+  //       crearOt();
+  //     }
+  //   }
+  // }, [
+  //   cliente_id,
+  //   dispositivo_id,
+  //   checklist_id,
+  //   tipoGarantia,
+  //   averia,
+  //   estado_id,
+  //   observaciones,
+  //   descripcion,
+  // ]);
+
+  // useEffect(() => {
+  //   if (fetchData) {
+  //     crearOt();
+  //     enqueueSnackbar("Datos Actualizados Correctamente", {
+  //       variant: "success",
+  //     });
+  //     setFetchData(false);
+  //   }
+  // }, [fetchData]);
   const handleEstado = (event) => {
     setEstado_id(event.target.value);
-    if (setEstado) {
-      setEstado(event.target.value + 1);
-    }
-  };
-  const handleTipoGarantia = (event) => {
-    setTipoGarantia(event.target.value);
+    setEstado && setEstado(event.target.value + 1);
   };
 
-  const handleObservaciones = (event) => {
-    setObservaciones(event.target.value);
-  };
-  const handleDescripcion = (event) => {
-    setDescripcion(event.target.value);
-  };
+  const {
+    isSubmitting,
+    values,
+    touched,
+    errors,
+    handleChange,
+    handleSubmit,
+    handleBlur,
+  } = useFormik({
+    enableReinitialize: true,
+    initialValues: order ? order : initialValues,
+    validationSchema: FormOrderSchema,
+    onSubmit: async function (values, actions) {
+      order ? updateMutation.mutate(values) : createMutation.mutate(values);
+      // actions.resetForm();
+    },
+  });
 
-  const handleAveria = (event) => {
-    setAveria(event.target.value);
+  const getSelectedValue = (array, value, property) => {
+    return array.find((item) => item.id === value)?.[property] || "";
   };
-
   return (
     <Paper elevation={4} sx={{ p: 2, display: "flex", alignItems: "center" }}>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -275,8 +293,8 @@ const FormOperacionesTecnicas = ({
                 label="Averia principal"
                 labelId="averia"
                 name="averia"
-                value={averia}
-                onChange={handleAveria}
+                value={values.averia}
+                onChange={handleChange}
                 size="small"
                 disabled={entregada}
               >
@@ -291,19 +309,21 @@ const FormOperacionesTecnicas = ({
             <TextField
               size="small"
               label="Descripcion"
-              value={descripcion}
-              onChange={handleDescripcion}
+              name="descripcion"
+              value={values.descripcion}
+              onChange={handleChange}
               disabled={entregada}
             />
             <TextField
               sx={{ mt: 2 }}
               fullWidth
+              name="observaciones"
               label="Observaciones Tecnicas"
               multiline
               rows={2}
-              variant="filled"
-              value={observaciones}
-              onChange={handleObservaciones}
+              variant="standard"
+              value={values.observaciones}
+              onChange={handleChange}
               disabled={entregada}
             />
           </Box>
@@ -358,7 +378,7 @@ const FormOperacionesTecnicas = ({
               <InputLabel id="estado">Estado</InputLabel>
               <Select
                 labelId="estado"
-                value={estado_id}
+                value={getSelectedValue(estados, values.estado_id, "id")}
                 onChange={handleEstado}
                 autoWidth
                 label="Estado"
@@ -376,8 +396,8 @@ const FormOperacionesTecnicas = ({
               <InputLabel id="tipoGarantia">Garantia</InputLabel>
               <Select
                 labelId="tipoGarantia"
-                value={tipoGarantia}
-                onChange={handleTipoGarantia}
+                value={values.tipoGarantia}
+                onChange={handleChange}
                 autoWidth
                 label="Garantia"
                 name="tipoGarantia"
