@@ -20,19 +20,16 @@ export default function CheckListRevision({
 
   useEffect(() => {
     if (checklist) {
-      const convertedChecklist = checklist.map((item) => {
-        const { id, ...rest } = item;
-        const convertedValues = {};
-
-        for (const key in rest) {
-          if (rest[key] !== null) {
-            convertedValues[key] = Boolean(rest[key]);
-          }
+      const convertedChecklist = {};
+      //Cambiar el estado de todos los checkbox a boolean
+      for (const key in checklist) {
+        if (key !== "id") {
+          // Excluir la propiedad 'id'
+          convertedChecklist[key] = Boolean(checklist[key]);
         }
-        return { ...convertedValues };
-      });
+      }
 
-      setState(...convertedChecklist);
+      setState(convertedChecklist);
     }
   }, [checklist]);
 

@@ -10,4 +10,5 @@ export const nombreAverias = [
   "Camara averiada",
   "Sin cobertura",
   "Se reinicia",
+  "No vibra",
 ];

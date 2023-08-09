@@ -46,27 +46,6 @@ const FormOperacionesTecnicas = ({
     },
   });
 
-  // const createChecklistMutation = useMutation({
-  //   mutationFn: (values) => addChecklist(values, user.token),
-  //   onSuccess: () => {
-  //     setCheclist_id(data.data);
-  //     enqueueSnackbar("Checklist creado correctamente", {
-  //       variant: "success",
-  //     });
-  //     queryClient.invalidateQueries(["order"]);
-  //   },
-  // });
-
-  // const updateChecklistMutation = useMutation({
-  //   mutationFn: (values) =>
-  //     updateChecklist(order.checklist_id, values, user.token),
-  //   onSuccess: () => {
-  //     enqueueSnackbar("Checklist actualizado correctamente", {
-  //       variant: "success",
-  //     });
-  //     queryClient.invalidateQueries(["order"]);
-  //   },
-  // });
   const {
     isSubmitting,
     values,
@@ -103,7 +82,7 @@ const FormOperacionesTecnicas = ({
         >
           <Box sx={{ display: "flex", alignItems: "end" }}>
             <Typography variant="h4" color="primary" fontWeight={"bold"}>
-              {`OT000${values.id}`}
+              {order ? `OT000${order?.order?.id}` : "Nueva Orden"}
             </Typography>
             {entregada ? (
               <Typography ml={2} variant="h6" color="primary">
@@ -209,12 +188,12 @@ const FormOperacionesTecnicas = ({
           Operaciones Servicio Tecnico
         </Typography>
         <TablaReparacion
-          ots_id={values.id}
-          dispositivo_id={values.dispositivo_id}
-          updatedDispositivo_id={values.id}
+          ots_id={order?.order.id}
+          dispositivo_id={order?.order.dispositivo_id}
+          updatedDispositivo_id={order?.order.dispositivo_id}
           setPrecio={values.precio}
-          entregada={entregada}
           numeroOt={values.id}
+          entregada={entregada}
           handleSubmit={handleSubmit}
           // order={values}
         />
@@ -246,30 +225,44 @@ const FormOperacionesTecnicas = ({
               m: 2,
             }}
           >
-            <FormControl sx={{ m: 1, width: 220 }}>
+            <FormControl
+              error={touched.estado_id && Boolean(errors.estado_id)}
+              sx={{ m: 1, width: 220 }}
+            >
               <InputLabel id="estado">Estado</InputLabel>
               <Select
                 labelId="estado"
                 value={getSelectedValue(estados, values.estado_id, "id")}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 autoWidth
                 label="Estado"
                 name="estado_id"
                 disabled={entregada}
               >
+                <MenuItem value={""}>
+                  <em>Seleccione</em>
+                </MenuItem>
                 {estados?.map((estado) => (
                   <MenuItem key={estado.id} value={estado.id}>
                     {estado.nombre}
                   </MenuItem>
                 ))}
               </Select>
+              {touched.estado_id && errors.estado_id && (
+                <FormHelperText>{errors.estado_id}</FormHelperText>
+              )}
             </FormControl>
-            <FormControl sx={{ m: 1, width: 220 }}>
+            <FormControl
+              error={touched.tipoGarantia && Boolean(errors.tipoGarantia)}
+              sx={{ m: 1, width: 220 }}
+            >
               <InputLabel id="tipoGarantia">Tipo de Garantia</InputLabel>
               <Select
                 labelId="tipoGarantia"
                 value={values.tipoGarantia}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 autoWidth
                 label="Tipo de Garantia"
                 name="tipoGarantia"
@@ -285,6 +278,9 @@ const FormOperacionesTecnicas = ({
                 <MenuItem value="Cortesia">Cortesia</MenuItem>
                 <MenuItem value="Irreparable">Irreparable</MenuItem>
               </Select>
+              {touched.tipoGarantia && errors.tipoGarantia && (
+                <FormHelperText>{errors.tipoGarantia}</FormHelperText>
+              )}
             </FormControl>
           </Box>
           <CheckListRevision

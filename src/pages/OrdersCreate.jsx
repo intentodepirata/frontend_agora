@@ -12,7 +12,7 @@ import { addCustomer } from "../api/clientes";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import { addDevice } from "../api/devices";
-import { addOrder } from "../api/orders";
+import { addOrder, updateOrder } from "../api/orders";
 import { useFormik } from "formik";
 
 import { FormOrderSchema } from "../components/FormOperacionesTecnicas/utils/FormOrderSchema";
@@ -24,6 +24,7 @@ const OrdersCreate = () => {
   const [cliente_id, setCliente_id] = useState(null);
   const [checklist_id, setChecklist_id] = useState(null);
   const [recepcionado, setRecepcionado] = useState(false);
+  const [order, setOrder] = useState(null);
   const queryClient = useQueryClient();
   const { user } = useUserContext();
   useScrollUp();
@@ -43,7 +44,6 @@ const OrdersCreate = () => {
       enqueueSnackbar("Cliente agregado correctamente", {
         variant: "success",
       });
-      queryClient.invalidateQueries(["customers"]);
     },
     onError: (error) => {
       console.error(error.message);
@@ -58,7 +58,6 @@ const OrdersCreate = () => {
       enqueueSnackbar("Dispositivo agregado correctamente", {
         variant: "success",
       });
-      queryClient.invalidateQueries(["devices"]);
     },
     onError: (error) => {
       console.error(error.message);
@@ -66,13 +65,29 @@ const OrdersCreate = () => {
   });
 
   const createOrderMutation = useMutation({
-    mutationFn: (order) =>
+    mutationFn: (values) =>
       addOrder(
-        { ...order, cliente_id, dispositivo_id, checklist_id },
+        { ...values, cliente_id, dispositivo_id, checklist_id },
         user.token
       ),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setOrder(data.data);
       enqueueSnackbar("Orden creada correctamente", {
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      enqueueSnackbar("Falta completar el checklist", {
+        variant: "error",
+      });
+      console.error(error.message);
+    },
+  });
+
+  const updateOrderMutation = useMutation({
+    mutationFn: (values) => updateOrder(order?.order.id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Orden actualizada correctamente", {
         variant: "success",
       });
       queryClient.invalidateQueries(["order"]);
@@ -147,7 +162,9 @@ const OrdersCreate = () => {
       {recepcionado && (
         <Box sx={{ py: 1, px: 2, mx: "auto", my: 5 }}>
           <FormOperacionesTecnicas
+            order={order}
             createOrderMutation={createOrderMutation}
+            updateOrderMutation={updateOrderMutation}
             createChecklistMutation={createChecklistMutation}
             updateChecklistMutation={updateChecklistMutation}
           />

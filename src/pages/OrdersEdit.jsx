@@ -52,7 +52,7 @@ const OrdersEdit = () => {
   });
 
   const queryOrder = useQuery({
-    queryKey: ["order"],
+    queryKey: ["order", id],
     queryFn: () => findOrder(id, user.token),
 
     onSuccess: (data) => {
@@ -97,7 +97,7 @@ const OrdersEdit = () => {
       enqueueSnackbar("Checklist actualizado correctamente", {
         variant: "success",
       });
-      queryClient.invalidateQueries(["order"]);
+      queryClient.invalidateQueries(["order", id]);
     },
   });
 
