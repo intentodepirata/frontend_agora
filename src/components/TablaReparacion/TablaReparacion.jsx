@@ -17,91 +17,97 @@ import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
 import CustomNoRowsOverlay from "../CustomNoRowsOverlay/CustomNoRowsOverlay";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { findProductsModel } from "../../api/products";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { findOperations } from "../../api/operations";
+import { useFormik } from "formik";
+import { initialValues } from "./utils/initialValues";
+import { TablaReparacionSchema } from "./utils/TablaReparacionSchema";
 
-const TablaReparacion = ({
-  ots_id,
-  dispositivo_id,
-  updatedDispositivo_id,
-  setPrecio,
-  entregada,
-  order,
-  handleSubmit,
-}) => {
+const TablaReparacion = ({ order, handleSubmit, entregada }) => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [componentes, setComponentes] = useState([]);
   const [rows, setRows] = useState([]);
   const [operacion, setOperacion] = useState("");
   const [componentes_id, setComponentes_id] = useState("");
   const [tiempo, setTiempo] = useState("");
-  const [actualizarTabla, setActualizarTabla] = useState(false);
-  const [cargando, setCargando] = useState(false);
 
   const { user } = useUserContext();
 
-  const fetchcomponentes = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}componente/modelo/${
-          dispositivo_id ? dispositivo_id : updatedDispositivo_id
-        }`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setComponentes(data);
-      } else {
-        console.error("Error al obtener los componentes:", response.status);
-      }
-    } catch (error) {
-      console.error("Error al obtener los estados:", error);
-    }
-  };
-  const fetchOperacionesByOt = async () => {
-    try {
-      setCargando(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}operacion/${ots_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        setRows(data);
-        setCargando(false);
-        setActualizarTabla(false);
-      } else {
-        console.error("Error al obtener las operaciones:", response.status);
-      }
-    } catch (error) {
-      console.error("Error al obtener las operaciones:", error);
-    }
-  };
+  useQuery({
+    queryKey: ["model-products", order?.order.id],
+    queryFn: () => findProductsModel(order?.order.dispositivo_id, user.token),
+    onSuccess: (data) => setComponentes(data.data),
+    onError: (error) => {
+      console.error(error.message);
+    },
+    enabled: Boolean(order?.order),
+  });
 
-  const fetchPrecio = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/price/${ots_id}`
-      );
+  const queryOperations = useQuery({
+    queryKey: ["operaciones", order?.order.id],
+    queryFn: () => findOperations(order?.order.id, user.token),
+    onSuccess: (data) => {
+      setRows(data.data);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+    enabled: Boolean(order?.order),
+  });
+  console.log(rows);
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error);
-      }
-      setPrecio(data);
-    } catch (error) {
-      console.error("Error al obtener los estados:", error);
-    }
-  };
+  // const fetchOperacionesByOt = async () => {
+  //   try {
+  //     setCargando(true);
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}operacion/${ots_id}`,
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${user.token}`,
+  //         },
+  //       }
+  //     );
+  //     const data = await response.json();
+  //     if (response.ok) {
+  //       setRows(data);
+  //       setCargando(false);
+  //       setActualizarTabla(false);
+  //     } else {
+  //       console.error("Error al obtener las operaciones:", response.status);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al obtener las operaciones:", error);
+  //   }
+  // };
 
+  // const fetchPrecio = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_URL}ot/price/${ots_id}`
+  //     );
+
+  //     const data = await response.json();
+  //     if (!response.ok) {
+  //       throw new Error(data.error);
+  //     }
+  //     setPrecio(data);
+  //   } catch (error) {
+  //     console.error("Error al obtener los estados:", error);
+  //   }
+  // };
+
+  const createMutation = useMutation({
+    mutationFn: addOperation,
+    onSuccess: () => {
+      enqueueSnackbar("Operacion agregada correctamente", {
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries(["operaciones", order?.order.id]);
+    },
+  });
   const fetchOperaciones = async () => {
     try {
       const values = {
@@ -137,18 +143,35 @@ const TablaReparacion = ({
       console.error("Error del servidor:", error);
     }
   };
+  const {
+    isSubmitting,
+    values,
+    touched,
+    errors,
+    handleChange,
+    handleSubmit: handleSubmitOperation,
+    handleBlur,
+  } = useFormik({
+    enableReinitialize: true,
+    initialValues: initialValues,
+    validationSchema: TablaReparacionSchema,
+    onSubmit: async function (values, actions) {
+      createMutation.mutate(values);
+      actions.resetForm();
+    },
+  });
 
-  useEffect(() => {
-    fetchOperacionesByOt();
-    fetchcomponentes();
-  }, [updatedDispositivo_id, dispositivo_id]);
+  // useEffect(() => {
+  //   fetchOperacionesByOt();
+  //   fetchcomponentes();
+  // }, [updatedDispositivo_id, dispositivo_id]);
 
-  useEffect(() => {
-    if (actualizarTabla) {
-      fetchOperacionesByOt();
-      fetchPrecio();
-    }
-  }, [actualizarTabla]);
+  // useEffect(() => {
+  //   if (actualizarTabla) {
+  //     fetchOperacionesByOt();
+  //     fetchPrecio();
+  //   }
+  // }, [actualizarTabla]);
 
   const handleSelectionModelChange = (newSelection) => {
     setSelectionModel(newSelection);
@@ -211,16 +234,16 @@ const TablaReparacion = ({
     closeSnackbar(snackbarId);
   };
 
-  function handleSubmitOperacion(e) {
-    e.preventDefault();
-    fetchOperaciones();
-    fetchPrecio();
-  }
+  // function handleSubmitOperacion(e) {
+  //   e.preventDefault();
+  //   fetchOperaciones();
+  //   fetchPrecio();
+  // }
 
   return (
     <Box>
       <Box
-        onSubmit={handleSubmitOperacion}
+        onSubmit={handleSubmitOperation}
         component={"form"}
         sx={{ display: "flex", gap: 2, pt: 1 }}
       >
@@ -322,7 +345,7 @@ const TablaReparacion = ({
             noRowsOverlay: CustomNoRowsOverlay,
             loadingOverlay: LinearProgress,
           }}
-          loading={Boolean(cargando)}
+          loading={Boolean(queryOperations.isFetching)}
         />
       </Box>
 

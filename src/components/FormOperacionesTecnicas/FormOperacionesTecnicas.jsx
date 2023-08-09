@@ -188,14 +188,9 @@ const FormOperacionesTecnicas = ({
           Operaciones Servicio Tecnico
         </Typography>
         <TablaReparacion
-          ots_id={order?.order.id}
-          dispositivo_id={order?.order.dispositivo_id}
-          updatedDispositivo_id={order?.order.dispositivo_id}
-          setPrecio={values.precio}
-          numeroOt={values.id}
-          entregada={entregada}
+          order={order}
           handleSubmit={handleSubmit}
-          // order={values}
+          entregada={entregada}
         />
       </Box>
       <Box sx={{ ml: 4 }}>
@@ -211,7 +206,7 @@ const FormOperacionesTecnicas = ({
               Total a Facturar
             </Typography>
             <Typography variant="h6" color="initial">
-              {values.precio} €
+              {order && `${order?.order.precio}€`}
             </Typography>
           </Box>
         </Paper>

@@ -14,7 +14,7 @@ export const getProducts = (token) =>
 export const findProduct = (id, token) =>
   productsApi.get(`/${id}`, createHeaders(token));
 
-export const findProductWithModel = (id, token) =>
+export const findProductsModel = (id, token) =>
   productsApi.get(`/modelo/${id}`, createHeaders(token));
 
 export const addProduct = (product, token) =>

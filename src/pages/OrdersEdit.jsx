@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
 import DoneAllRoundedIcon from "@mui/icons-material/DoneAllRounded";
@@ -8,7 +8,7 @@ import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormO
 import useScrollUp from "../hooks/useScrollUp";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 import DatosOrdenModal from "../components/DatosOrdenModal/DatosOrdenModal";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
 
@@ -21,18 +21,13 @@ import {
   updateOrderDeliver,
 } from "../api/orders";
 import HandleConfirmNotification from "../ui/HandleConfirmNotification";
-import { initialValues } from "../components/FormOperacionesTecnicas/utils/initialValues";
-import { useFormik } from "formik";
-import { FormOrderSchema } from "../components/FormOperacionesTecnicas/utils/FormOrderSchema";
-import { findChecklist, updateChecklist } from "../api/checklist";
+import { updateChecklist } from "../api/checklist";
 
 const OrdersEdit = () => {
-  const [fetchData, setFetchData] = useState(false);
   const [modal, setModal] = useState(false);
   const [entregada, setEntregada] = useState(false);
   const [cliente, setCliente] = useState(null);
   const [order, setOrder] = useState(null);
-  // const [checklist, setChecklist] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
   const queryClient = useQueryClient();
@@ -196,14 +191,16 @@ const OrdersEdit = () => {
         <DatosOrdenModal modal={modal} handleModal={handleModal} id={id} />
       )}
 
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormOperacionesTecnicas
-          order={order}
-          updateOrderMutation={updateOrderMutation}
-          updateChecklistMutation={updateChecklistMutation}
-          entregada={entregada}
-        />
-      </Box>
+      {order && (
+        <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
+          <FormOperacionesTecnicas
+            order={order}
+            updateOrderMutation={updateOrderMutation}
+            updateChecklistMutation={updateChecklistMutation}
+            entregada={entregada}
+          />
+        </Box>
+      )}
     </Box>
   );
 };
