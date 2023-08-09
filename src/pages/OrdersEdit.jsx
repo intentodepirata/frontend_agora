@@ -14,7 +14,6 @@ import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  addOrder,
   findOrder,
   findOrderToPrint,
   updateOrder,
@@ -35,7 +34,7 @@ const OrdersEdit = () => {
   useScrollUp();
 
   const queryPrintData = useQuery({
-    queryKey: ["print data", id],
+    queryKey: ["print data"],
     queryFn: () => findOrderToPrint(id, user.token),
 
     onSuccess: (data) => setCliente(data.data),
@@ -47,7 +46,7 @@ const OrdersEdit = () => {
   });
 
   const queryOrder = useQuery({
-    queryKey: ["order", id],
+    queryKey: ["order"],
     queryFn: () => findOrder(id, user.token),
 
     onSuccess: (data) => {
@@ -65,7 +64,7 @@ const OrdersEdit = () => {
       enqueueSnackbar("Orden actualizada correctamente", {
         variant: "success",
       });
-      queryClient.invalidateQueries(["order", id]);
+      queryClient.invalidateQueries(["order"]);
     },
     onError: (error) => {
       console.error(error.message);
@@ -79,7 +78,7 @@ const OrdersEdit = () => {
         variant: "success",
       });
 
-      queryClient.invalidateQueries(["order", id]);
+      queryClient.invalidateQueries(["order"]);
     },
     onError: (error) => {
       console.error(error.message);
@@ -92,7 +91,7 @@ const OrdersEdit = () => {
       enqueueSnackbar("Checklist actualizado correctamente", {
         variant: "success",
       });
-      queryClient.invalidateQueries(["order", id]);
+      queryClient.invalidateQueries(["order"]);
     },
   });
 

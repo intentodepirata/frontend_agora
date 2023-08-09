@@ -1,9 +1,30 @@
 import { Box } from "@mui/material";
 import FormForgot from "../components/FormForgot/FormForgot";
 import useScrollUp from "../hooks/useScrollUp";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { enqueueSnackbar } from "notistack";
+import { forgotPassword } from "../api/users";
 
 const Forgot = () => {
+  const navigate = useNavigate();
   useScrollUp();
+
+  const createMutation = useMutation({
+    mutationFn: forgotPassword,
+    onSuccess: () => {
+      enqueueSnackbar(" Instrucciones enviadas, revise su bandeja de entrada", {
+        variant: "success",
+      });
+      navigate("/login");
+    },
+    onError: (error) => {
+      enqueueSnackbar(`${error.message}`, {
+        variant: "error",
+      });
+    },
+  });
+
   return (
     <Box
       component="main"
@@ -21,7 +42,7 @@ const Forgot = () => {
         p: 2,
       }}
     >
-      <FormForgot />
+      <FormForgot createMutation={createMutation} />
     </Box>
   );
 };

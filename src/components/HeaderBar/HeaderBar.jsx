@@ -66,8 +66,7 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
     onError: (error) => {
       console.error(error.message);
     },
-    keepPreviousData: true,
-    staleTime: 700,
+
     enabled: !!value,
   });
 

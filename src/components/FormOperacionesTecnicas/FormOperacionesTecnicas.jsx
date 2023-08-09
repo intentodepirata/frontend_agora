@@ -9,19 +9,16 @@ import {
   Select,
   FormHelperText,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CheckListRevision from "../CheckListRevision/CheckListRevision";
 import TablaReparacion from "../TablaReparacion/TablaReparacion";
 import { nombreAverias } from "./utils/nombreAverias";
 import { useUserContext } from "../../contexts/UserContext";
-import { useParams } from "react-router-dom";
-import { enqueueSnackbar } from "notistack";
 import { initialValues } from "./utils/initialValues";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getStates } from "../../api/states";
 import { FormOrderSchema } from "./utils/FormOrderSchema";
 import { useFormik } from "formik";
-import { addChecklist, updateChecklist } from "../../api/checklist";
 
 const FormOperacionesTecnicas = ({
   order,
@@ -34,7 +31,7 @@ const FormOperacionesTecnicas = ({
   const [estados, setEstados] = useState([]);
 
   const { user } = useUserContext();
-  const queryClient = useQueryClient();
+
   const queryStates = useQuery({
     queryKey: ["states"],
     queryFn: () => getStates(user.token),

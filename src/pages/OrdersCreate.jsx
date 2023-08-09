@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link } from "react-router-dom";
@@ -13,10 +13,6 @@ import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import { addDevice } from "../api/devices";
 import { addOrder, updateOrder } from "../api/orders";
-import { useFormik } from "formik";
-
-import { FormOrderSchema } from "../components/FormOperacionesTecnicas/utils/FormOrderSchema";
-import { initialValues } from "../components/FormOperacionesTecnicas/utils/initialValues";
 import { addChecklist, updateChecklist } from "../api/checklist";
 const OrdersCreate = () => {
   const [step, setStep] = useState(-1);

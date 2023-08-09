@@ -1,6 +1,5 @@
 import { Box, Typography, Button } from "@mui/material";
 import { useEffect, useState } from "react";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import ManageHistoryIcon from "@mui/icons-material/ManageHistory";
@@ -11,12 +10,16 @@ import {
   formattedDate,
   getTotalByEstado,
   initialValues,
+  obtenerRolUsuario,
   updateHighcharts,
 } from "./utils/utils";
 import accessibility from "highcharts/modules/accessibility";
+import { STATES, TIME } from "./utils/constantes";
+import { customButton } from "./styles/customButton";
+
 const MainWidget = ({
   rows,
-  fetchOtsByTime,
+  setTime,
   setFiltroEstado,
   filtroEstado,
   totalFacturado,
@@ -24,9 +27,10 @@ const MainWidget = ({
   const [options, setOptions] = useState(initialValues);
   const [selectedButton, setSelectedButton] = useState(3);
   const [chartKey, setChartKey] = useState(0);
-
   const { user } = useUserContext();
+
   accessibility(Highcharts);
+
   useEffect(() => {
     const data = updateHighcharts(rows);
     setOptions((prevOptions) => ({
@@ -39,7 +43,7 @@ const MainWidget = ({
 
   const handleButtonClick = (buttonId, time) => {
     setSelectedButton(buttonId);
-    fetchOtsByTime(time);
+    setTime(time);
   };
 
   const handleFiltrarClick = (estado) => {
@@ -51,18 +55,6 @@ const MainWidget = ({
   };
   const isFiltroActivo = (estado) => filtroEstado === estado;
 
-  function obtenerRolUsuario(role) {
-    switch (role) {
-      case 1:
-        return "Propietario";
-      case 2:
-        return "Técnico";
-      case 3:
-        return "Recepcionista";
-      default:
-        return "rol desconocido";
-    }
-  }
   return (
     <Box
       sx={{
@@ -78,7 +70,7 @@ const MainWidget = ({
         <Typography textAlign={"center"} variant="h5" color="initial">
           Saludos, {user?.nombre} {user?.apellidos}
           <Box ml={1} component={"span"} sx={{ color: "#0150F5" }}>
-            {`(${obtenerRolUsuario(user?.role)})`}
+            {obtenerRolUsuario(user?.role)}
           </Box>
         </Typography>
         <Box
@@ -88,37 +80,16 @@ const MainWidget = ({
             justifyContent: "center",
             alignItems: "center",
             pt: 2,
+            gap: 1,
           }}
         >
           <Button
-            sx={{
-              m: 1,
-              p: 4,
-
-              border: isFiltroActivo("Pendiente")
-                ? "1px solid #0150F5"
-                : "1px solid transparent",
-              width: "100%",
-              maxWidth: "300px",
-              textTransform: "none",
-              fontSize: "1.25rem",
-              display: "flex",
-              placeContent: "center space-evenly",
-              alignItems: "center",
-              boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
-              transition: "0.2s",
-              "&:hover": {
-                transform: "scale(1.05)",
-                color: "primary",
-              },
-            }}
-            variant={"disable"}
-            color="primary"
-            onClick={() => handleFiltrarClick("Pendiente")}
+            sx={customButton(isFiltroActivo(STATES.PENDIENTE))}
+            onClick={() => handleFiltrarClick(STATES.PENDIENTE)}
           >
             <ErrorOutlineIcon
+              sx={{ fontSize: "1.8rem", mr: 1 }}
               color="primary"
-              sx={{ fontSize: "1.5rem", mr: 1 }}
             />
             {` ${getTotalByEstado(
               "Pendiente de repuesto",
@@ -126,64 +97,22 @@ const MainWidget = ({
             )} Pdt. de repuesto`}
           </Button>
           <Button
-            sx={{
-              m: 1,
-              p: 4,
-              border: isFiltroActivo("En reparacion")
-                ? "1px solid #0150F5"
-                : "1px solid transparent",
-              width: "100%",
-              maxWidth: "300px",
-              textTransform: "none",
-              fontSize: "1.25rem",
-              display: "flex",
-              placeContent: "center space-evenly",
-              alignItems: "center",
-              boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
-              transition: "0.2s",
-              "&:hover": {
-                transform: "scale(1.05)",
-                color: "primary",
-              },
-            }}
-            variant={"disable"}
-            color="primary"
-            onClick={() => handleFiltrarClick("En reparacion")}
+            sx={customButton(isFiltroActivo(STATES.EN_REPARACION))}
+            onClick={() => handleFiltrarClick(STATES.EN_REPARACION)}
           >
             <ManageHistoryIcon
+              sx={{ fontSize: "1.8rem", mr: 1 }}
               color="primary"
-              sx={{ fontSize: "1.5rem", mr: 1 }}
             />
-            {` ${getTotalByEstado("En reparacion", rows)} En reparacion`}
+            {` ${getTotalByEstado(STATES.EN_REPARACION, rows)} En reparación`}
           </Button>
           <Button
-            sx={{
-              m: 1,
-              p: 4,
-              border: isFiltroActivo("Finalizada")
-                ? "1px solid #0150F5"
-                : "1px solid transparent",
-              width: "100%",
-              maxWidth: "300px",
-              textTransform: "none",
-              fontSize: "1.25rem",
-              display: "flex",
-              placeContent: "center space-evenly",
-              alignItems: "center",
-              boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
-              transition: "0.2s",
-              "&:hover": {
-                transform: "scale(1.05)",
-                color: "primary",
-              },
-            }}
-            variant={"disable"}
-            color="primary"
-            onClick={() => handleFiltrarClick("Finalizada")}
+            sx={customButton(isFiltroActivo(STATES.FINALIZADA))}
+            onClick={() => handleFiltrarClick(STATES.FINALIZADA)}
           >
             <CheckCircleOutlineRoundedIcon
+              sx={{ fontSize: "1.8rem", mr: 1 }}
               color="primary"
-              sx={{ fontSize: "1.5rem", mr: 1 }}
             />
             {` ${getTotalByEstado("Reparacion Finalizada", rows)}  Finalizada`}
           </Button>
@@ -259,7 +188,7 @@ const MainWidget = ({
                   color: selectedButton === 1 ? "white" : "primary",
                 }}
                 onClick={() => {
-                  handleButtonClick(1, "dia");
+                  handleButtonClick(1, TIME.DIA);
                 }}
               >
                 Hoy
@@ -278,7 +207,7 @@ const MainWidget = ({
                   px: 3,
                 }}
                 onClick={() => {
-                  handleButtonClick(2, "semana");
+                  handleButtonClick(2, TIME.SEMANA);
                 }}
               >
                 Semana
@@ -296,7 +225,7 @@ const MainWidget = ({
                   color: selectedButton === 3 ? "white" : "primary",
                 }}
                 onClick={() => {
-                  handleButtonClick(3, "mes");
+                  handleButtonClick(3, TIME.MES);
                 }}
               >
                 Mes

@@ -1,5 +1,5 @@
 export const initialValues = {
   operacion: "",
-  componente_id: "",
+  componentes_id: "",
   tiempo: "",
 };

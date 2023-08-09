@@ -8,15 +8,12 @@ import {
   OutlinedInput,
   FormHelperText,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormForgotSchema } from "./FormForgotSchema";
-import { enqueueSnackbar } from "notistack";
 
-const FormForgot = () => {
-  const navigate = useNavigate();
-
+const FormForgot = ({ createMutation }) => {
   const {
     isSubmitting,
     values,
@@ -29,35 +26,8 @@ const FormForgot = () => {
     initialValues,
     validationSchema: FormForgotSchema,
     onSubmit: async function (values, actions) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}user/forgot-password`,
-          {
-            method: "POST",
-            body: JSON.stringify(values),
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
-
-        enqueueSnackbar(
-          "Instrucciones enviadas, revise su bandeja de entrada",
-          {
-            variant: "success",
-          }
-        );
-        actions.resetForm();
-
-        navigate("/login");
-      } catch (error) {
-        enqueueSnackbar(`${error.message}`, {
-          variant: "error",
-        });
-      }
+      createMutation.mutate(values);
+      actions.resetForm();
     },
   });
 
