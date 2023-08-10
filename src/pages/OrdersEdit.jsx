@@ -1,4 +1,13 @@
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
@@ -11,7 +20,8 @@ import DatosOrdenModal from "../components/DatosOrdenModal/DatosOrdenModal";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
-
+import DescriptionIcon from "@mui/icons-material/Description";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   findOrder,
@@ -27,6 +37,7 @@ const OrdersEdit = () => {
   const [entregada, setEntregada] = useState(false);
   const [cliente, setCliente] = useState(null);
   const [order, setOrder] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
   const queryClient = useQueryClient();
@@ -109,11 +120,16 @@ const OrdersEdit = () => {
     });
   };
 
-  function handlePrint() {
-    window.open(`/print/${id}`);
-  }
   const handleModal = () => {
     setModal((value) => !value);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuPrint = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   return (
@@ -176,7 +192,8 @@ const OrdersEdit = () => {
             </Button>
           )}
           <Button
-            onClick={() => handlePrint()}
+            // onClick={() => handlePrint()}
+            onClick={handleMenuPrint}
             variant="contained"
             endIcon={<PrintIcon />}
             color="success"
@@ -184,6 +201,61 @@ const OrdersEdit = () => {
           >
             Imprimir
           </Button>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            sx={{ mt: 5 }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiPaper-root": {
+                  width: 30,
+                  height: 30,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 8,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
+          >
+            <MenuItem onClick={() => window.open(`/print/${id}`)}>
+              <ListItemIcon>
+                <DescriptionIcon fontSize="small" />
+              </ListItemIcon>
+              Factura
+            </MenuItem>
+
+            <MenuItem onClick={() => window.open(`/print-simple/${id}`)}>
+              <ListItemIcon>
+                <ConfirmationNumberIcon fontSize="small" />
+              </ListItemIcon>
+              Ticket
+            </MenuItem>
+          </Menu>
         </Stack>
       </Box>
       {modal && (

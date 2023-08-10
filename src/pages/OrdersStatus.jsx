@@ -1,46 +1,28 @@
-import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
+import { Box, Divider, Paper, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import logo from "../assets/img/logo-trans.png";
-import { useEffect, useState } from "react";
 import Footer from "../components/Footer/Footer";
 import useScrollUp from "../hooks/useScrollUp";
 import { useUserContext } from "../contexts/UserContext";
+import { useQuery } from "@tanstack/react-query";
+import { findOrderStatus } from "../api/orders";
 
 export default function OrdersStatus() {
-  const [order, setOrder] = useState(null);
-  const [cargando, setCargando] = useState(false);
   const { user } = useUserContext();
   const { id } = useParams();
   useScrollUp();
-  useEffect(() => {
-    const statusFetch = async () => {
-      try {
-        setCargando(true);
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}ot/status/${id}`
-        );
 
-        const data = await response.json();
+  const { data: order } = useQuery({
+    queryKey: ["status-order", id],
+    queryFn: () => findOrderStatus(id),
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
-        setOrder(data);
+  const { precio, imei, estado, tipoGarantia, fechaModificacion } =
+    order?.data || {};
 
-        setCargando(false);
-      } catch (error) {
-        console.error("Error al obtener la Orden:", error);
-      }
-    };
-    statusFetch();
-  }, [id]);
-
-  const {
-    precio,
-    imei,
-    estado,
-    tipoGarantia,
-    fechaEntrada,
-    fechaModificacion,
-    averiaDetectadaSat,
-  } = order || {};
   return (
     <>
       <Box

@@ -6,8 +6,6 @@ import FormHelperText from "@mui/material/FormHelperText";
 import Switch from "@mui/material/Switch";
 import { useState, useEffect } from "react";
 import { Button } from "@mui/material";
-import { useUserContext } from "../../contexts/UserContext";
-import { enqueueSnackbar } from "notistack";
 import { initialState } from "./utils/initialState";
 
 export default function CheckListRevision({

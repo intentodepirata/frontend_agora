@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 import accessibility from "highcharts/modules/accessibility";
 
 const GraficaGastos = ({ data }) => {
@@ -14,8 +14,8 @@ const GraficaGastos = ({ data }) => {
       chart.update({});
     }
   }, [data]);
-  if (!data) {
-    return <CircularProgress sx={{ textAlign: "center" }} />;
+  if (!data || data.length === 0) {
+    return <Typography>No hay datos</Typography>;
   }
   accessibility(Highcharts);
   const categories = data

@@ -7,6 +7,7 @@ import {
   InputLabel,
   OutlinedInput,
   FormHelperText,
+  CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useFormik } from "formik";
@@ -88,14 +89,21 @@ const FormForgot = ({ createMutation }) => {
           </FormControl>
 
           <Button
-            disabled={isSubmitting}
+            disabled={createMutation.isLoading}
             type="submit"
             variant="contained"
             color="primary"
             size="large"
             sx={{ textTransform: "none", fontSize: "14px", py: "14", mb: 4 }}
           >
-            Enviar instrucciones
+            {createMutation.isLoading ? (
+              <>
+                Enviando instrucciones...
+                <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />
+              </>
+            ) : (
+              "Enviar instrucciones"
+            )}
           </Button>
           <Typography textAlign={"center"} variant="body2" color="initial">
             {" "}

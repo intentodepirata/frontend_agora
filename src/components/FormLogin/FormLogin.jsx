@@ -12,62 +12,28 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
-import { useUserContext } from "../../contexts/UserContext";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormLoginSchema } from "./FormLoginSchema";
-import { useSnackbar } from "notistack";
 
-const FormLogin = () => {
+const FormLogin = ({ loginMutation }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useUserContext();
-  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const { enqueueSnackbar } = useSnackbar();
-  const {
-    isSubmitting,
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleSubmit,
-    handleBlur,
-  } = useFormik({
-    initialValues,
-    validationSchema: FormLoginSchema,
-    onSubmit: async function (values, actions) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}user/login`,
-          {
-            method: "POST",
-            body: JSON.stringify(values),
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data);
-        }
-        login(data);
-        navigate("/home");
-        enqueueSnackbar(`Bienvenido ${data.nombre} ${data.apellidos}`, {
-          variant: "success",
-        });
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      initialValues,
+      validationSchema: FormLoginSchema,
+      onSubmit: async function (values, actions) {
+        loginMutation.mutate(values);
         actions.resetForm();
-      } catch (error) {
-        enqueueSnackbar(`${error.message}`, {
-          variant: "error",
-        });
-      }
-    },
-  });
+      },
+    });
 
   return (
     <Paper sx={{ px: 2, py: 4, margin: "3rem auto", maxWidth: "662px" }}>
@@ -170,7 +136,6 @@ const FormLogin = () => {
             <FormHelperText
               sx={{ backgroundColor: "white", px: 1, mx: 0 }}
               error={touched.password && Boolean(errors.password)}
-              id="my-helper-text"
             >
               {touched.password && errors.password}
             </FormHelperText>
@@ -185,7 +150,7 @@ const FormLogin = () => {
             ¿Olvidaste tu contraseña?
           </Typography>
           <Button
-            disabled={isSubmitting}
+            disabled={loginMutation.isLoading}
             type="submit"
             fullWidth
             variant="contained"
@@ -193,7 +158,7 @@ const FormLogin = () => {
             size="large"
             sx={{ textTransform: "none", fontSize: "14px", py: "14" }}
           >
-            {isSubmitting ? (
+            {loginMutation.isLoading ? (
               <>
                 Iniciando Sesión...
                 <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />

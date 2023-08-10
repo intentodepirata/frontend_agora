@@ -8,64 +8,34 @@ import {
   InputAdornment,
   IconButton,
   FormControl,
+  FormHelperText,
+  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormResetPasswordSchema } from "./FormResetPasswordSchema";
-import { enqueueSnackbar } from "notistack";
 
-const FormResetpassword = () => {
+const FormResetpassword = ({ resetPasswordMutation }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const navigate = useNavigate();
-  const { token } = useParams();
-  const decodedToken = decodeURIComponent(token);
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
 
-  const {
-    isSubmitting,
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleSubmit,
-    handleBlur,
-  } = useFormik({
-    initialValues,
-    validationSchema: FormResetPasswordSchema,
-    onSubmit: async function (values, actions) {
-      try {
-        actions.setSubmitting(true);
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}user/reset-password/${decodedToken}`,
-          {
-            method: "POST",
-            body: JSON.stringify(values),
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error);
-        }
-
-        enqueueSnackbar("Contraseña restablecida");
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      initialValues,
+      validationSchema: FormResetPasswordSchema,
+      onSubmit: async function (values, actions) {
+        resetPasswordMutation.mutate(values);
         actions.resetForm();
-        navigate("/login");
-        actions.setSubmitting(false);
-      } catch (error) {
-        alert("Error al resetear el password: " + error.message);
-      }
-    },
-  });
+      },
+    });
 
   return (
     <Paper sx={{ p: 2, margin: "3rem auto", maxWidth: "400px" }}>
@@ -91,6 +61,7 @@ const FormResetpassword = () => {
           <FormControl
             sx={{ mb: 4, width: "100%", bgcolor: "#F3F4F6" }}
             variant="outlined"
+            error={touched.password && Boolean(errors.password)}
           >
             <InputLabel size="small" htmlFor="password">
               Elige una contraseña
@@ -103,8 +74,6 @@ const FormResetpassword = () => {
               value={values.password}
               onChange={handleChange}
               onBlur={handleBlur}
-              error={touched.password && Boolean(errors.password)}
-              helperText={touched.password && errors.password}
               type={showPassword ? "text" : "password"}
               endAdornment={
                 <InputAdornment size="small" position="end">
@@ -124,16 +93,28 @@ const FormResetpassword = () => {
                 </InputAdornment>
               }
             />
+            {touched.password && errors.password && (
+              <FormHelperText sx={{ backgroundColor: "white", px: 1, mx: 0 }}>
+                {errors.password}
+              </FormHelperText>
+            )}
           </FormControl>
           <Button
-            disabled={isSubmitting}
+            disabled={resetPasswordMutation.isLoading}
             type="submit"
             variant="contained"
             color="primary"
             size="large"
             sx={{ textTransform: "none", fontSize: "14px", py: "14", mb: 4 }}
           >
-            Guardar Constraseña
+            {resetPasswordMutation.isLoading ? (
+              <>
+                Guardando contraseña...
+                <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />
+              </>
+            ) : (
+              "Guardar contraseña"
+            )}
           </Button>
           <Typography textAlign={"center"} variant="body1" color="initial">
             {" "}

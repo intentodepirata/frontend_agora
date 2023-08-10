@@ -25,8 +25,7 @@ export const findOrder = (id, token) =>
 export const findOrderToPrint = (id, token) =>
   ordersApi.get(`/print/${id}`, createHeaders(token));
 
-export const findOrderStatus = (id, token) =>
-  ordersApi.get(`/status/${id}`, createHeaders(token));
+export const findOrderStatus = (id) => ordersApi.get(`/status/${id}`);
 
 export const findOrderPrice = (id, token) =>
   ordersApi.get(`/price/${id}`, createHeaders(token));

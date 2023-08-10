@@ -4,60 +4,54 @@ import { useUserContext } from "../contexts/UserContext";
 import { Box, Grid, Paper, Typography } from "@mui/material";
 import QRCode from "qrcode.react";
 import useScrollUp from "../hooks/useScrollUp";
+import dayjs from "dayjs";
+import { useQuery } from "@tanstack/react-query";
+import { findOrderToPrint } from "../api/orders";
+import { findOperations } from "../api/operations";
 
 export default function OrdersPrintSmall() {
   const [order, setOrder] = useState(null);
-  const [cargando, setCargando] = useState(false);
+  const [operaciones, setOperaciones] = useState(null);
+  const fechaActual = dayjs().format("DD/MM/YYYY HH:mm:ss");
   const { user } = useUserContext();
   const { id } = useParams();
   useScrollUp();
 
-  const operaciones = [
-    {
-      tipo: "Sustitución",
-      nombreProducto: "pantalla LCD",
-      precio: 50,
-      unidades: 1,
+  const queryPrint = useQuery({
+    queryKey: ["print", id],
+    queryFn: async () => {
+      const [printData, operacionesData] = await Promise.all([
+        findOrderToPrint(id, user.token),
+        findOperations(id, user.token),
+      ]);
+      return {
+        print: printData.data,
+        operaciones: operacionesData.data,
+      };
     },
-    {
-      tipo: "Sustitucion",
-      nombreProducto: "Bateria Original",
-      precio: 30,
-      unidades: 1,
+    onSuccess: (data) => {
+      setOrder(data.print);
+      setOperaciones(data.operaciones);
     },
-  ];
-  const fechaActual = new Date().toLocaleDateString("es-ES");
-  useEffect(() => {
-    const printFetch = async () => {
-      try {
-        setCargando(true);
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}ot/print/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        setOrder(data);
-
-        setCargando(false);
-      } catch (error) {
-        console.error("Error al obtener la Orden:", error);
-      }
-    };
-    printFetch();
-  }, []);
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
   useEffect(() => {
-    if (order) {
-      window.print();
+    if (queryPrint.isSuccess) {
+      setTimeout(() => {
+        window.print();
+      }, 1000);
     }
-  }, [order]);
+  }, [queryPrint.isSuccess]);
+
+  function calculateIVA(precio) {
+    return precio * 0.21;
+  }
+  function calculateTotalPriceWithIVA(precio) {
+    return calculateIVA(precio) + precio;
+  }
 
   return (
     <Paper
@@ -68,77 +62,100 @@ export default function OrdersPrintSmall() {
         boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.1)",
       }}
     >
-      {" "}
       <Typography variant="body1" align="right">
         Fecha: {fechaActual}
       </Typography>
       <Typography variant="h4" align="center" gutterBottom>
-        Factura 000{`${order?.id}`}
+        Ticket 000{`${order?.id}`}
       </Typography>
       {/* Datos del cliente */}
       <Box mb={2}>
         <Typography variant="h5">Datos del cliente:</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Typography variant="body1">Nombre: {order?.cliente}</Typography>
-            <Typography variant="body1">Email: {order?.email}</Typography>
+            <Typography variant="body1">
+              <strong>Nombre:</strong> {order?.cliente}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Email:</strong> {order?.email}
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Typography variant="body1">DNI: {order?.dni}</Typography>
-            <Typography variant="body1">Teléfono: {order?.telefono}</Typography>
+            <Typography variant="body1">
+              <strong>DNI:</strong> {order?.dni}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Teléfono:</strong> {order?.telefono}
+            </Typography>
           </Grid>
         </Grid>
-        <Typography variant="body1">Dirección: {order?.direccion}</Typography>
+        <Typography variant="body1">
+          <strong>Dirección:</strong> {order?.direccion}
+        </Typography>
       </Box>
       {/* Datos de la reparación */}
       <Box mb={2}>
         <Typography variant="h5">Datos del dispositivo:</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Typography variant="body1">Marca: {order?.marca}</Typography>
-            <Typography variant="body1">Modelo: {order?.modelo}</Typography>
-            <Typography variant="body1">IMEI: {order?.imei}</Typography>
+            <Typography variant="body1">
+              <strong>Marca:</strong> {order?.marca}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Modelo:</strong> {order?.modelo}
+            </Typography>
+            <Typography variant="body1">
+              <strong>IMEI:</strong> {order?.imei}
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
             <Typography variant="body1">
-              Fecha de compra: {order?.fechaCompra}
+              <strong>Fecha de compra:</strong> {order?.fechaCompra}
             </Typography>
-            <Typography variant="body1">Color: {order?.color}</Typography>
+            <Typography variant="body1">
+              <strong>Color:</strong> {order?.color}
+            </Typography>
           </Grid>
         </Grid>
 
-        <Typography variant="body1">Cosmética: {order?.cosmetica}</Typography>
-
         <Typography variant="body1">
-          Avería detectada por el cliente: {order?.averiaDetectadaCliente}
+          <strong>Cosmética:</strong> {order?.cosmetica}
         </Typography>
 
-        <Typography variant="body1">Estado: {order?.estado}</Typography>
         <Typography variant="body1">
-          Tipo de garantía: {order?.tipoGarantia}
+          <strong>Avería detectada por el cliente:</strong>{" "}
+          {order?.averiaDetectadaCliente}
+        </Typography>
+
+        <Typography variant="body1">
+          <strong>Estado:</strong> {order?.estado}
         </Typography>
         <Typography variant="body1">
-          Fecha de entrada: {order?.fechaEntrada}
+          <strong>Tipo de garantía:</strong> {order?.tipoGarantia}
         </Typography>
         <Typography variant="body1">
-          Fecha de modificación: {order?.fechaModificacion}
+          <strong>Fecha de entrada:</strong> {order?.fechaEntrada}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Fecha de modificación:</strong> {order?.fechaModificacion}
         </Typography>
       </Box>
       <Box mb={2}>
         <Typography variant="h5">Resolucion:</Typography>
         <Typography variant="body1">
-          Avería detectada por el SAT: {order?.averiaDetectadaSat}
+          <strong>Avería detectada por el SAT:</strong>{" "}
+          {order?.averiaDetectadaSat}
         </Typography>
         <Typography variant="body1">
-          Descripción: {order?.descripcionDetectadaSat}
+          <strong>Descripción:</strong> {order?.descripcionDetectadaSat}
         </Typography>
       </Box>
       {/* Operaciones */}
       <Box mb={2}>
         <Typography variant="h5">Operaciones:</Typography>
-        {operaciones?.map((operacion, index) => (
+        {operaciones?.map((operacion) => (
           <Box
-            key={index}
+            key={operacion.id}
             mb={1}
             pb={1}
             borderBottom="1px solid grey"
@@ -146,29 +163,35 @@ export default function OrdersPrintSmall() {
             flexDirection="column"
           >
             <Typography variant="body1">
-              Tipo de operación: {operacion.tipo}
+              Tipo de operación: {operacion.operacion}
             </Typography>
             <Typography variant="body1">
-              Nombre del producto: {operacion.nombreProducto}
+              Nombre del producto: {operacion.componente}
             </Typography>
             <Typography variant="body1">
-              Precio: {operacion.precio.toFixed(2)}€
+              Precio: {parseFloat(operacion.precio).toFixed(2)}€
             </Typography>
             <Typography variant="body1">
-              Unidades: {operacion.unidades}
+              Unidades: {operacion.stockDisponible && 1}
             </Typography>
           </Box>
         ))}
       </Box>
-      {/* Precio total */}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Box>
           <Typography variant="body1">
-            Precio total: {calculateTotalPrice(operaciones)} €
+            Total: <strong> {parseFloat(order?.precio).toFixed(2)} €</strong>
           </Typography>
-          <Typography variant="body1">IVA: 21.00%</Typography>
           <Typography variant="body1">
-            Precio total + IVA: {calculateTotalPriceWithIVA(operaciones)} €
+            IVA 21.00%:{" "}
+            <strong> {calculateIVA(order?.precio).toFixed(2)}€</strong>
+          </Typography>
+          <Typography variant="body1">
+            Total Final:
+            <strong>
+              {parseFloat(calculateTotalPriceWithIVA(order?.precio)).toFixed(2)}
+              €
+            </strong>
           </Typography>
         </Box>
         <Box
@@ -188,8 +211,6 @@ export default function OrdersPrintSmall() {
           {order?.observacionesDetectadaSat}
         </Typography>
       </Box>
-      {/* Observaciones */}
-      {/* Firmar como entregado */}
       <Box>
         <Typography mb={2} variant="h5">
           Firmar como entregado:
@@ -206,16 +227,4 @@ export default function OrdersPrintSmall() {
       </Box>
     </Paper>
   );
-}
-
-function calculateTotalPrice(operaciones) {
-  return operaciones.reduce((total, operacion) => {
-    return total + operacion.precio * operacion.unidades;
-  }, 0);
-}
-
-function calculateTotalPriceWithIVA(operaciones) {
-  const precioTotal = calculateTotalPrice(operaciones);
-  const iva = precioTotal * 0.21;
-  return precioTotal + iva;
 }

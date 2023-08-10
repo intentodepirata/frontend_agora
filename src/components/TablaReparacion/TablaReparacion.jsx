@@ -8,7 +8,6 @@ import {
   Select,
   Stack,
   Box,
-  FormHelperText,
 } from "@mui/material";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -135,7 +134,6 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
         <FormControl
           error={touched.operacion && Boolean(errors.operacion)}
           fullWidth
-          sx={{ mb: touched.operacion && errors.operacion ? 1 : 4 }}
         >
           <InputLabel size="small">Agregar Operacion</InputLabel>
           <Select
@@ -155,15 +153,11 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
             </MenuItem>
             <MenuItem value={"ajuste mecanico"}>Ajuste Mecanico</MenuItem>
           </Select>
-          {touched.operacion && errors.operacion && (
-            <FormHelperText>{errors.operacion}</FormHelperText>
-          )}
         </FormControl>
 
         <FormControl
           error={touched.componentes_id && Boolean(errors.componentes_id)}
           fullWidth
-          sx={{ mb: touched.componentes_id && errors.componentes_id ? 1 : 4 }}
         >
           <InputLabel size="small">Agregar Componente</InputLabel>
           <Select
@@ -186,15 +180,8 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
               </MenuItem>
             ))}
           </Select>
-          {touched.componentes_id && errors.componentes_id && (
-            <FormHelperText>{errors.componentes_id}</FormHelperText>
-          )}
         </FormControl>
-        <FormControl
-          error={touched.tiempo && Boolean(errors.tiempo)}
-          fullWidth
-          sx={{ mb: touched.tiempo && errors.tiempo ? 1 : 4 }}
-        >
+        <FormControl error={touched.tiempo && Boolean(errors.tiempo)} fullWidth>
           <InputLabel size="small">Tiempo operacion</InputLabel>
           <Select
             name="tiempo"
@@ -214,16 +201,13 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
             <MenuItem value={"0.75"}>0.75</MenuItem>
             <MenuItem value={"1"}>1</MenuItem>
           </Select>
-          {touched.tiempo && errors.tiempo && (
-            <FormHelperText>{errors.tiempo}</FormHelperText>
-          )}
         </FormControl>
         <Button
-          sx={{ textTransform: "none", mb: 4 }}
+          sx={{ textTransform: "none" }}
           variant="contained"
           color="primary"
           type="submit"
-          disabled={entregada}
+          disabled={entregada || isSubmitting}
         >
           Agregar
         </Button>

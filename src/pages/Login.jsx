@@ -1,9 +1,32 @@
 import FormLogin from "../components/FormLogin/FormLogin";
 import { Box } from "@mui/material";
 import useScrollUp from "../hooks/useScrollUp";
+import { loginUser } from "../api/users";
+import { useMutation } from "@tanstack/react-query";
+import { enqueueSnackbar } from "notistack";
+import { useUserContext } from "../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const { login } = useUserContext();
+  const navigate = useNavigate();
   useScrollUp();
+
+  const loginMutation = useMutation({
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      enqueueSnackbar(`Bienvenido ${data.data.nombre} ${data.data.apellidos}`, {
+        variant: "success",
+      });
+      login(data.data);
+      navigate("/home");
+    },
+    onError: (error) => {
+      enqueueSnackbar(error.response.data, {
+        variant: "error",
+      });
+    },
+  });
   return (
     <Box
       component="main"
@@ -21,7 +44,7 @@ const Login = () => {
         p: 2,
       }}
     >
-      <FormLogin />
+      <FormLogin loginMutation={loginMutation} />
     </Box>
   );
 };

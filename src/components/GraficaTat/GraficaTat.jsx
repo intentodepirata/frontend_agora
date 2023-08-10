@@ -13,7 +13,7 @@ const GraficaReparaciones = ({ data }) => {
     }
   }, [data]);
 
-  if (!data) {
+  if (!data || data.length === 0) {
     return <Typography>No hay datos</Typography>;
   }
 
