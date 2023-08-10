@@ -2,12 +2,7 @@ import { Box, Paper, Typography, TextField, Button } from "@mui/material";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormClientesSchema } from "./FormClientesSchema";
-import { useState } from "react";
-import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
-import { enqueueSnackbar } from "notistack";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addCustomer, updateCustomer } from "../../api/clientes";
 
 const FormClientes = ({
   createCustomerMutation,
@@ -16,30 +11,23 @@ const FormClientes = ({
 }) => {
   const navigate = useNavigate();
 
-  const {
-    isSubmitting,
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleSubmit,
-    handleBlur,
-  } = useFormik({
-    enableReinitialize: true,
-    initialValues: cliente ? cliente : initialValues,
-    validationSchema: FormClientesSchema,
-    onSubmit: async function (values, actions) {
-      if (cliente) {
-        updateCustomerMutation?.mutate(values);
-        actions.resetForm();
-      } else {
-        createCustomerMutation?.mutate(values);
-        window.location.href ===
-          `${import.meta.env.VITE_URL}home/clientes/create` &&
-          navigate("/home/clientes");
-      }
-    },
-  });
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      enableReinitialize: true,
+      initialValues: cliente ? cliente : initialValues,
+      validationSchema: FormClientesSchema,
+      onSubmit: async function (values, actions) {
+        if (cliente) {
+          updateCustomerMutation?.mutate(values);
+          actions.resetForm();
+        } else {
+          createCustomerMutation?.mutate(values);
+          window.location.href ===
+            `${import.meta.env.VITE_URL}home/clientes/create` &&
+            navigate("/home/clientes");
+        }
+      },
+    });
 
   return (
     <>
@@ -139,7 +127,7 @@ const FormClientes = ({
             sx={{ width: "75%", mr: 2 }}
           />
           <Button
-            disabled={isSubmitting || createCustomerMutation?.isSuccess}
+            disabled={createCustomerMutation?.isSuccess}
             sx={{ width: "25%", textTransform: "none", height: "40px" }}
             variant="contained"
             color="primary"

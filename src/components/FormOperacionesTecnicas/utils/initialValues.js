@@ -3,5 +3,5 @@ export const initialValues = {
   observaciones: "",
   averia: "",
   tipoGarantia: "",
-  estado_id: 0,
+  estado_id: "",
 };

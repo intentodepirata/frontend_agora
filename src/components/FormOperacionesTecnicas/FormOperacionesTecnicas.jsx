@@ -32,7 +32,7 @@ const FormOperacionesTecnicas = ({
 
   const { user } = useUserContext();
 
-  const queryStates = useQuery({
+  useQuery({
     queryKey: ["states"],
     queryFn: () => getStates(user.token),
     onSuccess: (data) => {
@@ -43,24 +43,12 @@ const FormOperacionesTecnicas = ({
     },
   });
 
-  const {
-    isSubmitting,
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleSubmit,
-    handleBlur,
-  } = useFormik({
-    enableReinitialize: true,
-    initialValues: order ? order.order : initialValues,
-    validationSchema: FormOrderSchema,
-    onSubmit: async function (values, actions) {
-      order
-        ? updateOrderMutation.mutate(values)
-        : createOrderMutation.mutate(values);
-    },
-  });
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      enableReinitialize: true,
+      initialValues: order ? order.order : initialValues,
+      validationSchema: FormOrderSchema,
+    });
 
   const getSelectedValue = (array, value, property) => {
     return array.find((item) => item.id === value)?.[property] || "";
@@ -184,11 +172,7 @@ const FormOperacionesTecnicas = ({
         >
           Operaciones Servicio Tecnico
         </Typography>
-        <TablaReparacion
-          order={order}
-          handleSubmit={handleSubmit}
-          entregada={entregada}
-        />
+        <TablaReparacion order={order} entregada={entregada} />
       </Box>
       <Box sx={{ ml: 4 }}>
         <Paper elevation={4} sx={{ p: 2, mb: 2 }}>
@@ -203,7 +187,7 @@ const FormOperacionesTecnicas = ({
               Total a Facturar
             </Typography>
             <Typography variant="h6" color="initial">
-              {order && `${order?.order.precio}€`}
+              {order ? `${order?.order.precio}€` : "0€"}
             </Typography>
           </Box>
         </Paper>
@@ -278,12 +262,16 @@ const FormOperacionesTecnicas = ({
           <CheckListRevision
             checklist={order?.checklist}
             createChecklistMutation={createChecklistMutation}
-            s
             updateChecklistMutation={updateChecklistMutation}
+            handleSubmit={handleSubmit}
             entregada={entregada}
+            createOrderMutation={createOrderMutation}
+            updateOrderMutation={updateOrderMutation}
+            values={values}
           />
         </Paper>
-        {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+        {/* <pre>{JSON.stringify(values, null, 2)}</pre>
+        <pre>{JSON.stringify(errors, null, 2)}</pre> */}
       </Box>
     </Paper>
   );

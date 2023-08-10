@@ -3,16 +3,22 @@ import FormControl from "@mui/material/FormControl";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
+import SaveIcon from "@mui/icons-material/Save";
 import Switch from "@mui/material/Switch";
 import { useState, useEffect } from "react";
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { initialState } from "./utils/initialState";
+import { enqueueSnackbar } from "notistack";
 
 export default function CheckListRevision({
   checklist,
   createChecklistMutation,
   updateChecklistMutation,
+  handleSubmit,
   entregada,
+  createOrderMutation,
+  updateOrderMutation,
+  values,
 }) {
   const [state, setState] = useState(initialState);
 
@@ -38,10 +44,27 @@ export default function CheckListRevision({
     }));
   };
 
-  const handleSubmit = () => {
-    checklist
-      ? updateChecklistMutation.mutate(state)
-      : createChecklistMutation.mutate({ state });
+  const handleSubmitChecklist = async () => {
+    if (
+      values.descripcion === "" ||
+      values.averia === "" ||
+      values.tipoGarantia === "" ||
+      values.estado_id === ""
+    ) {
+      enqueueSnackbar("Faltan datos obligatorios", { variant: "error" });
+      return;
+    }
+    if (checklist) {
+      updateChecklistMutation.mutate(state);
+      updateOrderMutation.mutate(values);
+    } else {
+      handleSubmit();
+      const { data: checklist_id } = await createChecklistMutation.mutateAsync({
+        state,
+      });
+
+      await createOrderMutation.mutateAsync({ ...values, checklist_id });
+    }
   };
 
   return (
@@ -157,15 +180,27 @@ export default function CheckListRevision({
       <FormHelperText sx={{ my: 1 }}>
         Revisar cuidadosamente antes de reparar
       </FormHelperText>
+
       <Button
-        onClick={handleSubmit}
-        fullWidth
+        onClick={handleSubmitChecklist}
         variant="contained"
+        disabled={
+          updateChecklistMutation.isLoading ||
+          createChecklistMutation?.isLoading
+        }
         color="primary"
-        sx={{ textTransform: "none", fontSize: "16px" }}
-        disabled={entregada}
+        endIcon={
+          createChecklistMutation?.isLoading ||
+          updateChecklistMutation.isLoading ? (
+            <CircularProgress size={"16px"} color="grey" />
+          ) : (
+            <SaveIcon />
+          )
+        }
       >
-        Guardar
+        {createChecklistMutation?.isLoading || updateChecklistMutation.isLoading
+          ? "Guardando..."
+          : "Guardar"}
       </Button>
     </FormControl>
   );

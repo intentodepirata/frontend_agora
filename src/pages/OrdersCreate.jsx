@@ -7,22 +7,23 @@ import FormDispositivo from "../components/FormDispositivo/FormDispositivo";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 import OrderStatusBar from "../components/OrderStatusBar/OrderStatusBar";
 import useScrollUp from "../hooks/useScrollUp";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addCustomer } from "../api/clientes";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import { addDevice } from "../api/devices";
-import { addOrder, updateOrder } from "../api/orders";
+import { addOrder, findOrder, updateOrder } from "../api/orders";
 import { addChecklist, updateChecklist } from "../api/checklist";
 const OrdersCreate = () => {
   const [step, setStep] = useState(-1);
   const [dispositivo_id, setDispositivo_id] = useState(null);
   const [cliente_id, setCliente_id] = useState(null);
-  const [checklist_id, setChecklist_id] = useState(null);
+
   const [recepcionado, setRecepcionado] = useState(false);
   const [order, setOrder] = useState(null);
-  const queryClient = useQueryClient();
+
   const { user } = useUserContext();
+
   useScrollUp();
 
   useEffect(() => {
@@ -31,6 +32,19 @@ const OrdersCreate = () => {
       setStep((currentStatus) => currentStatus + 1);
     }
   }, [dispositivo_id, cliente_id]);
+
+  const queryOrder = useQuery({
+    queryKey: ["order", order?.order.id],
+    queryFn: () => findOrder(order?.order.id, user.token),
+
+    onSuccess: (data) => {
+      setOrder(data.data);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+    enabled: Boolean(order?.order),
+  });
 
   const createCustomerMutation = useMutation({
     mutationFn: (values) => addCustomer(values, user.token),
@@ -60,12 +74,29 @@ const OrdersCreate = () => {
     },
   });
 
+  const updateOrderMutation = useMutation({
+    mutationFn: (values) => updateOrder(order?.order.id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Orden actualizada correctamente", {
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const createChecklistMutation = useMutation({
+    mutationFn: (values) => addChecklist(values, user.token),
+  });
+  const updateChecklistMutation = useMutation({
+    mutationFn: (values) =>
+      updateChecklist(order?.order.checklist_id, values, user.token),
+  });
+
   const createOrderMutation = useMutation({
     mutationFn: (values) =>
-      addOrder(
-        { ...values, cliente_id, dispositivo_id, checklist_id },
-        user.token
-      ),
+      addOrder({ ...values, cliente_id, dispositivo_id }, user.token),
     onSuccess: (data) => {
       setOrder(data.data);
       enqueueSnackbar("Orden creada correctamente", {
@@ -77,40 +108,6 @@ const OrdersCreate = () => {
         variant: "error",
       });
       console.error(error.message);
-    },
-  });
-
-  const updateOrderMutation = useMutation({
-    mutationFn: (values) => updateOrder(order?.order.id, values, user.token),
-    onSuccess: () => {
-      enqueueSnackbar("Orden actualizada correctamente", {
-        variant: "success",
-      });
-      queryClient.invalidateQueries(["order"]);
-    },
-    onError: (error) => {
-      console.error(error.message);
-    },
-  });
-
-  const createChecklistMutation = useMutation({
-    mutationFn: (values) => addChecklist(values, user.token),
-    onSuccess: (data) => {
-      setChecklist_id(data.data);
-      enqueueSnackbar("Checklist creado correctamente", {
-        variant: "success",
-      });
-      queryClient.invalidateQueries(["order"]);
-    },
-  });
-
-  const updateChecklistMutation = useMutation({
-    mutationFn: (values) => updateChecklist(checklist_id, values, user.token),
-    onSuccess: () => {
-      enqueueSnackbar("Checklist actualizado correctamente", {
-        variant: "success",
-      });
-      queryClient.invalidateQueries(["order"]);
     },
   });
 

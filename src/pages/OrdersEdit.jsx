@@ -56,7 +56,7 @@ const OrdersEdit = () => {
     },
   });
 
-  const queryOrder = useQuery({
+  useQuery({
     queryKey: ["order"],
     queryFn: () => findOrder(id, user.token),
 
@@ -68,6 +68,7 @@ const OrdersEdit = () => {
       console.error(error.message);
     },
   });
+  console.log(order);
 
   const updateOrderMutation = useMutation({
     mutationFn: (order) => updateOrder(id, order, user.token),
@@ -99,9 +100,6 @@ const OrdersEdit = () => {
     mutationFn: (values) =>
       updateChecklist(order?.order.checklist_id, values, user.token),
     onSuccess: () => {
-      enqueueSnackbar("Checklist actualizado correctamente", {
-        variant: "success",
-      });
       queryClient.invalidateQueries(["order"]);
     },
   });
@@ -178,7 +176,6 @@ const OrdersEdit = () => {
           </Button>
 
           <BotonNotificar cliente={cliente} />
-
           {!entregada && (
             <Button
               onClick={() => handleDeliver()}
@@ -192,7 +189,6 @@ const OrdersEdit = () => {
             </Button>
           )}
           <Button
-            // onClick={() => handlePrint()}
             onClick={handleMenuPrint}
             variant="contained"
             endIcon={<PrintIcon />}

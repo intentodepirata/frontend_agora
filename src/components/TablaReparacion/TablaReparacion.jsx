@@ -8,10 +8,10 @@ import {
   Select,
   Stack,
   Box,
+  CircularProgress,
 } from "@mui/material";
-import EditNoteIcon from "@mui/icons-material/EditNote";
+
 import DeleteIcon from "@mui/icons-material/Delete";
-import SaveIcon from "@mui/icons-material/Save";
 import { useState } from "react";
 import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
@@ -29,7 +29,7 @@ import { initialValues } from "./utils/initialValues";
 import { TablaReparacionSchema } from "./utils/TablaReparacionSchema";
 import HandleConfirmNotification from "../../ui/HandleConfirmNotification";
 
-const TablaReparacion = ({ order, handleSubmit, entregada }) => {
+const TablaReparacion = ({ order, entregada }) => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [componentes, setComponentes] = useState([]);
   const [rows, setRows] = useState([]);
@@ -83,7 +83,6 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
   });
 
   const {
-    isSubmitting,
     values,
     touched,
     errors,
@@ -104,10 +103,15 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
     setSelectionModel(newSelection);
   };
 
-  function handleEditar(id) {
-    console.log("editando", id[0]);
-  }
   const handleDelete = (id) => {
+    if (!selectionModel) {
+      enqueueSnackbar("No hay operaciones seleccionadas", {
+        variant: "info",
+        persist: true,
+      });
+      return;
+    }
+
     enqueueSnackbar("Desear eliminar la operacion?", {
       variant: "success",
       persist: true,
@@ -207,9 +211,13 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
           variant="contained"
           color="primary"
           type="submit"
-          disabled={entregada || isSubmitting}
+          disabled={entregada || createMutation.isLoading}
         >
-          Agregar
+          {createMutation.isLoading ? (
+            <CircularProgress size={"26px"} color="grey" />
+          ) : (
+            "Agregar"
+          )}
         </Button>
       </Box>
       <Box sx={{ mt: 2, height: "375px", width: "100%", minWidth: "400px" }}>
@@ -252,26 +260,16 @@ const TablaReparacion = ({ order, handleSubmit, entregada }) => {
           onClick={() => handleDelete(selectionModel)}
           color="error"
           variant="contained"
-          endIcon={<DeleteIcon />}
-          disabled={entregada}
+          disabled={entregada || deleteMutation.isLoading}
+          endIcon={
+            deleteMutation.isLoading ? (
+              <CircularProgress size={"14px"} color="grey" />
+            ) : (
+              <DeleteIcon />
+            )
+          }
         >
-          Eliminar
-        </Button>
-        <Button
-          onClick={() => handleEditar(selectionModel)}
-          variant="contained"
-          endIcon={<EditNoteIcon />}
-          disabled={entregada}
-        >
-          Editar
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          color="success"
-          endIcon={<SaveIcon />}
-        >
-          Guardar
+          Eliminar operación
         </Button>
       </Stack>
     </Box>

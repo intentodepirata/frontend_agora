@@ -11,5 +11,5 @@ export const FormOrderSchema = yup.object().shape({
     .min(5, "La descripción debe tener al menos 5 caracteres"),
   averia: yup.string().required("Campo requerido"),
   tipoGarantia: yup.string().required("Campo requerido"),
-  estado_id: yup.number().required("Campo requerido"),
+  estado_id: yup.string().required("Campo requerido"),
 });
