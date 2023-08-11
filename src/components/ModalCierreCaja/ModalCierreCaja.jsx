@@ -1,12 +1,8 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { useUserContext } from "../../contexts/UserContext";
-import { useState } from "react";
-import { Button, Divider, Stack, TextField } from "@mui/material";
+import { Button, Divider, TextField } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
-import { useNavigate } from "react-router-dom";
 import { style } from "./style/style";
 
 export default function ModalCierreCaja({
@@ -14,82 +10,18 @@ export default function ModalCierreCaja({
   handleModal,
   totalGastos,
   totalIngresos,
+  registroDiario,
+  setRegistroDiario,
+  handleConfirmarCaja,
   estadoCaja,
 }) {
-  const [gastoFinal, setGastoFinal] = useState("");
-  const [ingresoFinal, setIngresoFinal] = useState("");
-  const { user } = useUserContext();
-  const navigate = useNavigate();
-  const handleCierreCaja = async (snackbarId) => {
-    closeSnackbar(snackbarId);
-    if (gastoFinal === "" || ingresoFinal === "") {
-      enqueueSnackbar("Complete todos los campos", {
-        variant: "error",
-      });
-      return;
-    }
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}tesoreria`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + user.token,
-        },
-        body: JSON.stringify({
-          gastoFinal,
-          ingresoFinal,
-        }),
-      });
-
-      if (!response.ok) {
-        enqueueSnackbar("Solo puede cerrar una caja al dia", {
-          variant: "error",
-        });
-        throw new Error("Error al cerrar la caja");
-      }
-
-      enqueueSnackbar("Caja cerrada correctamente", {
-        variant: "success",
-      });
-      setGastoFinal("");
-      setIngresoFinal("");
-      localStorage.removeItem("totalGastos");
-      localStorage.removeItem("totalIngresos");
-      handleModal();
-      navigate("/home");
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-
-  const handleConfirmarCaja = () => {
-    enqueueSnackbar("Desear hacer el cierre de caja para hoy?", {
-      variant: "success",
-      persist: true,
-      action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => handleCierreCaja(snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
-      ),
+  const handleChange = (e) => {
+    setRegistroDiario({
+      ...registroDiario,
+      [e.target.name]: e.target.value,
     });
   };
+
   return (
     <div>
       <Modal
@@ -202,17 +134,19 @@ export default function ModalCierreCaja({
             <TextField
               id="gastoFinal"
               label="Total de gastos"
-              value={gastoFinal}
+              name="gastoFinal"
+              value={registroDiario.gastoFinal}
               type="number"
-              onChange={(e) => setGastoFinal(e.target.value)}
+              onChange={handleChange}
               size="small"
             />
             <TextField
               id="ingresoFinal"
               label="Total de ingresos"
-              value={ingresoFinal}
+              name="ingresoFinal"
+              value={registroDiario.ingresoFinal}
               type="number"
-              onChange={(e) => setIngresoFinal(e.target.value)}
+              onChange={handleChange}
               size="small"
             />
           </Box>

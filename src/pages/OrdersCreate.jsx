@@ -18,10 +18,8 @@ const OrdersCreate = () => {
   const [step, setStep] = useState(-1);
   const [dispositivo_id, setDispositivo_id] = useState(null);
   const [cliente_id, setCliente_id] = useState(null);
-
   const [recepcionado, setRecepcionado] = useState(false);
   const [order, setOrder] = useState(null);
-
   const { user } = useUserContext();
 
   useScrollUp();
@@ -69,9 +67,7 @@ const OrdersCreate = () => {
         variant: "success",
       });
     },
-    onError: (error) => {
-      console.error(error.message);
-    },
+    onError: (error) => console.error(error.message),
   });
 
   const updateOrderMutation = useMutation({
@@ -89,6 +85,7 @@ const OrdersCreate = () => {
   const createChecklistMutation = useMutation({
     mutationFn: (values) => addChecklist(values, user.token),
   });
+
   const updateChecklistMutation = useMutation({
     mutationFn: (values) =>
       updateChecklist(order?.order.checklist_id, values, user.token),

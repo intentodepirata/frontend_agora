@@ -11,18 +11,16 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormDispositivoSchema } from "./FormDispositivoSchema";
 import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
-import { enqueueSnackbar } from "notistack";
 import { useQuery } from "@tanstack/react-query";
 import { findBrandModels, getBrands } from "../../api/brands";
 
 const FormDispositivo = ({ createDeviceMutation }) => {
   const [marcas, setMarcas] = useState([]);
   const [modelos, setModelos] = useState([]);
-  const [guardado, setGuardado] = useState(false);
   const { user } = useUserContext();
 
   const {
@@ -37,34 +35,6 @@ const FormDispositivo = ({ createDeviceMutation }) => {
     initialValues,
     validationSchema: FormDispositivoSchema,
     onSubmit: async function (values, actions) {
-      // try {
-      //   const token = user.token;
-
-      //   const response = await fetch(
-      //     `${import.meta.env.VITE_API_URL}dispositivo/`,
-      //     {
-      //       method: "POST",
-      //       body: JSON.stringify(values),
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //         Authorization: `Bearer ${token}`,
-      //       },
-      //     }
-      //   );
-
-      //   const data = await response.json();
-      //   if (!response.ok) {
-      //     throw new Error(data.error);
-      //   }
-      //   enqueueSnackbar("Dispositivo Guardado Correctamente", {
-      //     variant: "success",
-      //   });
-      //   setDispositivo_id(data);
-      //   setGuardado(true);
-      //   actions.setSubmitting(false);
-      // } catch (error) {
-      //   throw new Error(error.message);
-      // }
       createDeviceMutation.mutate(values);
     },
   });
@@ -73,9 +43,7 @@ const FormDispositivo = ({ createDeviceMutation }) => {
     queryKey: ["brands"],
     queryFn: () => getBrands(user.token),
     onSuccess: (data) => setMarcas(data.data),
-    onError: (error) => {
-      console.error(error.message);
-    },
+    onError: (error) => console.error(error.message),
   });
 
   useQuery({
@@ -86,55 +54,9 @@ const FormDispositivo = ({ createDeviceMutation }) => {
       }
     },
     onSuccess: (data) => setModelos(data.data),
-    onError: (error) => {
-      console.error(error.message);
-    },
-    // Habilitar la llamada solo si values.marca tiene un valor
+    onError: (error) => console.error(error.message),
     enabled: Boolean(values.marca),
   });
-  // useEffect(() => {
-  //   const fetchMarcas = async () => {
-  //     try {
-  //       const response = await fetch(`${import.meta.env.VITE_API_URL}marca/`, {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${user.token}`,
-  //         },
-  //       });
-
-  //       const data = await response.json();
-  //       setMarcas(data);
-  //     } catch (error) {
-  //       console.error("Error al obtener las marcas:");
-  //     }
-  //   };
-  //   fetchMarcas();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchModelos = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${import.meta.env.VITE_API_URL}marca/modelo/${values.marca}`,
-  //         {
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             Authorization: `Bearer ${user.token}`,
-  //           },
-  //         }
-  //       );
-
-  //       const data = await response.json();
-  //       setModelos(data);
-  //     } catch (error) {
-  //       console.error("Error al obtener los Modelos:");
-  //     }
-  //   };
-
-  //   if (values.marca !== "") {
-  //     fetchModelos();
-  //   }
-  // }, [values.marca]);
 
   return (
     <Paper

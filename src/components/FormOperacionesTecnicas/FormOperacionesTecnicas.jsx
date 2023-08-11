@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getStates } from "../../api/states";
 import { FormOrderSchema } from "./utils/FormOrderSchema";
 import { useFormik } from "formik";
+import { initialState } from "../CheckListRevision/utils/initialState";
 
 const FormOperacionesTecnicas = ({
   order,
@@ -29,7 +30,7 @@ const FormOperacionesTecnicas = ({
   entregada,
 }) => {
   const [estados, setEstados] = useState([]);
-
+  const [stateChecklist, setStateChecklist] = useState(initialState);
   const { user } = useUserContext();
 
   useQuery({
@@ -42,12 +43,25 @@ const FormOperacionesTecnicas = ({
       console.log(error);
     },
   });
-
   const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
     useFormik({
       enableReinitialize: true,
       initialValues: order ? order.order : initialValues,
       validationSchema: FormOrderSchema,
+      onSubmit: async function (values) {
+        try {
+          if (order) {
+            updateChecklistMutation.mutate(stateChecklist);
+            updateOrderMutation.mutate(values);
+          } else {
+            const { data: checklist_id } =
+              await createChecklistMutation.mutateAsync({ stateChecklist });
+            await createOrderMutation.mutateAsync({ ...values, checklist_id });
+          }
+        } catch (error) {
+          console.error(error.message);
+        }
+      },
     });
 
   const getSelectedValue = (array, value, property) => {
@@ -260,14 +274,14 @@ const FormOperacionesTecnicas = ({
             </FormControl>
           </Box>
           <CheckListRevision
-            checklist={order?.checklist}
+            order={order}
             createChecklistMutation={createChecklistMutation}
             updateChecklistMutation={updateChecklistMutation}
-            handleSubmit={handleSubmit}
             entregada={entregada}
-            createOrderMutation={createOrderMutation}
-            updateOrderMutation={updateOrderMutation}
+            setStateChecklist={setStateChecklist}
+            stateChecklist={stateChecklist}
             values={values}
+            handleSubmit={handleSubmit}
           />
         </Paper>
         {/* <pre>{JSON.stringify(values, null, 2)}</pre>

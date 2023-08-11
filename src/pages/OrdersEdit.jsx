@@ -62,13 +62,12 @@ const OrdersEdit = () => {
 
     onSuccess: (data) => {
       setOrder(data.data);
-      data.data.entregada === 1 && setEntregada(true);
+      data.data.order.entregada === 1 && setEntregada(true);
     },
     onError: (error) => {
       console.error(error.message);
     },
   });
-  console.log(order);
 
   const updateOrderMutation = useMutation({
     mutationFn: (order) => updateOrder(id, order, user.token),

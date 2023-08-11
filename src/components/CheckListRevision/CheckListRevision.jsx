@@ -11,19 +11,17 @@ import { initialState } from "./utils/initialState";
 import { enqueueSnackbar } from "notistack";
 
 export default function CheckListRevision({
-  checklist,
+  order,
   createChecklistMutation,
   updateChecklistMutation,
-  handleSubmit,
   entregada,
-  createOrderMutation,
-  updateOrderMutation,
-  values,
+  setStateChecklist,
+  stateChecklist,
+  handleSubmit,
 }) {
-  const [state, setState] = useState(initialState);
-
   useEffect(() => {
-    if (checklist) {
+    if (order?.checklist) {
+      const { checklist } = order;
       const convertedChecklist = {};
       //Cambiar el estado de todos los checkbox a boolean
       for (const key in checklist) {
@@ -33,38 +31,15 @@ export default function CheckListRevision({
         }
       }
 
-      setState(convertedChecklist);
+      setStateChecklist(convertedChecklist);
     }
-  }, [checklist]);
+  }, [order?.checklist]);
 
   const handleChange = (event) => {
-    setState((prevState) => ({
+    setStateChecklist((prevState) => ({
       ...prevState,
       [event.target.name]: event.target.checked,
     }));
-  };
-
-  const handleSubmitChecklist = async () => {
-    if (
-      values.descripcion === "" ||
-      values.averia === "" ||
-      values.tipoGarantia === "" ||
-      values.estado_id === ""
-    ) {
-      enqueueSnackbar("Faltan datos obligatorios", { variant: "error" });
-      return;
-    }
-    if (checklist) {
-      updateChecklistMutation.mutate(state);
-      updateOrderMutation.mutate(values);
-    } else {
-      handleSubmit();
-      const { data: checklist_id } = await createChecklistMutation.mutateAsync({
-        state,
-      });
-
-      await createOrderMutation.mutateAsync({ ...values, checklist_id });
-    }
   };
 
   return (
@@ -80,7 +55,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.encendido}
+              checked={stateChecklist.encendido}
               onChange={handleChange}
               name="encendido"
               disabled={entregada}
@@ -91,7 +66,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.cobertura}
+              checked={stateChecklist.cobertura}
               onChange={handleChange}
               name="cobertura"
               disabled={entregada}
@@ -102,7 +77,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.pantalla}
+              checked={stateChecklist.pantalla}
               onChange={handleChange}
               name="pantalla"
               disabled={entregada}
@@ -113,7 +88,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.tapa}
+              checked={stateChecklist.tapa}
               onChange={handleChange}
               name="tapa"
               disabled={entregada}
@@ -124,7 +99,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.camaras}
+              checked={stateChecklist.camaras}
               onChange={handleChange}
               name="camaras"
               disabled={entregada}
@@ -135,7 +110,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.sonido}
+              checked={stateChecklist.sonido}
               onChange={handleChange}
               name="sonido"
               disabled={entregada}
@@ -146,7 +121,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.carga}
+              checked={stateChecklist.carga}
               onChange={handleChange}
               name="carga"
               disabled={entregada}
@@ -157,7 +132,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.microfono}
+              checked={stateChecklist.microfono}
               onChange={handleChange}
               name="microfono"
               disabled={entregada}
@@ -168,7 +143,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.huella}
+              checked={stateChecklist.huella}
               onChange={handleChange}
               name="huella"
               disabled={entregada}
@@ -182,23 +157,21 @@ export default function CheckListRevision({
       </FormHelperText>
 
       <Button
-        onClick={handleSubmitChecklist}
+        onClick={handleSubmit}
         variant="contained"
-        disabled={
-          updateChecklistMutation.isLoading ||
-          createChecklistMutation?.isLoading
-        }
+        disabled={entregada}
         color="primary"
         endIcon={
           createChecklistMutation?.isLoading ||
-          updateChecklistMutation.isLoading ? (
-            <CircularProgress size={"16px"} color="grey" />
+          updateChecklistMutation?.isLoading ? (
+            <CircularProgress size={"10px"} color="grey" />
           ) : (
-            <SaveIcon />
+            <SaveIcon size="10px" />
           )
         }
       >
-        {createChecklistMutation?.isLoading || updateChecklistMutation.isLoading
+        {createChecklistMutation?.isLoading ||
+        updateChecklistMutation?.isLoading
           ? "Guardando..."
           : "Guardar"}
       </Button>
