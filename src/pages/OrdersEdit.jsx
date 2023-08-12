@@ -76,6 +76,7 @@ const OrdersEdit = () => {
         variant: "success",
       });
       queryClient.invalidateQueries(["order"]);
+      queryClient.invalidateQueries(["print data"]);
     },
     onError: (error) => {
       console.error(error.message);

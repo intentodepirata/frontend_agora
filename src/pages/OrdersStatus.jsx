@@ -85,7 +85,7 @@ export default function OrdersStatus() {
                 }}
               >
                 <Typography fontWeight={"bold"} variant="h6" color="primary">
-                  OT00{order?.id}
+                  {order?.id && `OT00${order?.id}`}
                 </Typography>
                 <Typography variant="subtitle2" color="grey">
                   {fechaModificacion}

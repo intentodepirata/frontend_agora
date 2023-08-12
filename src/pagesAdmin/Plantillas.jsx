@@ -11,7 +11,7 @@ import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import useScrollUp from "../hooks/useScrollUp";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { enqueueSnackbar } from "notistack";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import { columnsChecklist } from "../components/TablaGenerica/utils/columnas";
@@ -52,11 +52,10 @@ const Plantillas = () => {
     onSuccess: (data) => {
       setPlantilla(data.data.politicas);
     },
+    enabled: user?.negocio !== undefined,
   });
 
-  const handleSubmit = () => {
-    fetchPlantilla();
-  };
+  const handleSubmit = () => {};
   return (
     <>
       <Box

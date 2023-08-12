@@ -45,6 +45,8 @@ const Negocio = () => {
       enqueueSnackbar(error.message, {
         variant: "error",
       }),
+
+    enabled: negocioId !== undefined,
   });
 
   const createBusinessMutation = useMutation({
