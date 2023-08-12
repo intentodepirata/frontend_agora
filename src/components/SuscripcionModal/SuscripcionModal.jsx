@@ -32,6 +32,7 @@ import {
   PayPalScriptProvider,
   usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
+import { useMutation } from "@tanstack/react-query";
 
 const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -138,12 +139,13 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
     return (
       <>
         {showSpinner && isPending && <div className="spinner" />}
+
         <PayPalButtons
           style={style}
           disabled={false}
           forceReRender={[userPlan.amount, currency, style]}
           fundingSource={undefined}
-          createOrder={(data, actions) => {
+          createOrder={async (data, actions) => {
             return actions.order
               .create({
                 purchase_units: [
@@ -156,14 +158,11 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
                 ],
               })
               .then((orderId) => {
-                // Your code here after create the order
                 return orderId;
               });
           }}
-          onApprove={function (data, actions) {
-            return actions.order.capture().then(function () {
-              // Your code here after capture the order
-            });
+          onApprove={async function (data, actions) {
+            return actions.order.capture().then(function () {});
           }}
         />
       </>

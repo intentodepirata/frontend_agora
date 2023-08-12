@@ -2,22 +2,65 @@ import { Box, Paper, Typography, Button, TextField } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
 import { useEffect, useState } from "react";
 import useScrollUp from "../hooks/useScrollUp";
+import { initialUserValues } from "./utils/initialValues";
+import { useMutation } from "@tanstack/react-query";
+import { updateUser } from "../api/users";
+import { enqueueSnackbar } from "notistack";
 
 const MisDatos = () => {
-  const [nombre, setNombre] = useState("");
-  const [correo, setCorreo] = useState("");
-  const [apellidos, setApellidos] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [fechaRegistro, setFechaRegistro] = useState("");
-  const { user } = useUserContext();
+  const [userValues, setUserValues] = useState(initialUserValues);
+  const [errors, setErrors] = useState(false);
+  const { user, login } = useUserContext();
   useScrollUp();
+
   useEffect(() => {
-    setNombre(user.nombre);
-    setCorreo(user.email);
-    setApellidos(user.apellidos);
-    setTelefono(user.telefono);
-    setFechaRegistro(user.fechaRegistro);
-  }, []);
+    setUserValues({
+      nombre: user.nombre,
+      email: user.email,
+      apellidos: user.apellidos,
+      telefono: user.telefono,
+      fechaRegistro: user.fechaRegistro,
+    });
+  }, [user]);
+
+  const handleChange = (e) => {
+    setErrors(false);
+    setUserValues({ ...userValues, [e.target.name]: e.target.value });
+  };
+
+  const updateMutaton = useMutation({
+    mutationFn: (values) => updateUser(values, user.token),
+    onSuccess: () => {
+      login({
+        ...user,
+        ...userValues,
+      });
+      enqueueSnackbar("Datos actualizados", {
+        variant: "success",
+      });
+    },
+    onError: (error) => console.error(error.message),
+  });
+
+  const handleSubmit = () => {
+    if (
+      userValues.nombre === "" ||
+      userValues.apellidos === "" ||
+      userValues.telefono === ""
+    ) {
+      setErrors(true);
+      enqueueSnackbar("Todos los campos son obligatorios", {
+        variant: "error",
+      });
+      return;
+    }
+
+    updateMutaton.mutate({
+      nombre: userValues.nombre,
+      apellidos: userValues.apellidos,
+      telefono: userValues.telefono,
+    });
+  };
   return (
     <>
       <Box
@@ -36,6 +79,7 @@ const MisDatos = () => {
           variant="contained"
           color="primary"
           sx={{ textTransform: "none", fontSize: "16px" }}
+          onClick={handleSubmit}
         >
           Guardar
         </Button>
@@ -57,45 +101,51 @@ const MisDatos = () => {
             fullWidth
             id="nombre"
             label="Nombre usuario"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            name="nombre"
+            value={userValues.nombre}
+            onChange={handleChange}
             size="small"
             sx={{ mr: 2 }}
+            error={errors}
           />
           <TextField
             fullWidth
             id="apellidos"
+            name="apellidos"
             label="Apellidos usuario"
-            value={apellidos}
-            onChange={(e) => setApellidos(e.target.value)}
+            value={userValues.apellidos}
+            onChange={handleChange}
             size="small"
+            error={errors}
           />
         </Box>
         <Box sx={{ display: "flex", mb: 2 }}>
           <TextField
             fullWidth
             id="telefono"
+            name="telefono"
             label="telefono usuario"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
+            value={userValues.telefono}
+            onChange={handleChange}
             size="small"
             sx={{ mr: 2 }}
+            error={errors}
           />
           <TextField
             fullWidth
             id="fechaRegistro"
             label="Fecha de registro"
-            value={fechaRegistro}
-            onChange={(e) => setFechaRegistro(e.target.value)}
+            value={userValues.fechaRegistro}
             size="small"
+            disabled
           />
         </Box>
         <TextField
           fullWidth
           id="correo"
           label="Correo usuario"
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
+          name="correo"
+          value={userValues.email}
           size="small"
           disabled
         />

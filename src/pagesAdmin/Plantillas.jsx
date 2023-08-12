@@ -15,6 +15,8 @@ import { useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import { columnsChecklist } from "../components/TablaGenerica/utils/columnas";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { findBusiness, updateBusinessPolicy } from "../api/business";
 
 const Plantillas = () => {
   const [selectionModel, setSelectionModel] = useState(null);
@@ -24,55 +26,36 @@ const Plantillas = () => {
   const [plantilla, setPlantilla] = useState("");
   const [cargando, setCargando] = useState(false);
   useScrollUp();
-  const { user } = useUserContext();
-  const handleSubmit = () => {
-    fetchPlantilla();
-  };
+  const { user, login } = useUserContext();
 
-  const fetchPlantilla = async () => {
-    try {
-      const url = `${import.meta.env.VITE_API_URL}negocios/policy/${user.id}`;
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + user.token,
+  const queryClient = useQueryClient();
+  const updatePlantilla = useMutation({
+    mutationFn: (values) => updateBusinessPolicy(values, user.token),
+    onSuccess: () => {
+      login({
+        ...user,
+        negocio: {
+          ...user.negocio,
+          politicas: plantilla,
         },
-        body: JSON.stringify({ plantilla }),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error("Error al guardar la plantilla");
-      }
-      setPlantilla(data.politicas);
-      enqueueSnackbar("La plantilla ha sido guardada", {
+      enqueueSnackbar("La plantilla ha sido actualizada", {
         variant: "success",
       });
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
-  useEffect(() => {
-    getPlantilla();
-  }, []);
-  const getPlantilla = async () => {
-    try {
-      const url = `${import.meta.env.VITE_API_URL}negocios/user/${user.id}`;
-      const response = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + user.token,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error("Error al 0btener la plantilla");
-      }
+      queryClient.invalidateQueries(["Plantilla"]);
+    },
+  });
 
-      setPlantilla(data.politicas);
-    } catch (error) {
-      console.error(error.message);
-    }
+  useQuery({
+    queryKey: ["Plantilla"],
+    queryFn: () => findBusiness(user.token),
+    onSuccess: (data) => {
+      setPlantilla(data.data.politicas);
+    },
+  });
+
+  const handleSubmit = () => {
+    fetchPlantilla();
   };
   return (
     <>
@@ -92,7 +75,7 @@ const Plantillas = () => {
           variant="contained"
           color="primary"
           sx={{ textTransform: "none", fontSize: "16px" }}
-          onClick={handleSubmit}
+          onClick={() => updatePlantilla.mutate({ plantilla })}
         >
           Guardar
         </Button>
