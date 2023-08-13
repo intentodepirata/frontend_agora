@@ -1,23 +1,26 @@
 import { Box, Typography, Button, Stack } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUserContext } from "../contexts/UserContext";
 import { Link, useNavigate } from "react-router-dom";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import useScrollUp from "../hooks/useScrollUp";
 import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import { columnsClientes } from "../components/TablaGenerica/utils/columnas";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import MenuClickDerechoGenerico from "../components/MenuClickDerechoGenerico/MenuClickDerechoGenerico";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteCustomer, getCustomers } from "../api/clientes";
 const Clientes = () => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [rows, setRows] = useState([]);
-  const [cargando, setCargando] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const [selectedRow, setSelectedRow] = useState();
   const { user } = useUserContext();
-  useScrollUp();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  useScrollUp();
 
   const handleClose = () => {
     setContextMenu(null);
@@ -31,34 +34,27 @@ const Clientes = () => {
     handleClose();
   }
 
-  useEffect(() => {
-    const fetchClientes = async () => {
-      try {
-        setCargando(true);
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}cliente/`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
+  const query = useQuery({
+    queryKey: ["customers"],
+    queryFn: () => getCustomers(user.token),
 
-        const data = await response.json();
-        if (data.length === 0) {
-          enqueueSnackbar("No hay clientes registrados", {
-            variant: "info",
-          });
-        }
-        setCargando(false);
-        setRows(data);
-      } catch (error) {
-        console.error("Error al obtener las ots:", error);
-      }
-    };
-    fetchClientes();
-  }, []);
+    onSuccess: (data) => setRows(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
+
+  const deleteCustomerMutation = useMutation({
+    mutationFn: (customerId) => deleteCustomer(customerId, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Cliente eliminado correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["customers"]);
+    },
+  });
 
   const handleDeleteClientes = (id) => {
     handleClose();
@@ -66,54 +62,15 @@ const Clientes = () => {
       variant: "success",
       persist: true,
       action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => handleEliminar(id, snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deleteCustomerMutation}
+        />
       ),
     });
   };
-  async function handleEliminar([id]) {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}clientes/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + user.token,
-          },
-        }
-      );
 
-      if (!response.ok) {
-        throw new Error("Error al eliminar el elemento");
-      }
-
-      enqueueSnackbar("Proveedor eliminado correctamente", {
-        variant: "success",
-      });
-      fetchClientes();
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
   return (
     <>
       <Box
@@ -134,7 +91,7 @@ const Clientes = () => {
           component={Link}
           to="/home/clientes/create"
         >
-          Crear cliente
+          Nuevo cliente
         </Button>
       </Box>
       <Typography textAlign={"center"} variant="h6" color="grey">
@@ -152,7 +109,7 @@ const Clientes = () => {
         <TablaGenerica
           columns={columnsClientes}
           rows={rows}
-          cargando={cargando}
+          cargando={query.isFetching}
           setSelectionModel={setSelectionModel}
           handleDoubleClickModelChange={handleDoubleClickModelChange}
           setSelectedRow={setSelectedRow}

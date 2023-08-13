@@ -1,6 +1,7 @@
 export const initialValues = {
   descripcion: "",
   observaciones: "",
-  estado: "",
-  averias: "",
+  averia: "",
+  tipoGarantia: "",
+  estado_id: "",
 };

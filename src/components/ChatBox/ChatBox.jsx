@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import ChatIcon from "@mui/icons-material/Chat";
 import EditIcon from "@mui/icons-material/Edit";
 import SendIcon from "@mui/icons-material/Send";
@@ -138,8 +137,6 @@ const ChatBox = () => {
           },
         }}
       >
-        {/* <Slide direction="left" in={openModal} mountOnEnter unmountOnExit> */}
-        {/* <Grow in={openModal} timeout={200} mountOnEnter unmountOnExit> */}
         <Fade in={openModal} timeout={200}>
           <Box
             bgcolor={"primary.main"}
@@ -248,8 +245,6 @@ const ChatBox = () => {
             </Box>
           </Box>
         </Fade>
-        {/* </Grow> */}
-        {/* </Slide> */}
       </Modal>
     </div>
   );

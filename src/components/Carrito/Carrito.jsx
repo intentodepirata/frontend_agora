@@ -1,8 +1,10 @@
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Box, Button } from "@mui/material";
 import ProveedoresModal from "../ProveedoresModal/ProveedoresModal";
 import { enqueueSnackbar } from "notistack";
+import { useQuery } from "@tanstack/react-query";
+import { getSuppliers } from "../../api/suppliers";
 
 const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -16,28 +18,16 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     setProveedorSeleccionado(null);
   };
 
-  useEffect(() => {
-    const obtenerProveedores = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}proveedores/`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-        setProveedores(data);
-      } catch (error) {
-        console.error("Error al obtener los proveedores:", error);
-      }
-    };
-
-    obtenerProveedores();
-  }, []);
+  useQuery({
+    queryKey: ["suppliers"],
+    queryFn: () => getSuppliers(user.token),
+    onSuccess: (data) => setProveedores(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
   const seleccionarProveedor = (proveedor) => {
     setProveedorSeleccionado(proveedor);
   };
@@ -58,21 +48,15 @@ const Carrito = ({ rowsCarrito, user, setRowsCarrito }) => {
     closeModal();
     window.open(enlace, "_blank");
     setRowsCarrito([]);
-    enqueueSnackbar("Pedido Realizado por WhatsApp", {
-      variant: "success",
-    });
   };
   const solicitarPorEmail = (proveedor) => {
     const email = encodeURIComponent(proveedor.email);
     const asunto = encodeURIComponent("Solicitud de pedido");
     const cuerpo = encodeURIComponent(generarMensajeCarrito());
     const url = `mailto:${email}?subject=${asunto}&body=${cuerpo}`;
-    window.open(url, "_blank");
+    window.open(url);
     setRowsCarrito([]);
     closeModal();
-    enqueueSnackbar("Pedido Realizado por Email", {
-      variant: "success",
-    });
   };
   return (
     <Box>

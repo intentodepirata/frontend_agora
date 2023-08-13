@@ -9,19 +9,22 @@ import { columns } from "./utils/columns";
 import CustomGridFooter from "../CustomGridFooter/CustomGridFooter";
 import { customLocaleText } from "../../traductions/customGridLocaleText";
 import MenuClickDerechoMain from "../MenuClickDerechoMain/MenuClickDerechoMain";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import {
   notificarPorEmail,
   notificarPorWhatsApp,
 } from "../BotonNotificar/utils/generarMensaje";
 import { useUserContext } from "../../contexts/UserContext";
+import { findOrderToPrint } from "../../api/orders";
+import HandleConfirmNotification from "../../ui/HandleConfirmNotification";
+import { dataGridStyles } from "./style/dataGridStyles";
 
 export default function TablaHome({
   rows,
   cargando,
   opcionesFiltro,
-  fetchEntregar,
-  fetchCliente,
+  deliverMutation,
+  deleteMutation,
 }) {
   const [selectionModel, setSelectionModel] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
@@ -59,114 +62,49 @@ export default function TablaHome({
 
   //Funciones para el menu del click derecho
   async function avisarWhatsApp() {
-    const cliente = await fetchCliente(selectedRow);
-    notificarPorWhatsApp(cliente, user);
+    const cliente = await findOrderToPrint(selectedRow, user.token);
+    notificarPorWhatsApp(cliente.data, user);
     handleClose();
   }
   async function avisarEmail() {
-    const cliente = await fetchCliente(selectedRow);
-    notificarPorEmail(cliente, user);
+    const cliente = await findOrderToPrint(selectedRow, user.token);
+    notificarPorEmail(cliente.data, user);
     handleClose();
   }
 
-  const handleEntregar = (id) => {
+  const handleDeliver = (id) => {
     handleClose();
     enqueueSnackbar("Desear entregar el terminal al Cliente?", {
       variant: "success",
       persist: true,
       action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => fetchEntregar(id, snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deliverMutation}
+        />
       ),
     });
   };
-  async function handleEliminarOts([id]) {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}ots/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + user.token,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al eliminar el elemento");
-      }
-
-      enqueueSnackbar("Proveedor eliminado correctamente", {
-        variant: "success",
-      });
-      // fetchOts();
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
-
-  const handleDeleteOts = (id) => {
+  const handleDelete = (id) => {
     handleClose();
-    enqueueSnackbar("Desear eliminar la OT?", {
+    enqueueSnackbar("Desear Eliminar la Orden?", {
       variant: "success",
       persist: true,
       action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => handleEliminarOts(id, snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deleteMutation}
+        />
       ),
     });
   };
+
   return (
     <Box sx={{ width: "100%", maxWidth: "1400px" }}>
       <DataGrid
-        sx={{
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#F3F4F6",
-          },
-          "& .css-t89xny-MuiDataGrid-columnHeaderTitle": {
-            fontWeight: 700,
-            color: "grey",
-          },
-          "& .MuiDataGrid-cell:hover": {
-            color: "primary.main",
-          },
-          height: 660,
-          mb: 2,
-        }}
+        sx={dataGridStyles}
         rows={rows}
         columns={columns}
         initialState={{
@@ -196,12 +134,12 @@ export default function TablaHome({
       <MenuClickDerechoMain
         contextMenu={contextMenu}
         handleClose={handleClose}
-        entregar={() => handleEntregar(selectedRow)}
+        entregar={() => handleDeliver(selectedRow)}
         avisarWhatsApp={avisarWhatsApp}
         avisarEmail={avisarEmail}
-        imprimir={() => handlePrint([selectedRow])}
+        imprimir={() => handlePrint(selectedRow)}
         editar={() => handleEditar([selectedRow])}
-        eliminar={() => handleDeleteOts([selectedRow])}
+        eliminar={() => handleDelete(selectedRow)}
       />
 
       <Stack
@@ -213,7 +151,7 @@ export default function TablaHome({
         spacing={2}
       >
         <Button
-          onClick={() => handleDeleteOts(selectionModel)}
+          onClick={() => handleDelete(selectionModel)}
           color="error"
           variant="contained"
           endIcon={<DeleteIcon />}

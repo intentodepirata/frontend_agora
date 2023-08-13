@@ -10,23 +10,17 @@ import { MuiFileInput } from "mui-file-input";
 import { useUserContext } from "../../contexts/UserContext";
 
 export default function FormNegocio({
-  nombre,
-  setNombre,
-  telefono,
-  setTelefono,
-  pais,
-  setPais,
-  precio,
-  setPrecio,
-  direccion,
-  setDireccion,
-  logo,
-  setLogo,
-  subirImagen,
-  logoUrl,
-  borrarImagen,
+  businessValues,
+  setBusinessValues,
+  logoData,
+  setLogoData,
+  deleteImageMutation,
+  handleImageUpload,
 }) {
   const { user } = useUserContext();
+  const handleChange = (e) => {
+    setBusinessValues({ ...businessValues, [e.target.name]: e.target.value });
+  };
 
   return (
     <>
@@ -46,16 +40,18 @@ export default function FormNegocio({
             <TextField
               id="negocio"
               label="Nombre del negocio"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              name="nombre"
+              value={businessValues.nombre}
+              onChange={handleChange}
               size="small"
               sx={{ mr: 2, width: "50%" }}
             />
             <TextField
               id="telefono"
               label="Telefono"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
+              name="telefono"
+              value={businessValues.telefono}
+              onChange={handleChange}
               size="small"
               sx={{ width: "50%" }}
             />
@@ -64,16 +60,18 @@ export default function FormNegocio({
             <TextField
               id="pais"
               label="Pais"
-              value={pais}
-              onChange={(e) => setPais(e.target.value)}
+              name="pais"
+              value={businessValues.pais}
+              onChange={handleChange}
               size="small"
               sx={{ mr: 2, width: "50%" }}
             />
             <TextField
               id="precio"
               label="Precio/hora"
-              value={precio}
-              onChange={(e) => setPrecio(e.target.value)}
+              name="precioHora"
+              value={businessValues.precioHora}
+              onChange={handleChange}
               size="small"
               sx={{ width: "50%" }}
             />
@@ -82,8 +80,9 @@ export default function FormNegocio({
             fullWidth
             id="direccion"
             label="Direccion"
-            value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
+            name="direccion"
+            value={businessValues.direccion}
+            onChange={handleChange}
             multiline
             rows={2}
             variant="filled"
@@ -104,15 +103,15 @@ export default function FormNegocio({
           >
             <MuiFileInput
               size="small"
-              value={logo}
-              onChange={(imagen) => setLogo(imagen)}
+              value={logoData}
+              onChange={(imagen) => setLogoData(imagen)}
               placeholder="Imagen Logo"
             />
             <Stack direction="row" spacing={2}>
               <Button
                 variant="contained"
                 color="success"
-                onClick={() => subirImagen()}
+                onClick={handleImageUpload}
                 disabled={!user.negocio}
               >
                 Subir Logo
@@ -120,7 +119,7 @@ export default function FormNegocio({
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => borrarImagen()}
+                onClick={() => deleteImageMutation.mutate()}
                 disabled={!user.negocio}
               >
                 Eliminar Logo
@@ -130,7 +129,7 @@ export default function FormNegocio({
           <Box
             mt={2}
             component={"img"}
-            src={logoUrl}
+            src={businessValues.logo}
             width={"60%"}
             p={10}
             sx={{

@@ -2,70 +2,33 @@ import { Box, Paper, Typography, TextField, Button } from "@mui/material";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
 import { FormClientesSchema } from "./FormClientesSchema";
-import { useState } from "react";
-import { useUserContext } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
-import { enqueueSnackbar } from "notistack";
 
-const FormClientes = ({ setCliente_id, cliente }) => {
-  const { user } = useUserContext();
-  const [guardado, setGuardado] = useState(false);
-  const urlCompleta = window.location.href;
-
+const FormClientes = ({
+  createCustomerMutation,
+  updateCustomerMutation,
+  cliente,
+}) => {
   const navigate = useNavigate();
-  const {
-    isSubmitting,
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleSubmit,
-    handleBlur,
-  } = useFormik({
-    enableReinitialize: true,
-    initialValues: cliente ? cliente : initialValues,
-    validationSchema: FormClientesSchema,
-    onSubmit: async function (values, actions) {
-      try {
-        const token = user.token;
-        const url = cliente
-          ? `${import.meta.env.VITE_API_URL}cliente/${cliente.id}`
-          : `${import.meta.env.VITE_API_URL}cliente/`;
 
-        const response = await fetch(url, {
-          method: cliente ? "PUT" : "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
-
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      enableReinitialize: true,
+      initialValues: cliente ? cliente : initialValues,
+      validationSchema: FormClientesSchema,
+      onSubmit: async function (values, actions) {
         if (cliente) {
-          enqueueSnackbar("Cliente actualizado correctamente", {
-            variant: "info",
-          });
+          updateCustomerMutation?.mutate(values);
           actions.resetForm();
-          navigate("/home/clientes");
         } else {
-          enqueueSnackbar("Cliente Guardado Correctamente", {
-            variant: "success",
-          });
-          setGuardado(true);
-
-          urlCompleta === `${import.meta.env.VITE_URL}home/clientes/create` &&
+          createCustomerMutation?.mutate(values);
+          window.location.href ===
+            `${import.meta.env.VITE_URL}home/clientes/create` &&
             navigate("/home/clientes");
-          setCliente_id(data);
         }
-      } catch (error) {}
-      actions.setSubmitting(false);
-    },
-  });
+      },
+    });
+
   return (
     <>
       <Paper
@@ -78,13 +41,14 @@ const FormClientes = ({ setCliente_id, cliente }) => {
           flexDirection: "column",
           maxWidth: "1308px",
           margin: "auto",
+          width: "100%",
         }}
       >
         <Typography
           sx={{ textAlign: "left", mb: 1 }}
           fontWeight={"bold"}
           variant="h6"
-          color={guardado ? "primary" : "grey"}
+          color={createCustomerMutation?.isSuccess ? "primary" : "grey"}
         >
           Datos Cliente
         </Typography>
@@ -97,7 +61,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             name="dni"
             label="DNI"
             InputLabelProps={{ shrink: cliente?.dni && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.dni}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -110,7 +74,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             label="Nombre completo"
             name="nombre"
             InputLabelProps={{ shrink: cliente?.nombre && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.nombre}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -126,7 +90,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             autoComplete="email"
             label="Correo electronico"
             InputLabelProps={{ shrink: cliente?.email && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.email}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -139,7 +103,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             name="telefono"
             label="Telefono de contacto"
             InputLabelProps={{ shrink: cliente?.telefono && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.telefono}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -154,7 +118,7 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             name="direccion"
             label="Direccion completa"
             InputLabelProps={{ shrink: cliente?.direccion && true }}
-            disabled={guardado}
+            disabled={createCustomerMutation?.isSuccess}
             value={values.direccion}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -163,14 +127,18 @@ const FormClientes = ({ setCliente_id, cliente }) => {
             sx={{ width: "75%", mr: 2 }}
           />
           <Button
-            disabled={isSubmitting}
+            disabled={createCustomerMutation?.isSuccess}
             sx={{ width: "25%", textTransform: "none", height: "40px" }}
             variant="contained"
             color="primary"
             type="submit"
             size="small"
           >
-            {guardado ? "Cliente Guardado" : "Guardar Cliente"}
+            {createCustomerMutation?.isSuccess
+              ? "Cliente Guardado"
+              : cliente
+              ? "Actualizar"
+              : "Guardar Cliente"}
           </Button>
         </Box>
       </Paper>

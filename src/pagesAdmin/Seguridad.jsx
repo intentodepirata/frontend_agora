@@ -11,21 +11,16 @@ import {
 } from "@mui/material";
 import { useUserContext } from "../contexts/UserContext";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import * as yup from "yup";
+
 import { useFormik } from "formik";
 import { useState } from "react";
 import useScrollUp from "../hooks/useScrollUp";
-const initialValues = { password: "" };
-const passwordRules = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
-const passwordSchema = yup.object().shape({
-  password: yup
-    .string()
-    .matches(passwordRules, {
-      message:
-        "Debe contener un minimo de 5 caracteres, 1 mayuscula, 1 minuscula y 1 numero",
-    })
-    .required("Requerido"),
-});
+import { passwordSchema } from "./utils/passwordSchema";
+
+import { initialPasswordValues } from "./utils/initialValues";
+import { updateUserPassword } from "../api/users";
+import { useMutation } from "@tanstack/react-query";
+import { enqueueSnackbar } from "notistack";
 
 const Seguridad = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,44 +29,26 @@ const Seguridad = () => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-  const {
-    isSubmitting,
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleSubmit,
-    handleBlur,
-  } = useFormik({
-    initialValues,
-    validationSchema: passwordSchema,
-    onSubmit: async function (values, actions) {
-      // actions.setSubmitting(true);
-      // const response = await fetch(
-      //   `${import.meta.env.VITE_API_URL}user/login`,
-      //   {
-      //     method: "POST",
-      //     body: JSON.stringify(values),
-      //     headers: { "Content-Type": "application/json" },
-      //   }
-      // );
-      // const data = await response.json();
-      // if (response.status !== 200) {
-      //   enqueueSnackbar(`${data}`, {
-      //     variant: "error",
-      //   });
-      // } else {
-      //   login(data);
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      initialValues: initialPasswordValues,
+      validationSchema: passwordSchema,
+      onSubmit: async function (values, actions) {
+        updateMutation.mutate(values);
+        actions.resetForm();
+      },
+    });
 
-      //   navigate("/home");
-      //   actions.resetForm();
-      //   enqueueSnackbar(`Bienvenido ${data.nombre} ${data.apellidos}`, {
-      //     variant: "success",
-      //   });
-      // }
-      actions.setSubmitting(false);
+  const updateMutation = useMutation({
+    mutationFn: (values) => updateUserPassword(values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Datos actualizados", {
+        variant: "success",
+      });
     },
+    onError: (error) => console.error(error.message),
   });
+
   useScrollUp();
   return (
     <>
@@ -91,6 +68,7 @@ const Seguridad = () => {
           variant="contained"
           color="primary"
           sx={{ textTransform: "none", fontSize: "16px" }}
+          onClick={handleSubmit}
         >
           Guardar
         </Button>

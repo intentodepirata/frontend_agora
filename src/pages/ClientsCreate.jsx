@@ -3,9 +3,27 @@ import { Link } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormClientes from "../components/FormClientes/FormClientes";
 import useScrollUp from "../hooks/useScrollUp";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addCustomer } from "../api/clientes";
+import { useUserContext } from "../contexts/UserContext";
+import { enqueueSnackbar } from "notistack";
 
 const ClientsCreate = () => {
+  const { user } = useUserContext();
+  const queryClient = useQueryClient();
   useScrollUp();
+
+  const createCustomerMutation = useMutation({
+    mutationFn: (values) => addCustomer(values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Cliente creado correctamente", {
+        variant: "success",
+      });
+
+      queryClient.invalidateQueries(["customers"]);
+    },
+  });
+
   return (
     <Box
       component="section"
@@ -46,7 +64,7 @@ const ClientsCreate = () => {
       </Box>
 
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormClientes />
+        <FormClientes createCustomerMutation={createCustomerMutation} />
       </Box>
     </Box>
   );

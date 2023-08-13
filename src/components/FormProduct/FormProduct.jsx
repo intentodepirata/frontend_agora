@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormProductSchema } from "./FormProductSchema";
 import { useFormik } from "formik";
 import {
@@ -14,15 +14,14 @@ import {
   Typography,
 } from "@mui/material";
 import { useUserContext } from "../../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
 import { initialValues } from "./utils/initialValues";
-import { enqueueSnackbar } from "notistack";
+import { findBrandModels, getBrands } from "../../api/brands";
+import { useQuery } from "@tanstack/react-query";
 
-const FormProduct = ({ producto }) => {
+const FormProduct = ({ producto, createMutation, updateMutation }) => {
   const [marcas, setMarcas] = useState([]);
   const [modelos, setModelos] = useState([]);
   const { user } = useUserContext();
-  const navigate = useNavigate();
 
   const {
     isSubmitting,
@@ -37,86 +36,34 @@ const FormProduct = ({ producto }) => {
     initialValues: producto ? producto : initialValues,
     validationSchema: FormProductSchema,
     onSubmit: async function (values, actions) {
-      const token = user.token;
-      const url = producto
-        ? `${import.meta.env.VITE_API_URL}componente/${producto.id}`
-        : `${import.meta.env.VITE_API_URL}componente/`;
-
-      try {
-        const response = await fetch(url, {
-          method: producto ? "PUT" : "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
-
-        if (producto) {
-          enqueueSnackbar("Producto Actualizado Correctamente", {
-            variant: "success",
-          });
-          actions.resetForm();
-          navigate("/home/products");
-        } else {
-          enqueueSnackbar("Producto Guardado Correctamente", {
-            variant: "success",
-          });
-          actions.resetForm();
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
+      producto ? updateMutation.mutate(values) : createMutation.mutate(values);
+      actions.resetForm();
     },
   });
 
-  useEffect(() => {
-    const fetchMarcas = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}marca/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
+  useQuery({
+    queryKey: ["brands"],
+    queryFn: () => getBrands(user.token),
+    onSuccess: (data) => setMarcas(data.data),
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
-        const data = await response.json();
-        setMarcas(data);
-      } catch (error) {
-        console.error("Error al obtener las marcas:");
+  useQuery({
+    queryKey: ["models", values.marca],
+    queryFn: () => {
+      if (values.marca) {
+        return findBrandModels(values.marca, user.token);
       }
-    };
-
-    const fetchModelos = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}marca/modelo/${values.marca}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-        setModelos(data);
-      } catch (error) {
-        console.error("Error al obtener los Modelos:");
-      }
-    };
-
-    fetchMarcas();
-
-    if (values.marca !== "") {
-      fetchModelos();
-    }
-  }, [user.token, values.marca]);
+    },
+    onSuccess: (data) => setModelos(data.data),
+    onError: (error) => {
+      console.error(error.message);
+    },
+    // Habilitar la llamada solo si values.marca tiene un valor
+    enabled: Boolean(values.marca),
+  });
 
   const getSelectedValue = (array, value, property) => {
     return array.find((item) => item.id === value)?.[property] || "";
@@ -133,6 +80,7 @@ const FormProduct = ({ producto }) => {
         flexDirection: "column",
         maxWidth: "1308px",
         margin: "auto",
+        width: "100%",
       }}
     >
       <Box sx={{ mb: 2 }}>
@@ -272,11 +220,13 @@ const FormProduct = ({ producto }) => {
           type="submit"
           fullWidth
         >
-          {isSubmitting ? "Guardando" : "Guardar Producto"}
+          {isSubmitting
+            ? "Guardando"
+            : producto
+            ? "Actualizar"
+            : "Guardar Producto"}
         </Button>
       </Box>
-      {/* <pre>{JSON.stringify(producto, null, 2)}</pre>
-      <pre>{JSON.stringify(values, null, 2)}</pre> */}
     </Paper>
   );
 };

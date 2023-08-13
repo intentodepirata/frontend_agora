@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link } from "react-router-dom";
@@ -7,29 +7,106 @@ import FormDispositivo from "../components/FormDispositivo/FormDispositivo";
 import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormOperacionesTecnicas";
 import OrderStatusBar from "../components/OrderStatusBar/OrderStatusBar";
 import useScrollUp from "../hooks/useScrollUp";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { addCustomer } from "../api/clientes";
+import { enqueueSnackbar } from "notistack";
+import { useUserContext } from "../contexts/UserContext";
+import { addDevice } from "../api/devices";
+import { addOrder, findOrder, updateOrder } from "../api/orders";
+import { addChecklist, updateChecklist } from "../api/checklist";
 const OrdersCreate = () => {
-  const [cliente_id, setCliente_id] = useState(null);
-  const [estado, setEstado] = useState(-1);
+  const [step, setStep] = useState(-1);
   const [dispositivo_id, setDispositivo_id] = useState(null);
+  const [cliente_id, setCliente_id] = useState(null);
   const [recepcionado, setRecepcionado] = useState(false);
+  const [order, setOrder] = useState(null);
+  const { user } = useUserContext();
+
   useScrollUp();
-  useEffect(() => {
-    if (cliente_id) {
-      setEstado((currentStatus) => currentStatus + 1);
-    }
-  }, [cliente_id]);
-  useEffect(() => {
-    if (dispositivo_id) {
-      setEstado((currentStatus) => currentStatus + 1);
-    }
-  }, [dispositivo_id]);
 
   useEffect(() => {
     if (cliente_id && dispositivo_id) {
       setRecepcionado(true);
-      setEstado((currentStatus) => currentStatus + 1);
+      setStep((currentStatus) => currentStatus + 1);
     }
   }, [dispositivo_id, cliente_id]);
+
+  const queryOrder = useQuery({
+    queryKey: ["order", order?.order.id],
+    queryFn: () => findOrder(order?.order.id, user.token),
+
+    onSuccess: (data) => {
+      setOrder(data.data);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+    enabled: Boolean(order?.order),
+  });
+
+  const createCustomerMutation = useMutation({
+    mutationFn: (values) => addCustomer(values, user.token),
+    onSuccess: (data) => {
+      setStep(0);
+      setCliente_id(data.data);
+      enqueueSnackbar("Cliente agregado correctamente", {
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const createDeviceMutation = useMutation({
+    mutationFn: (values) => addDevice(values, user.token),
+    onSuccess: (data) => {
+      setStep(1);
+      setDispositivo_id(data.data);
+      enqueueSnackbar("Dispositivo agregado correctamente", {
+        variant: "success",
+      });
+    },
+    onError: (error) => console.error(error.message),
+  });
+
+  const updateOrderMutation = useMutation({
+    mutationFn: (values) => updateOrder(order?.order.id, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Orden actualizada correctamente", {
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const createChecklistMutation = useMutation({
+    mutationFn: (values) => addChecklist(values, user.token),
+  });
+
+  const updateChecklistMutation = useMutation({
+    mutationFn: (values) =>
+      updateChecklist(order?.order.checklist_id, values, user.token),
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: (values) =>
+      addOrder({ ...values, cliente_id, dispositivo_id }, user.token),
+    onSuccess: (data) => {
+      setOrder(data.data);
+      enqueueSnackbar("Orden creada correctamente", {
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      enqueueSnackbar("Falta completar el checklist", {
+        variant: "error",
+      });
+      console.error(error.message);
+    },
+  });
 
   return (
     <Box
@@ -61,30 +138,25 @@ const OrdersCreate = () => {
             Orden de trabajo
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ textTransform: "none", fontSize: "16px" }}
-        >
-          Guardar
-        </Button>
       </Box>
       <Box sx={{ px: 2, my: 2, maxWidth: "1308px", mx: "auto" }}>
-        <OrderStatusBar estado={estado} />
+        <OrderStatusBar estado={step} />
       </Box>
 
       <Box sx={{ py: 1, px: 2, my: 5 }}>
-        <FormClientes setCliente_id={setCliente_id} />
+        <FormClientes createCustomerMutation={createCustomerMutation} />
       </Box>
       <Box sx={{ py: 1, px: 2, my: 5 }}>
-        <FormDispositivo setDispositivo_id={setDispositivo_id} />
+        <FormDispositivo createDeviceMutation={createDeviceMutation} />
       </Box>
       {recepcionado && (
         <Box sx={{ py: 1, px: 2, mx: "auto", my: 5 }}>
           <FormOperacionesTecnicas
-            cliente_id={cliente_id}
-            dispositivo_id={dispositivo_id}
-            setEstado={setEstado}
+            order={order}
+            createOrderMutation={createOrderMutation}
+            updateOrderMutation={updateOrderMutation}
+            createChecklistMutation={createChecklistMutation}
+            updateChecklistMutation={updateChecklistMutation}
           />
         </Box>
       )}

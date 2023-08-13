@@ -3,71 +3,40 @@ import FormControl from "@mui/material/FormControl";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
+import SaveIcon from "@mui/icons-material/Save";
 import Switch from "@mui/material/Switch";
 import { useState, useEffect } from "react";
-import { Button } from "@mui/material";
-import { useUserContext } from "../../contexts/UserContext";
-import { enqueueSnackbar } from "notistack";
+import { Button, CircularProgress } from "@mui/material";
 import { initialState } from "./utils/initialState";
+import { enqueueSnackbar } from "notistack";
 
 export default function CheckListRevision({
-  checklist,
-  setChecklist_id,
-  dispositivo_id,
-  updatedDispositivo_id,
+  order,
+  createChecklistMutation,
+  updateChecklistMutation,
   entregada,
+  setStateChecklist,
+  stateChecklist,
+  handleSubmit,
 }) {
-  const [state, setState] = useState(initialState);
-
-  const { user } = useUserContext();
-
   useEffect(() => {
-    if (checklist) {
+    if (order?.checklist) {
+      const { checklist } = order;
       const convertedChecklist = {};
       //Cambiar el estado de todos los checkbox a boolean
       for (const key in checklist) {
-        convertedChecklist[key] = Boolean(checklist[key]);
-      }
-
-      setState(convertedChecklist);
-    }
-  }, [checklist]);
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const token = user.token;
-      const checklistWithDispositivoId = {
-        ...state,
-        dispositivo_id: updatedDispositivo_id || dispositivo_id,
-      };
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}checklist/`,
-        {
-          method: "POST",
-          body: JSON.stringify(checklistWithDispositivoId),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+        if (key !== "id") {
+          // Excluir la propiedad 'id'
+          convertedChecklist[key] = Boolean(checklist[key]);
         }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error);
       }
-      enqueueSnackbar("Checklist Guardado Correctamente", {
-        variant: "info",
-      });
-      setChecklist_id(data);
-    } catch (error) {
-      console.error(error);
+
+      setStateChecklist(convertedChecklist);
     }
-  };
+  }, [order?.checklist]);
 
   const handleChange = (event) => {
-    setState((prevState) => ({
+    setStateChecklist((prevState) => ({
       ...prevState,
       [event.target.name]: event.target.checked,
     }));
@@ -86,7 +55,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.encendido}
+              checked={stateChecklist.encendido}
               onChange={handleChange}
               name="encendido"
               disabled={entregada}
@@ -97,7 +66,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.cobertura}
+              checked={stateChecklist.cobertura}
               onChange={handleChange}
               name="cobertura"
               disabled={entregada}
@@ -108,7 +77,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.pantalla}
+              checked={stateChecklist.pantalla}
               onChange={handleChange}
               name="pantalla"
               disabled={entregada}
@@ -119,7 +88,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.tapa}
+              checked={stateChecklist.tapa}
               onChange={handleChange}
               name="tapa"
               disabled={entregada}
@@ -130,7 +99,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.camaras}
+              checked={stateChecklist.camaras}
               onChange={handleChange}
               name="camaras"
               disabled={entregada}
@@ -141,7 +110,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.sonido}
+              checked={stateChecklist.sonido}
               onChange={handleChange}
               name="sonido"
               disabled={entregada}
@@ -152,7 +121,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.carga}
+              checked={stateChecklist.carga}
               onChange={handleChange}
               name="carga"
               disabled={entregada}
@@ -163,7 +132,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.microfono}
+              checked={stateChecklist.microfono}
               onChange={handleChange}
               name="microfono"
               disabled={entregada}
@@ -174,7 +143,7 @@ export default function CheckListRevision({
         <FormControlLabel
           control={
             <Switch
-              checked={state.huella}
+              checked={stateChecklist.huella}
               onChange={handleChange}
               name="huella"
               disabled={entregada}
@@ -186,15 +155,25 @@ export default function CheckListRevision({
       <FormHelperText sx={{ my: 1 }}>
         Revisar cuidadosamente antes de reparar
       </FormHelperText>
+
       <Button
         onClick={handleSubmit}
-        fullWidth
         variant="contained"
-        color="primary"
-        sx={{ textTransform: "none", fontSize: "16px" }}
         disabled={entregada}
+        color="primary"
+        endIcon={
+          createChecklistMutation?.isLoading ||
+          updateChecklistMutation?.isLoading ? (
+            <CircularProgress size={"10px"} color="grey" />
+          ) : (
+            <SaveIcon size="10px" />
+          )
+        }
       >
-        Guardar
+        {createChecklistMutation?.isLoading ||
+        updateChecklistMutation?.isLoading
+          ? "Guardando..."
+          : "Guardar"}
       </Button>
     </FormControl>
   );

@@ -5,14 +5,22 @@ import MainWidget from "../components/MainWidget/MainWidget";
 import { useUserContext } from "../contexts/UserContext";
 import { closeSnackbar, enqueueSnackbar } from "notistack";
 import useScrollUp from "../hooks/useScrollUp";
+import {
+  deleteOrder,
+  getOrdersByTime,
+  getOrdersPriceByTime,
+  updateOrderDeliver,
+} from "../api/orders";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { TIME } from "../components/MainWidget/utils/constantes";
 
 const Home = () => {
   const [rows, setRows] = useState([]);
-  const [cargando, setCargando] = useState(false);
   const [opcionesFiltro, setOpcionesFiltro] = useState(null);
   const [filtroEstado, setFiltroEstado] = useState("");
   const [totalFacturado, setTotalFacturado] = useState(0);
-
+  const [time, setTime] = useState(TIME.MES);
+  const queryClient = useQueryClient();
   const { user } = useUserContext();
   useScrollUp();
 
@@ -29,99 +37,56 @@ const Home = () => {
     setOpcionesFiltro(opcionesFiltro);
   }, [filtroEstado]);
 
-  useEffect(() => {
-    fetchOtsByTime("mes");
-  }, []);
+  const queryOrdersHome = useQuery({
+    queryKey: ["orders-home", time],
+    queryFn: () => getOrdersByTime(time, user.token),
+    onSuccess: (data) => {
+      setRows(data.data);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
-  const fetchOtsByTime = async (time) => {
-    try {
-      setCargando(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/time/${time}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      const responseFacturado = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/total-price/${time}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      const dataFacturado = await responseFacturado.json();
-      const data = await response.json();
+  const queryOrdersPriceHome = useQuery({
+    queryKey: ["orders-total-price-home", time],
+    queryFn: () => getOrdersPriceByTime(time, user.token),
+    onSuccess: (data) => {
+      setTotalFacturado(data.data);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
-      if (data.length === 0) {
-        enqueueSnackbar(`No hay ots en la vista por ${time}`, {
-          variant: "info",
-        });
-      }
-
-      setRows(data);
-      setTotalFacturado(dataFacturado);
-      setCargando(false);
-    } catch (error) {
-      console.error(`Error al obtener las ots de ${time}:`, error);
-    }
-  };
-  const fetchCliente = async (id) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/print/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      return data;
-    } catch (error) {
-      console.error("Error al obtener al cliente");
-    }
-  };
-  const fetchEntregar = async (id, snackbarId) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/deliver/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!data) {
-        throw new Error("Error al entregar la Orden");
-      }
-
-      fetchOtsByTime("mes");
-      closeSnackbar(snackbarId);
+  const deliverMutation = useMutation({
+    mutationFn: (id) => updateOrderDeliver(id, user.token),
+    onSuccess: () => {
       enqueueSnackbar("Orden entregada correctamente", {
         variant: "success",
       });
-    } catch (error) {
-      closeSnackbar(snackbarId);
-      console.error("Error al entregar la Orden:");
-    }
-  };
+
+      queryClient.invalidateQueries(["orders-home", time]);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteOrder(id, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Orden eliminada correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["orders-home", time]);
+    },
+  });
 
   return (
     <>
       <MainWidget
         rows={rows}
-        fetchOtsByTime={fetchOtsByTime}
+        setTime={setTime}
         setFiltroEstado={setFiltroEstado}
         filtroEstado={filtroEstado}
         totalFacturado={totalFacturado}
@@ -129,10 +94,10 @@ const Home = () => {
       <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
         <TablaHome
           rows={rows}
-          cargando={cargando}
+          cargando={queryOrdersHome.isFetching}
           opcionesFiltro={opcionesFiltro}
-          fetchEntregar={fetchEntregar}
-          fetchCliente={fetchCliente}
+          deliverMutation={deliverMutation}
+          deleteMutation={deleteMutation}
         />
       </Box>
     </>

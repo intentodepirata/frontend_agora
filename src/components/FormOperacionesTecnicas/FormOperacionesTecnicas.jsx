@@ -7,220 +7,66 @@ import {
   FormControl,
   MenuItem,
   Select,
+  FormHelperText,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CheckListRevision from "../CheckListRevision/CheckListRevision";
 import TablaReparacion from "../TablaReparacion/TablaReparacion";
 import { nombreAverias } from "./utils/nombreAverias";
 import { useUserContext } from "../../contexts/UserContext";
-import { useParams } from "react-router-dom";
-import { enqueueSnackbar } from "notistack";
+import { initialValues } from "./utils/initialValues";
+import { useQuery } from "@tanstack/react-query";
+import { getStates } from "../../api/states";
+import { FormOrderSchema } from "./utils/FormOrderSchema";
+import { useFormik } from "formik";
+import { initialState } from "../CheckListRevision/utils/initialState";
 
 const FormOperacionesTecnicas = ({
-  cliente_id,
-  dispositivo_id,
-  fetchData,
-  setFetchData,
-  setEstado,
+  order,
+  createOrderMutation,
+  updateOrderMutation,
+  createChecklistMutation,
+  updateChecklistMutation,
   entregada,
 }) => {
-  const { id } = useParams();
-  const [averia, setAveria] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [observaciones, setObservaciones] = useState("");
-  const [estado_id, setEstado_id] = useState("");
-  const [checklist_id, setChecklist_id] = useState(undefined);
-  const [checklist, setChecklist] = useState(null);
   const [estados, setEstados] = useState([]);
-  const [tipoGarantia, setTipoGarantia] = useState("");
-  const [precio, setPrecio] = useState(0);
-  const [numeroOt, setNumeroOt] = useState(null);
-  const [updatedDispositivo_id, setUpdatedDispositivo_id] = useState(null);
-  const [updateCliente_id, setUpdateCliente_id] = useState(null);
-  const [ots_id, setOts_id] = useState(id || null);
+  const [stateChecklist, setStateChecklist] = useState(initialState);
   const { user } = useUserContext();
 
-  const fetchOt = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-
-      if (response.ok) {
-        const otData = await response.json();
-        setUpdateCliente_id(otData.cliente_id);
-        setAveria(otData.averia);
-        setDescripcion(otData.descripcion);
-        setObservaciones(otData.observaciones);
-        setEstado_id(otData.estado_id);
-        setChecklist_id(otData.checklist_id);
-        setTipoGarantia(otData.tipoGarantia);
-        setPrecio(otData.precio);
-        setUpdatedDispositivo_id(otData.dispositivo_id);
-      } else {
-        console.error("Error al obtener los datos de la OT:", response.status);
-      }
-    } catch (error) {
-      console.error("Error al obtener los datos de la OT:", error);
-    }
-  };
-  const fetchChecklist = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}checklist/${checklist_id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
+  useQuery({
+    queryKey: ["states"],
+    queryFn: () => getStates(user.token),
+    onSuccess: (data) => {
+      setEstados(data.data);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      enableReinitialize: true,
+      initialValues: order ? order.order : initialValues,
+      validationSchema: FormOrderSchema,
+      onSubmit: async function (values) {
+        try {
+          if (order) {
+            updateChecklistMutation.mutate(stateChecklist);
+            updateOrderMutation.mutate(values);
+          } else {
+            const { data: checklist_id } =
+              await createChecklistMutation.mutateAsync({ stateChecklist });
+            await createOrderMutation.mutateAsync({ ...values, checklist_id });
+          }
+        } catch (error) {
+          console.error(error.message);
         }
-      );
+      },
+    });
 
-      const data = await response.json();
-      if (!response.ok) {
-        console.error("Error al obtener el checklist:");
-        return;
-      }
-
-      setChecklist(data);
-    } catch (error) {
-      console.error("Error al obtener los estados:");
-    }
+  const getSelectedValue = (array, value, property) => {
+    return array.find((item) => item.id === value)?.[property] || "";
   };
-  const crearOt = async () => {
-    try {
-      const token = user.token;
-
-      const ot = {
-        averia,
-        descripcion,
-        observaciones,
-        tipoGarantia,
-        estado_id,
-        cliente_id: updateCliente_id ? updateCliente_id : cliente_id,
-        checklist_id,
-        dispositivo_id: updatedDispositivo_id
-          ? updatedDispositivo_id
-          : dispositivo_id,
-      };
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/`, {
-        method: "POST",
-        body: JSON.stringify(ot),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error);
-      }
-      if (response.status === 201) {
-        enqueueSnackbar("Datos Guardados Correctamente", {
-          variant: "success",
-        });
-        setOts_id(data);
-        setNumeroOt(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      fetchOt();
-    }
-  }, [id]);
-
-  useEffect(() => {
-    if (checklist_id !== undefined) {
-      fetchChecklist();
-    }
-  }, [checklist_id]);
-
-  // console.log(estadoId);
-  useEffect(() => {
-    const fetchEstados = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}estado/`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-
-        const data = await response.json();
-        setEstados(data);
-      } catch (error) {
-        console.error("Error al obtener los estados:", error);
-      }
-    };
-
-    fetchEstados();
-  }, []);
-
-  useEffect(() => {
-    if (
-      averia &&
-      cliente_id &&
-      estado_id &&
-      descripcion &&
-      checklist_id &&
-      dispositivo_id
-    ) {
-      console.log("hay ot");
-
-      if (!id) {
-        crearOt();
-      }
-    }
-  }, [
-    cliente_id,
-    dispositivo_id,
-    checklist_id,
-    tipoGarantia,
-    averia,
-    estado_id,
-    observaciones,
-    descripcion,
-  ]);
-
-  useEffect(() => {
-    if (fetchData) {
-      crearOt();
-      enqueueSnackbar("Datos Actualizados Correctamente", {
-        variant: "success",
-      });
-      setFetchData(false);
-    }
-  }, [fetchData]);
-  const handleEstado = (event) => {
-    setEstado_id(event.target.value);
-    if (setEstado) {
-      setEstado(event.target.value + 1);
-    }
-  };
-  const handleTipoGarantia = (event) => {
-    setTipoGarantia(event.target.value);
-  };
-
-  const handleObservaciones = (event) => {
-    setObservaciones(event.target.value);
-  };
-  const handleDescripcion = (event) => {
-    setDescripcion(event.target.value);
-  };
-
-  const handleAveria = (event) => {
-    setAveria(event.target.value);
-  };
-
   return (
     <Paper elevation={4} sx={{ p: 2, display: "flex", alignItems: "center" }}>
       <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
@@ -235,7 +81,7 @@ const FormOperacionesTecnicas = ({
         >
           <Box sx={{ display: "flex", alignItems: "end" }}>
             <Typography variant="h4" color="primary" fontWeight={"bold"}>
-              OT000{id || numeroOt}
+              {order ? `OT000${order?.order?.id}` : "Nueva Orden"}
             </Typography>
             {entregada ? (
               <Typography ml={2} variant="h6" color="primary">
@@ -244,7 +90,8 @@ const FormOperacionesTecnicas = ({
             ) : (
               <Typography ml={2} variant="h6" color="primary">
                 {estados &&
-                  estados.find((estado) => estado.id === estado_id)?.nombre}
+                  estados.find((estado) => estado.id === values.estado_id)
+                    ?.nombre}
               </Typography>
             )}
           </Box>
@@ -268,17 +115,23 @@ const FormOperacionesTecnicas = ({
               htmlFor="averia"
               sx={{ mb: 2, mt: 0.5, width: "100%" }}
             >
-              <InputLabel size="small" id="averia">
+              <InputLabel
+                error={touched.averia && Boolean(errors.averia)}
+                size="small"
+                id="averia"
+              >
                 Averia principal
               </InputLabel>
               <Select
                 label="Averia principal"
                 labelId="averia"
                 name="averia"
-                value={averia}
-                onChange={handleAveria}
+                value={values.averia}
+                onChange={handleChange}
+                onBlur={handleBlur}
                 size="small"
                 disabled={entregada}
+                error={touched.averia && Boolean(errors.averia)}
               >
                 <MenuItem value="">Seleccionar Averia</MenuItem>
                 {nombreAverias.map((name) => (
@@ -287,23 +140,38 @@ const FormOperacionesTecnicas = ({
                   </MenuItem>
                 ))}
               </Select>
+              {touched.averia && errors.averia && (
+                <FormHelperText
+                  error={touched.averia && Boolean(errors.averia)}
+                >
+                  {errors.averia}
+                </FormHelperText>
+              )}
             </FormControl>
             <TextField
               size="small"
               label="Descripcion"
-              value={descripcion}
-              onChange={handleDescripcion}
+              name="descripcion"
+              value={values.descripcion}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              helperText={touched.descripcion && errors.descripcion}
+              error={touched.descripcion && Boolean(errors.descripcion)}
               disabled={entregada}
             />
             <TextField
               sx={{ mt: 2 }}
+              name="observaciones"
               fullWidth
               label="Observaciones Tecnicas"
               multiline
               rows={2}
               variant="filled"
-              value={observaciones}
-              onChange={handleObservaciones}
+              value={values.observaciones}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              helperText={touched.observaciones && errors.observaciones}
+              error={touched.observaciones && Boolean(errors.observaciones)}
               disabled={entregada}
             />
           </Box>
@@ -318,14 +186,7 @@ const FormOperacionesTecnicas = ({
         >
           Operaciones Servicio Tecnico
         </Typography>
-        <TablaReparacion
-          ots_id={ots_id}
-          dispositivo_id={dispositivo_id}
-          updatedDispositivo_id={updatedDispositivo_id}
-          setPrecio={setPrecio}
-          entregada={entregada}
-          numeroOt={numeroOt}
-        />
+        <TablaReparacion order={order} entregada={entregada} />
       </Box>
       <Box sx={{ ml: 4 }}>
         <Paper elevation={4} sx={{ p: 2, mb: 2 }}>
@@ -340,7 +201,7 @@ const FormOperacionesTecnicas = ({
               Total a Facturar
             </Typography>
             <Typography variant="h6" color="initial">
-              {precio} €
+              {order ? `${order?.order.precio}€` : "0€"}
             </Typography>
           </Box>
         </Paper>
@@ -354,32 +215,46 @@ const FormOperacionesTecnicas = ({
               m: 2,
             }}
           >
-            <FormControl sx={{ m: 1, width: 220 }}>
+            <FormControl
+              error={touched.estado_id && Boolean(errors.estado_id)}
+              sx={{ m: 1, width: 220 }}
+            >
               <InputLabel id="estado">Estado</InputLabel>
               <Select
                 labelId="estado"
-                value={estado_id}
-                onChange={handleEstado}
+                value={getSelectedValue(estados, values.estado_id, "id")}
+                onChange={handleChange}
+                onBlur={handleBlur}
                 autoWidth
                 label="Estado"
-                name="estado"
+                name="estado_id"
                 disabled={entregada}
               >
+                <MenuItem value={""}>
+                  <em>Seleccione</em>
+                </MenuItem>
                 {estados?.map((estado) => (
                   <MenuItem key={estado.id} value={estado.id}>
                     {estado.nombre}
                   </MenuItem>
                 ))}
               </Select>
+              {touched.estado_id && errors.estado_id && (
+                <FormHelperText>{errors.estado_id}</FormHelperText>
+              )}
             </FormControl>
-            <FormControl sx={{ m: 1, width: 220 }}>
-              <InputLabel id="tipoGarantia">Garantia</InputLabel>
+            <FormControl
+              error={touched.tipoGarantia && Boolean(errors.tipoGarantia)}
+              sx={{ m: 1, width: 220 }}
+            >
+              <InputLabel id="tipoGarantia">Tipo de Garantia</InputLabel>
               <Select
                 labelId="tipoGarantia"
-                value={tipoGarantia}
-                onChange={handleTipoGarantia}
+                value={values.tipoGarantia}
+                onChange={handleChange}
+                onBlur={handleBlur}
                 autoWidth
-                label="Garantia"
+                label="Tipo de Garantia"
                 name="tipoGarantia"
                 disabled={entregada}
               >
@@ -393,16 +268,24 @@ const FormOperacionesTecnicas = ({
                 <MenuItem value="Cortesia">Cortesia</MenuItem>
                 <MenuItem value="Irreparable">Irreparable</MenuItem>
               </Select>
+              {touched.tipoGarantia && errors.tipoGarantia && (
+                <FormHelperText>{errors.tipoGarantia}</FormHelperText>
+              )}
             </FormControl>
           </Box>
           <CheckListRevision
-            checklist={checklist}
-            setChecklist_id={setChecklist_id}
-            dispositivo_id={dispositivo_id}
-            updatedDispositivo_id={updatedDispositivo_id}
+            order={order}
+            createChecklistMutation={createChecklistMutation}
+            updateChecklistMutation={updateChecklistMutation}
             entregada={entregada}
+            setStateChecklist={setStateChecklist}
+            stateChecklist={stateChecklist}
+            values={values}
+            handleSubmit={handleSubmit}
           />
         </Paper>
+        {/* <pre>{JSON.stringify(values, null, 2)}</pre>
+        <pre>{JSON.stringify(errors, null, 2)}</pre> */}
       </Box>
     </Paper>
   );

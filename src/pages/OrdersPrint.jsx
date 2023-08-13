@@ -1,87 +1,50 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useUserContext } from "../contexts/UserContext";
-import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
+import { Box, Divider, Paper, Typography } from "@mui/material";
 import QRCode from "qrcode.react";
 import useScrollUp from "../hooks/useScrollUp";
 import dayjs from "dayjs";
+import { findOrderToPrint } from "../api/orders";
+import { useQuery } from "@tanstack/react-query";
+import { findOperations } from "../api/operations";
 
 export default function OrdersPrint() {
   const [order, setOrder] = useState(null);
   const [operaciones, setOperaciones] = useState([]);
-  const [precio, setPrecio] = useState(null);
   const { user } = useUserContext();
   const { id } = useParams();
+  const fecha = dayjs().format("DD/MM/YYYY HH:mm:ss");
   useScrollUp();
 
-  const fecha = dayjs().format("DD/MM/YYYY HH:mm:ss");
-  useEffect(() => {
-    const printFetch = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}ot/print/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        setOrder(data);
-      } catch (error) {
-        console.error("Error al obtener la Orden:", error);
-      }
-    };
-    const fetchOperacionesByOt = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}operacion/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setOperaciones(data);
-        } else {
-          console.error("Error al obtener las operaciones:", response.status);
-        }
-      } catch (error) {
-        console.error("Error al obtener las operaciones:", error);
-      }
-    };
-
-    const fetchPrecio = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}ot/price/${id}`
-        );
-
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
-        setPrecio(data);
-      } catch (error) {
-        console.error("Error al obtener los estados:", error);
-      }
-    };
-    fetchOperacionesByOt();
-    fetchPrecio();
-    printFetch();
-  }, []);
+  const queryPrint = useQuery({
+    queryKey: ["print", id],
+    queryFn: async () => {
+      const [printData, operacionesData] = await Promise.all([
+        findOrderToPrint(id, user.token),
+        findOperations(id, user.token),
+      ]);
+      return {
+        print: printData.data,
+        operaciones: operacionesData.data,
+      };
+    },
+    onSuccess: (data) => {
+      setOrder(data.print);
+      setOperaciones(data.operaciones);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
 
   useEffect(() => {
-    if (order) {
-      window.print();
+    if (queryPrint.isSuccess) {
+      setTimeout(() => {
+        window.print();
+      }, 1000);
     }
-  }, [order]);
+  }, [queryPrint.isSuccess]);
 
   function calculateIVA(precio) {
     return precio * 0.21;
@@ -399,21 +362,22 @@ export default function OrdersPrint() {
               variant="body2"
               border="1px solid lightgrey"
             >
-              {precio}€
+              {order?.precio}€
             </Typography>
             <Typography
               component="p"
               variant="body2"
               border="1px solid lightgrey"
             >
-              {calculateIVA(precio).toFixed(2)}€
+              {calculateIVA(order?.precio).toFixed(2)}€
             </Typography>
             <Typography
               component="p"
               variant="body2"
               border="1px solid lightgrey"
             >
-              {parseFloat(calculateTotalPriceWithIVA(precio)).toFixed(2)}€
+              {parseFloat(calculateTotalPriceWithIVA(order?.precio)).toFixed(2)}
+              €
             </Typography>
           </Box>
         </Box>

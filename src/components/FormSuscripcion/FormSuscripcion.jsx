@@ -7,10 +7,12 @@ import {
   Typography,
 } from "@mui/material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import SuscripcionModal from "../SuscripcionModal/SuscripcionModal";
 import { useUserContext } from "../../contexts/UserContext";
+import { getExpirationDate } from "../../api/users";
+import { useQuery } from "@tanstack/react-query";
 
 export default function FormSuscripcion() {
   const [fecha, setFecha] = useState("");
@@ -22,29 +24,14 @@ export default function FormSuscripcion() {
   const closeModal = () => {
     setModalAbierto(false);
   };
-  useEffect(() => {
-    const obtenerFechaDelServidor = async () => {
-      try {
-        const url = `${import.meta.env.VITE_API_URL}user/fecha/${user.id}`;
-        const response = await fetch(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + user.token,
-          },
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error("Error al obtener la fecha");
-        }
 
-        setFecha(data);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-
-    obtenerFechaDelServidor();
-  }, []);
+  useQuery({
+    queryKey: ["expirationDate"],
+    queryFn: () => getExpirationDate(user.id),
+    onSuccess: (data) => {
+      setFecha(data.data);
+    },
+  });
 
   return (
     <>
@@ -94,7 +81,6 @@ export default function FormSuscripcion() {
               disabled={true}
               type="date"
               value={fecha}
-              // onChange={(e) => setFecha(e.target.value)}
               sx={{ mr: 2, width: "50%", bgcolor: "grey.100" }}
               InputProps={{
                 startAdornment: (

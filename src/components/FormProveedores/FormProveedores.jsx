@@ -1,15 +1,9 @@
 import { useFormik } from "formik";
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import { useUserContext } from "../../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
 import { initialValues } from "./utils/initialValues";
 import { FormProveedoresSchema } from "./utils/FormProveedoresSchema";
-import { enqueueSnackbar } from "notistack";
 
-const FormProveedores = ({ proveedor }) => {
-  const { user } = useUserContext();
-  const navigate = useNavigate();
-
+const FormProveedores = ({ proveedor, createMutation, updateMutation }) => {
   const {
     isSubmitting,
     values,
@@ -23,46 +17,13 @@ const FormProveedores = ({ proveedor }) => {
     initialValues: proveedor ? proveedor : initialValues,
     validationSchema: FormProveedoresSchema,
     onSubmit: async function (values, actions) {
-      const token = user.token;
-      const url = proveedor
-        ? `${import.meta.env.VITE_API_URL}proveedores/${proveedor.id}`
-        : `${import.meta.env.VITE_API_URL}proveedores/`;
-
-      try {
-        const response = await fetch(url, {
-          method: proveedor ? "PUT" : "POST",
-          body: JSON.stringify(values),
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
-
-        if (proveedor) {
-          enqueueSnackbar("Proveedor actualizado correctamente", {
-            variant: "success",
-          });
-          actions.resetForm();
-          navigate("/home/suppliers");
-        } else {
-          enqueueSnackbar("Proveedor guardado correctamente", {
-            variant: "success",
-          });
-          actions.resetForm();
-          navigate("/home/suppliers");
-        }
-      } catch (error) {
-        enqueueSnackbar(error.message, {
-          variant: "error",
-        });
+      if (proveedor) {
+        updateMutation.mutate(values);
+        actions.resetForm();
+      } else {
+        createMutation.mutate(values);
+        actions.resetForm();
       }
-
-      actions.setSubmitting(false);
     },
   });
 
@@ -77,6 +38,7 @@ const FormProveedores = ({ proveedor }) => {
         flexDirection: "column",
         maxWidth: "1308px",
         margin: "auto",
+        width: "100%",
       }}
     >
       <Box sx={{ mb: 2 }}>
@@ -203,7 +165,11 @@ const FormProveedores = ({ proveedor }) => {
           type="submit"
           fullWidth
         >
-          {isSubmitting ? "Guardando" : "Guardar proveedor"}
+          {isSubmitting
+            ? "Guardando"
+            : proveedor
+            ? "Actualizar"
+            : "Guardar proveedor"}
         </Button>
       </Box>
     </Paper>

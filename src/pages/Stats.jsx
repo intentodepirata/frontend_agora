@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import GraficaGastos from "../components/GraficaGastos/GraficaGastos";
 import GraficaAverias from "../components/GraficaAverias/GraficaAverias";
 import useScrollUp from "../hooks/useScrollUp";
@@ -9,6 +9,9 @@ import { useUserContext } from "../contexts/UserContext";
 import GraficaGastosMaxMin from "../components/GraficaGastosMaxMin/GraficaGastosMaxMin";
 import GraficaTat from "../components/GraficaTat/GraficaTat";
 import { enqueueSnackbar } from "notistack";
+import { generateStats } from "../api/stats";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 export default function Stats() {
   const [gastosIngresos, setGastosIngresos] = useState(null);
   const [averias, setAverias] = useState(null);
@@ -32,38 +35,25 @@ export default function Stats() {
 
   useScrollUp();
 
-  const fetchStats = async (rangeDates) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}estadisticas`,
+  const statsMutation = useMutation({
+    mutationFn: (rangeDates) => generateStats(rangeDates, user.token),
+    onSuccess: (data) => {
+      setGastosIngresos(data.data.gastosIngresos);
+      setAverias(data.data.averias);
+      setTat(data.data.tatFinalizadas);
+    },
 
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-          body: JSON.stringify(rangeDates),
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error);
-      }
-      setGastosIngresos(data.gastosIngresos);
-      setAverias(data.averias);
-      setTat(data.tatFinalizadas);
-    } catch (error) {
-      enqueueSnackbar("No hay reapraciones en esa fecha", {
-        variant: "info",
+    onError: (error) => {
+      console.error(error.message);
+      enqueueSnackbar(error.message, {
+        variant: "error",
       });
-      console.error("Error al obtener las estadisticas", error);
-    }
-  };
+    },
+  });
 
   const handleShowStats = () => {
     setShowStats(true);
-    fetchStats(rangeDates);
+    statsMutation.mutate(rangeDates);
   };
   return (
     <>
@@ -106,7 +96,14 @@ export default function Stats() {
           sx={{ bgcolor: "#3D91FF" }}
           onClick={() => handleShowStats()}
         >
-          Ver estadisticas
+          {statsMutation.isLoading ? (
+            <>
+              Generando Estadísticas...
+              <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />
+            </>
+          ) : (
+            "Generar Estadísticas "
+          )}
         </Button>
       </Box>
       <Box
@@ -129,6 +126,7 @@ export default function Stats() {
             <Box
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", md: "row" },
                 justifyContent: "center",
                 alignItems: "center",
                 gap: 5,
@@ -148,8 +146,8 @@ export default function Stats() {
             <Box
               sx={{
                 mt: 2,
-
                 display: "flex",
+                flexDirection: { xs: "column", md: "row" },
                 justifyContent: "center",
                 alignItems: "center",
                 gap: 5,

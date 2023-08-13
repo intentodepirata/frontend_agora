@@ -16,6 +16,7 @@ export default function CustomGridFooter() {
           utf8WithBom: true,
         }}
       />
+
       <GridPagination />
     </GridToolbarContainer>
   );

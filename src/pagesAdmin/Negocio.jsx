@@ -4,172 +4,117 @@ import FormNegocio from "../components/FormNegocio/FormNegocio";
 import useScrollUp from "../hooks/useScrollUp";
 import { useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
+import {
+  addBusiness,
+  deleteImage,
+  findBusiness,
+  updateBusiness,
+} from "../api/business";
+import { initialBusinessValues } from "./utils/initialValues";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { uploadImage } from "../api/cloudinary";
 
 const Negocio = () => {
-  const [negocioId, setNegocioId] = useState(null);
-  const [nombre, setNombre] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [pais, setPais] = useState("");
-  const [precio, setPrecio] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [logo, setLogo] = useState(null);
-  const [logoUrl, setLogoUrl] = useState("");
   const { user, login } = useUserContext();
+  const [negocioId, setNegocioId] = useState(null || user?.negocio?.id);
+  const [logoData, setLogoData] = useState(null);
+  const [businessValues, setBusinessValues] = useState(initialBusinessValues);
+  const queryClient = useQueryClient();
   useScrollUp();
-  async function getNegocio() {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}negocios/user/${user.id}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      }
-    );
-    const data = await response.json();
 
-    // console.log(data);
-    if (!response.ok) {
-      enqueueSnackbar(data.error, { variant: "error" });
-      throw new Error(data.error);
-    }
-    setNombre(data.nombre);
-    setTelefono(data.telefono);
-    setPais(data.pais);
-    setPrecio(data.precioHora);
-    setDireccion(data.direccion);
-    setNegocioId(data.id);
-    setLogoUrl(data.logo);
-    login({
-      ...user,
-      negocio: {
-        ...user.negocio,
-        id: data.id,
-        nombre: data.nombre,
-        telefono: data.telefono,
-        pais: data.pais,
-        precioHora: data.precioHora,
-        direccion: data.direccion,
-        logo: data.logo,
-      },
-    });
-  }
-
-  useEffect(() => {
-    if (!negocioId) {
-      getNegocio();
-    }
-  }, [user]);
-
-  async function subirImagen() {
-    try {
-      const formData = new FormData();
-      formData.append("file", logo);
-      formData.append("upload_preset", "trgxzbtn");
-      const url = import.meta.env.VITE_CLOUDINARY_URL;
-
-      const responseCloudinary = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!responseCloudinary.ok) {
-        throw new Error("Error al subir la imagen a Cloudinary");
-      }
-
-      const cloudinaryData = await responseCloudinary.json();
-      const imageUrl = cloudinaryData.secure_url;
-
-      const urlLocal = `${
-        import.meta.env.VITE_API_URL
-      }negocios/image/${negocioId}`;
-
-      const response = await fetch(urlLocal, {
-        method: "PUT",
-        body: JSON.stringify({ logoUrl: imageUrl }),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
+  useQuery({
+    queryKey: ["Business"],
+    queryFn: () => findBusiness(user.token),
+    onSuccess: (data) => {
+      setBusinessValues(data.data);
+      login({
+        ...user,
+        negocio: {
+          ...user.negocio,
+          id: data.data.id,
+          nombre: data.data.nombre,
+          telefono: data.data.telefono,
+          pais: data.data.pais,
+          precioHora: data.data.precioHora,
+          direccion: data.data.direccion,
+          logo: data.data.logo,
         },
       });
-      const data = await response.json();
+    },
+    onError: (error) =>
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      }),
 
-      if (!response.ok) {
-        enqueueSnackbar(data.error, { variant: "error" });
-        throw new Error(data.error);
-      }
-      enqueueSnackbar("Imagen subida correctamente", {
+    enabled: negocioId !== undefined,
+  });
+
+  const createBusinessMutation = useMutation({
+    mutationFn: (values) => addBusiness(values, user.token),
+    onSuccess: (data) => {
+      setNegocioId(data.data);
+      enqueueSnackbar("Negocio agregado correctamente", {
         variant: "success",
       });
-      getNegocio();
+    },
+    onError: (error) => console.error(error.message),
+  });
 
-      // Aquí puedes realizar acciones adicionales con la URL de la imagen en Cloudinary
-      console.log("URL de la imagen en Cloudinary:", imageUrl);
+  const updateBusinessMutation = useMutation({
+    mutationFn: (values) => updateBusiness(negocioId, values, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Negocio Actualizado correctamente", {
+        variant: "success",
+      });
+    },
+    onError: (error) =>
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      }),
+  });
 
-      // La imagen se ha subido exitosamente a Cloudinary
+  const createImageMutation = useMutation({
+    mutationFn: uploadImage,
+    onSuccess: async (data) => {
+      const updatedValues = {
+        ...businessValues,
+        logo: data.data.secure_url,
+      };
+
+      await updateBusinessMutation.mutateAsync(updatedValues);
+      queryClient.invalidateQueries(["Business"]);
+    },
+  });
+
+  const handleImageUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", logoData);
+      formData.append("upload_preset", "trgxzbtn");
+
+      await createImageMutation.mutateAsync(formData);
     } catch (error) {
-      console.error("Error al subir la imagen:", error);
+      console.error(error.message);
     }
-  }
-  const postNegocio = async () => {
-    const negocio = {
-      nombre,
-      telefono,
-      pais,
-      precio,
-      direccion,
-    };
-    const url = negocioId
-      ? `${import.meta.env.VITE_API_URL}negocios/${negocioId}`
-      : `${import.meta.env.VITE_API_URL}negocios/${user.id}`;
-
-    const response = await fetch(url, {
-      method: negocioId ? "PUT" : "POST",
-      body: JSON.stringify(negocio),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-    });
-    const data = await response.json();
-
-    if (!response.ok) {
-      enqueueSnackbar(data.error, { variant: "error" });
-      throw new Error(data.error);
-    }
-    enqueueSnackbar("Datos actualizados correctamente", { variant: "success" });
-    getNegocio();
   };
 
   const handleSubmit = () => {
-    postNegocio();
+    negocioId
+      ? updateBusinessMutation.mutate(businessValues)
+      : createBusinessMutation.mutate(businessValues);
   };
-  async function borrarImagen() {
-    try {
-      const url = `${import.meta.env.VITE_API_URL}negocios/image/${negocioId}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
 
-      if (!response.ok) {
-        const data = await response.json();
-        enqueueSnackbar(data.error, { variant: "error" });
-        throw new Error(data.error);
-      }
-      getNegocio();
-
-      // La URL de la imagen ha sido borrada exitosamente
-      enqueueSnackbar("La imagen ha sido borrada ", {
+  const deleteImageMutation = useMutation({
+    mutationFn: () => deleteImage(negocioId, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Logo eliminado correctamente", {
         variant: "success",
       });
-    } catch (error) {
-      console.error("Error al borrar la URL de la imagen:", error);
-    }
-  }
+      queryClient.invalidateQueries(["Business"]);
+    },
+    onError: (error) => console.error(error.message),
+  });
+
   return (
     <>
       <Box
@@ -194,22 +139,12 @@ const Negocio = () => {
         </Button>
       </Box>
       <FormNegocio
-        nombre={nombre}
-        setNombre={setNombre}
-        telefono={telefono}
-        setTelefono={setTelefono}
-        pais={pais}
-        setPais={setPais}
-        precio={precio}
-        setPrecio={setPrecio}
-        direccion={direccion}
-        setDireccion={setDireccion}
-        postNegocio={postNegocio}
-        logo={logo}
-        setLogo={setLogo}
-        subirImagen={subirImagen}
-        logoUrl={logoUrl}
-        borrarImagen={borrarImagen}
+        businessValues={businessValues}
+        setBusinessValues={setBusinessValues}
+        logoData={logoData}
+        setLogoData={setLogoData}
+        deleteImageMutation={deleteImageMutation}
+        handleImageUpload={handleImageUpload}
       />
     </>
   );

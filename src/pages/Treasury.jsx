@@ -5,8 +5,14 @@ import useScrollUp from "../hooks/useScrollUp";
 import FormTesoreria from "../components/FormTesoreria/FormTesoreria";
 import ModalCierreCaja from "../components/ModalCierreCaja/ModalCierreCaja";
 import { useUserContext } from "../contexts/UserContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getStatus, postStatus } from "../api/treasury";
+import { enqueueSnackbar } from "notistack";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
+import { initialValues } from "../components/ModalCierreCaja/utils/initialValues";
 
 export default function Treasury() {
+  const [registroDiario, setRegistroDiario] = useState(initialValues);
   const [modal, setModal] = useState(false);
   const [totalGastos, setTotalGastos] = useState(
     JSON.parse(localStorage.getItem("totalGastos")) || []
@@ -14,8 +20,8 @@ export default function Treasury() {
   const [totalIngresos, setTotalIngresos] = useState(
     JSON.parse(localStorage.getItem("totalIngresos")) || []
   );
-  const [estadoCaja, setEstadoCaja] = useState(false);
-
+  const [estadoCaja, setEstadoCaja] = useState(null);
+  const queryClient = useQueryClient();
   useEffect(() => {
     localStorage.setItem("totalIngresos", JSON.stringify(totalIngresos));
     localStorage.setItem("totalGastos", JSON.stringify(totalGastos));
@@ -28,30 +34,64 @@ export default function Treasury() {
   const { user } = useUserContext();
   useScrollUp();
 
-  useEffect(() => {
-    fetchComprobarEstadoCaja();
-  }, []);
-  const fetchComprobarEstadoCaja = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}tesoreria/status`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + user.token,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error);
-      }
+  const queryTreasuryStatus = useQuery({
+    queryKey: ["queryTreasuryStatus"],
+    queryFn: () => getStatus(user.token),
+    onSuccess: (data) => setEstadoCaja(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
 
-      setEstadoCaja(true);
-    } catch (error) {
-      console.log(error);
+  const createMutation = useMutation({
+    mutationFn: () =>
+      postStatus(
+        {
+          ...registroDiario,
+        },
+        user.token
+      ),
+    onSuccess: () => {
+      enqueueSnackbar("Caja cerrada correctamente", {
+        variant: "success",
+      });
+      localStorage.removeItem("totalGastos");
+      localStorage.removeItem("totalIngresos");
+      handleModal();
+      queryClient.invalidateQueries(["queryTreasuryStatus"]);
+    },
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
+      });
+    },
+  });
+
+  const handleConfirmarCaja = (id) => {
+    if (
+      registroDiario.gastoFinal === "" ||
+      registroDiario.ingresoFinal === ""
+    ) {
+      enqueueSnackbar("Complete todos los campos", {
+        variant: "error",
+      });
+      return;
     }
+    enqueueSnackbar("Desear hacer el cierre de caja para hoy?", {
+      variant: "success",
+      persist: true,
+      action: (snackbarId) => (
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={createMutation}
+        />
+      ),
+    });
   };
+
   return (
     <Box
       component="section"
@@ -108,6 +148,9 @@ export default function Treasury() {
         handleModal={handleModal}
         totalGastos={totalGastos}
         totalIngresos={totalIngresos}
+        registroDiario={registroDiario}
+        setRegistroDiario={setRegistroDiario}
+        handleConfirmarCaja={handleConfirmarCaja}
         estadoCaja={estadoCaja}
       />
     </Box>

@@ -8,16 +8,22 @@ import { NotificationProvider } from "./ui/NotificationProvider.jsx";
 import "./main.css";
 import "@fontsource/outfit/";
 import App from "./App.jsx";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { queryClient } from "./tanstackquery/queryClient.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <NotificationProvider>
-          <CssBaseline />
-          <App />
-        </NotificationProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <NotificationProvider>
+            <CssBaseline />
+            <App />
+          </NotificationProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   </StrictMode>
 );

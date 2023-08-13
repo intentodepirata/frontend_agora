@@ -1,5 +1,14 @@
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PrintIcon from "@mui/icons-material/Print";
 import DoneAllRoundedIcon from "@mui/icons-material/DoneAllRounded";
@@ -8,124 +17,117 @@ import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormO
 import useScrollUp from "../hooks/useScrollUp";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 import DatosOrdenModal from "../components/DatosOrdenModal/DatosOrdenModal";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import BotonNotificar from "../components/BotonNotificar/BotonNotificar";
+import DescriptionIcon from "@mui/icons-material/Description";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  findOrder,
+  findOrderToPrint,
+  updateOrder,
+  updateOrderDeliver,
+} from "../api/orders";
+import HandleConfirmNotification from "../ui/HandleConfirmNotification";
+import { updateChecklist } from "../api/checklist";
+
 const OrdersEdit = () => {
-  const [fetchData, setFetchData] = useState(false);
   const [modal, setModal] = useState(false);
   const [entregada, setEntregada] = useState(false);
   const [cliente, setCliente] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const { id } = useParams();
   const { user } = useUserContext();
+  const queryClient = useQueryClient();
+
   useScrollUp();
 
-  useEffect(() => {
-    fetchCliente();
-    fetchIsEntregada();
-  }, [id, fetchData]);
+  const queryPrintData = useQuery({
+    queryKey: ["print data"],
+    queryFn: () => findOrderToPrint(id, user.token),
 
-  const fetchCliente = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/print/${id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      setCliente(data);
-      setFetchData(false);
-    } catch (error) {
-      console.error("Error al obtener al cliente");
-    }
-  };
-
-  const fetchIsEntregada = async () => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}ot/${id}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
+    onSuccess: (data) => setCliente(data.data),
+    onError: (error) => {
+      enqueueSnackbar(error.message, {
+        variant: "error",
       });
-      const data = await response.json();
-      if (data.entregada === 1) {
-        setEntregada(true);
-      }
-    } catch (error) {
-      console.error("Error al entregar la Orden:");
-    }
-  };
+    },
+  });
 
-  const fetchEntregar = async (snackbarId) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}ot/deliver/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (!data) {
-        throw new Error("Error al entregar la Orden");
-      }
+  useQuery({
+    queryKey: ["order"],
+    queryFn: () => findOrder(id, user.token),
 
-      setEntregada(true);
-      closeSnackbar(snackbarId);
+    onSuccess: (data) => {
+      setOrder(data.data);
+      data.data.order.entregada === 1 && setEntregada(true);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const updateOrderMutation = useMutation({
+    mutationFn: (order) => updateOrder(id, order, user.token),
+    onSuccess: () => {
+      enqueueSnackbar("Orden actualizada correctamente", {
+        variant: "success",
+      });
+      queryClient.invalidateQueries(["order"]);
+      queryClient.invalidateQueries(["print data"]);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+
+  const deliverMutation = useMutation({
+    mutationFn: () => updateOrderDeliver(id, user.token),
+    onSuccess: () => {
       enqueueSnackbar("Orden entregada correctamente", {
         variant: "success",
       });
-    } catch (error) {
-      closeSnackbar(snackbarId);
-      console.error("Error al entregar la Orden:");
-    }
-  };
-  const handleEntregar = () => {
+
+      queryClient.invalidateQueries(["order"]);
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+  });
+  const updateChecklistMutation = useMutation({
+    mutationFn: (values) =>
+      updateChecklist(order?.order.checklist_id, values, user.token),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["order"]);
+    },
+  });
+
+  const handleDeliver = (id) => {
     enqueueSnackbar("Desear entregar el terminal al Cliente?", {
       variant: "success",
       persist: true,
       action: (snackbarId) => (
-        <Stack direction="row" spacing={2}>
-          <Button
-            sx={{ textTransform: "none" }}
-            size="small"
-            variant="contained"
-            onClick={() => fetchEntregar(snackbarId)}
-            color="primary"
-          >
-            Confirmar
-          </Button>
-          <Button
-            sx={{ textTransform: "none" }}
-            variant="contained"
-            color="error"
-            size="small"
-            onClick={() => closeSnackbar(snackbarId)}
-          >
-            Cancelar
-          </Button>
-        </Stack>
+        <HandleConfirmNotification
+          id={id}
+          snackbarId={snackbarId}
+          fetch={deliverMutation}
+        />
       ),
     });
   };
-  const handleGuardar = () => {
-    setFetchData(true);
-  };
-  function handlePrint() {
-    window.open(`/print/${id}`);
-  }
+
   const handleModal = () => {
     setModal((value) => !value);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuPrint = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   return (
@@ -174,10 +176,9 @@ const OrdersEdit = () => {
           </Button>
 
           <BotonNotificar cliente={cliente} />
-
           {!entregada && (
             <Button
-              onClick={() => handleEntregar()}
+              onClick={() => handleDeliver()}
               variant="contained"
               endIcon={<DoneAllRoundedIcon />}
               color="success"
@@ -188,7 +189,7 @@ const OrdersEdit = () => {
             </Button>
           )}
           <Button
-            onClick={() => handlePrint()}
+            onClick={handleMenuPrint}
             variant="contained"
             endIcon={<PrintIcon />}
             color="success"
@@ -196,27 +197,77 @@ const OrdersEdit = () => {
           >
             Imprimir
           </Button>
-          <Button
-            onClick={handleGuardar}
-            variant="contained"
-            color="primary"
-            sx={{ textTransform: "none", fontSize: "16px" }}
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            sx={{ mt: 5 }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+            PaperProps={{
+              elevation: 0,
+              sx: {
+                overflow: "visible",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                mt: 1.5,
+                "& .MuiPaper-root": {
+                  width: 30,
+                  height: 30,
+                  ml: -0.5,
+                  mr: 1,
+                },
+                "&:before": {
+                  content: '""',
+                  display: "block",
+                  position: "absolute",
+                  top: 0,
+                  right: 14,
+                  width: 8,
+                  height: 10,
+                  bgcolor: "background.paper",
+                  transform: "translateY(-50%) rotate(45deg)",
+                  zIndex: 0,
+                },
+              },
+            }}
           >
-            Guardar Orden
-          </Button>
+            <MenuItem onClick={() => window.open(`/print/${id}`)}>
+              <ListItemIcon>
+                <DescriptionIcon fontSize="small" />
+              </ListItemIcon>
+              Factura
+            </MenuItem>
+
+            <MenuItem onClick={() => window.open(`/print-simple/${id}`)}>
+              <ListItemIcon>
+                <ConfirmationNumberIcon fontSize="small" />
+              </ListItemIcon>
+              Ticket
+            </MenuItem>
+          </Menu>
         </Stack>
       </Box>
       {modal && (
         <DatosOrdenModal modal={modal} handleModal={handleModal} id={id} />
       )}
 
-      <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-        <FormOperacionesTecnicas
-          fetchData={fetchData}
-          setFetchData={setFetchData}
-          entregada={entregada}
-        />
-      </Box>
+      {order && (
+        <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
+          <FormOperacionesTecnicas
+            order={order}
+            updateOrderMutation={updateOrderMutation}
+            updateChecklistMutation={updateChecklistMutation}
+            entregada={entregada}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

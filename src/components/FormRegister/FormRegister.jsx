@@ -16,17 +16,15 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FormRegisterSchema } from "./FormRegisterSchema";
 import { useFormik } from "formik";
 import { initialValues } from "./utils/initialValues";
-import { enqueueSnackbar } from "notistack";
 
-const FormRegister = () => {
+const FormRegister = ({ createUserMutation }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const navigate = useNavigate();
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -44,30 +42,8 @@ const FormRegister = () => {
     initialValues,
     validationSchema: FormRegisterSchema,
     onSubmit: async function (values, actions) {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}user/register`,
-          {
-            method: "POST",
-            body: JSON.stringify(values),
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error);
-        }
-
-        enqueueSnackbar(
-          `Usuario registrado con exito, Se ha enviado un email de 
-          confirmacion a su bandeja de entrada`,
-          { variant: "success", persist: true }
-        );
-        actions.resetForm();
-        navigate("/login");
-      } catch (error) {
-        enqueueSnackbar(error.message, { variant: "error" });
-      }
+      createUserMutation.mutate(values);
+      actions.resetForm();
     },
   });
 
