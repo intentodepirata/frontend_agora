@@ -85,7 +85,7 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}user/payments`,
+        `${import.meta.env.VITE_API_URL}user/payments/update`,
         {
           method: "PUT",
           headers: {
