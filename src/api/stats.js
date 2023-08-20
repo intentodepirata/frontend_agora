@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const statsApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}estadisticas`,
+  baseURL: `${import.meta.env.VITE_API_URL}orders`,
 });
 
 const createHeaders = (token) => {
@@ -9,4 +9,4 @@ const createHeaders = (token) => {
 };
 
 export const generateStats = (rangeDates, token) =>
-  statsApi.post("/", rangeDates, createHeaders(token));
+  statsApi.post("/stats", rangeDates, createHeaders(token));

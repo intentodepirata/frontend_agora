@@ -36,7 +36,31 @@ const Orders = () => {
   const queryOrders = useQuery({
     queryKey: ["orders"],
     queryFn: () => getOrders(user.token),
-    onSuccess: (data) => setRows(data.data),
+    onSuccess: (data) => {
+      console.log(data.data);
+      setRows(
+        data.data.map((order) => ({
+          id: order.id,
+          otNumber: order.otNumber,
+          brands: order.device.models.brands.nombre,
+          modelo: order.device.models.nombre,
+          imei: order.device.imei,
+          cliente: order.customer.nombre,
+          telefono: order.customer.telefono,
+          dni: order.customer.dni,
+          estado: order.state.estado,
+          tipoGarantia: order.tipoGarantia,
+          fechaEntrada: new Date(order.createdAt).toLocaleString("es-ES", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          }),
+          entregada: order.entregada,
+        }))
+      );
+    },
     onError: (error) => {
       enqueueSnackbar(error.message, {
         variant: "error",

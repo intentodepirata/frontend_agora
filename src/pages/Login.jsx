@@ -1,11 +1,12 @@
 import FormLogin from "../components/FormLogin/FormLogin";
 import { Box } from "@mui/material";
 import useScrollUp from "../hooks/useScrollUp";
-import { loginUser } from "../api/users";
+
 import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/auth";
 
 const Login = () => {
   const { login } = useUserContext();

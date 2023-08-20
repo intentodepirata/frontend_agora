@@ -10,7 +10,6 @@ import {
   formattedDate,
   getTotalByEstado,
   initialValues,
-  obtenerRolUsuario,
   updateHighcharts,
 } from "./utils/utils";
 import accessibility from "highcharts/modules/accessibility";
@@ -70,7 +69,10 @@ const MainWidget = ({
         <Typography textAlign={"center"} variant="h5" color="initial">
           Saludos, {user?.nombre} {user?.apellidos}
           <Box ml={1} component={"span"} sx={{ color: "#0150F5" }}>
-            {obtenerRolUsuario(user?.role)}
+            (
+            {user?.role.charAt(0).toUpperCase() +
+              user?.role.slice(1).toLowerCase()}
+            )
           </Box>
         </Typography>
         <Box

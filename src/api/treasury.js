@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const treasuryApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}tesoreria`,
+  baseURL: `${import.meta.env.VITE_API_URL}daily-closures`,
 });
 
 const createHeaders = (token) => {
@@ -12,4 +12,4 @@ export const getStatus = (token) =>
   treasuryApi.get("/status", createHeaders(token));
 
 export const postStatus = (data, token) =>
-  treasuryApi.post("/", data, createHeaders(token));
+  treasuryApi.post("/create", data, createHeaders(token));

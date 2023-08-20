@@ -1,11 +1,11 @@
 export const columns = [
   {
-    field: "id",
+    field: "otNumber",
     headerName: "OT",
     width: 80,
   },
   {
-    field: "marca",
+    field: "brands",
     headerName: "Marca",
     width: 80,
   },

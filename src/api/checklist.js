@@ -8,17 +8,14 @@ const createHeaders = (token) => {
   return { headers: { Authorization: `Bearer ${token}` } };
 };
 
-export const getChecklists = (token) =>
-  checklistApi.get("/", createHeaders(token));
-
 export const findChecklist = (id, token) =>
   checklistApi.get(`/${id}`, createHeaders(token));
 
 export const addChecklist = (checklist, token) =>
-  checklistApi.post("/", checklist, createHeaders(token));
+  checklistApi.post("/create", checklist, createHeaders(token));
 
-export const deleteBrand = (id, token) =>
+export const deleteChecklist = (id, token) =>
   checklistApi.delete(`/${id}`, createHeaders(token));
 
 export const updateChecklist = (id, checklist, token) =>
-  checklistApi.put(`/${id}`, checklist, createHeaders(token));
+  checklistApi.put(`/edit/${id}`, checklist, createHeaders(token));

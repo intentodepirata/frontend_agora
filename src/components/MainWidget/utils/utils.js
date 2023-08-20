@@ -79,16 +79,3 @@ export const getTotalByEstado = (estado, data) => {
 
   return filteredData.length;
 };
-
-export const obtenerRolUsuario = (role) => {
-  switch (role) {
-    case 1:
-      return "Propietario";
-    case 2:
-      return "Técnico";
-    case 3:
-      return "Recepcionista";
-    default:
-      return "rol desconocido";
-  }
-};

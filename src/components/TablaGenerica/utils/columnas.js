@@ -1,6 +1,6 @@
 export const columnsOrders = [
-  { field: "id", headerName: "OT", width: 80 },
-  { field: "marca", headerName: "Marca", width: 80 },
+  { field: "otNumber", headerName: "OT", width: 80 },
+  { field: "brands", headerName: "Marca", width: 80 },
   { field: "modelo", headerName: "Modelo", width: 160 },
   {
     field: "imei",
@@ -27,7 +27,7 @@ export const columnsOrders = [
   },
 ];
 export const columnsProveedores = [
-  { field: "id", headerName: "ID", width: 40 },
+  // { field: "id", headerName: "ID", width: 40 },
   { field: "empresa", headerName: "Empresa", width: 200 },
   { field: "nombre", headerName: "Persona de Contacto", width: 140 },
   { field: "email", headerName: "Email", width: 240 },
@@ -37,7 +37,7 @@ export const columnsProveedores = [
 ];
 
 export const columnsProducts = [
-  { field: "id", headerName: "ID", width: 80 },
+  // { field: "id", headerName: "ID", width: 80 },
   { field: "nombre", headerName: "Producto", width: 200 },
   { field: "modelo", headerName: "Modelo", width: 180 },
   { field: "marca", headerName: "Marca", width: 80 },
@@ -52,19 +52,19 @@ export const columnsProducts = [
 ];
 
 export const columnsServicios = [
-  { field: "id", headerName: "ID", width: 40 },
+  // { field: "id", headerName: "ID", width: 40 },
   { field: "servicio", headerName: "Servicio", width: 400 },
   { field: "precio", headerName: "Precio", width: 100 },
   { field: "e", headerName: " ", width: 460 },
 ];
 
 export const columnsChecklist = [
-  { field: "id", headerName: "ID", width: 40 },
+  // { field: "id", headerName: "ID", width: 40 },
   { field: "nombre", headerName: "Nombre", width: 200 },
 ];
 
 export const columnsClientes = [
-  { field: "id", headerName: "ID", width: 60 },
+  // { field: "id", headerName: "ID", width: 60 },
   { field: "nombre", headerName: "Nombre completo", width: 200 },
   { field: "dni", headerName: "DNI", width: 100 },
   { field: "email", headerName: "Email", width: 260 },

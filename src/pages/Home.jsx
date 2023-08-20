@@ -8,7 +8,6 @@ import useScrollUp from "../hooks/useScrollUp";
 import {
   deleteOrder,
   getOrdersByTime,
-  getOrdersPriceByTime,
   updateOrderDeliver,
 } from "../api/orders";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -41,18 +40,29 @@ const Home = () => {
     queryKey: ["orders-home", time],
     queryFn: () => getOrdersByTime(time, user.token),
     onSuccess: (data) => {
-      setRows(data.data);
-    },
-    onError: (error) => {
-      console.error(error.message);
-    },
-  });
-
-  const queryOrdersPriceHome = useQuery({
-    queryKey: ["orders-total-price-home", time],
-    queryFn: () => getOrdersPriceByTime(time, user.token),
-    onSuccess: (data) => {
-      setTotalFacturado(data.data);
+      setRows(
+        data.data.orders.map((order) => ({
+          id: order.id,
+          otNumber: order.otNumber,
+          brands: order.device.models.brands.nombre,
+          modelo: order.device.models.nombre,
+          imei: order.device.imei,
+          cliente: order.customer.nombre,
+          telefono: order.customer.telefono,
+          dni: order.customer.dni,
+          estado: order.state.estado,
+          tipoGarantia: order.tipoGarantia,
+          fechaEntrada: new Date(order.createdAt).toLocaleString("es-ES", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          }),
+          entregada: order.entregada,
+        }))
+      );
+      setTotalFacturado(data.data.total);
     },
     onError: (error) => {
       console.error(error.message);

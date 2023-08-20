@@ -1,17 +1,16 @@
 import axios from "axios";
 
 const usersApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}user`,
+  baseURL: `${import.meta.env.VITE_API_URL}users`,
 });
 const createHeaders = (token) => {
   return { headers: { Authorization: `Bearer ${token}` } };
 };
-export const loginUser = (auth) => usersApi.post("/login", auth);
 
 export const addUser = (user) => usersApi.post(`/register`, user);
 
 export const updateUser = (user, token) =>
-  usersApi.put("/", user, createHeaders(token));
+  usersApi.put("/edit", user, createHeaders(token));
 
 export const updateUserPassword = (password, token) =>
   usersApi.put("/password/update", password, createHeaders(token));
@@ -19,11 +18,10 @@ export const updateUserPassword = (password, token) =>
 export const validateUser = (confirmationToken) =>
   usersApi.get(`/confirm/${confirmationToken}`, supplier);
 
-export const forgotPassword = (email) =>
-  usersApi.post("/forgot-password/", email);
+export const forgotPassword = (email) => usersApi.post("/forgot", email);
 
 export const resetPassword = (resetToken, password) =>
-  usersApi.post(`/reset-password/${resetToken}`, password);
+  usersApi.post(`/reset/${resetToken}`, password);
 
 export const updateSubscription = (values, token) =>
   usersApi.post("/payments/update", values, createHeaders(token));

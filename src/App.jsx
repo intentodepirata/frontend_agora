@@ -38,6 +38,7 @@ import Notificaciones from "./pagesAdmin/Notificaciones";
 import Plantillas from "./pagesAdmin/Plantillas";
 import MisDatos from "./pagesAdmin/MisDatos";
 import Seguridad from "./pagesAdmin/Seguridad";
+import { ROLES } from "./constants/ROLES";
 
 const App = () => {
   const location = useLocation();
@@ -59,7 +60,18 @@ const App = () => {
 
         {/* Rutas Privadas  */}
         <Route
-          element={<ProtectedRoute allowedRoles={[1, 2, 3]} redirect={"/"} />}
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                ROLES.ADMIN,
+                ROLES.PROPIETARIO,
+                ROLES.TECNICO,
+                ROLES.DEPENDIENTE,
+                ROLES.IMPAGADO,
+              ]}
+              redirect={"/"}
+            />
+          }
         >
           <Route path="home" element={<HomeLayout />}>
             <Route index element={<Home />} />
@@ -72,7 +84,12 @@ const App = () => {
               <Route index element={<Treasury />} />
             </Route>
             <Route
-              element={<ProtectedRoute allowedRoles={[1, 2]} redirect={"/"} />}
+              element={
+                <ProtectedRoute
+                  allowedRoles={[ROLES.PROPIETARIO, ROLES.TECNICO, ROLES.ADMIN]}
+                  redirect={"/"}
+                />
+              }
             >
               <Route path="products">
                 <Route index element={<Products />} />
@@ -96,7 +113,12 @@ const App = () => {
 
             {/* Ruta Super protegida  */}
             <Route
-              element={<ProtectedRoute allowedRoles={[1]} redirect={"/"} />}
+              element={
+                <ProtectedRoute
+                  allowedRoles={[ROLES.PROPIETARIO, ROLES.ADMIN]}
+                  redirect={"/"}
+                />
+              }
             >
               <Route path="stats">
                 <Route index element={<Stats />} />
@@ -106,7 +128,19 @@ const App = () => {
         </Route>
 
         {/* Rutas protegida */}
-        <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                ROLES.ADMIN,
+                ROLES.PROPIETARIO,
+                ROLES.TECNICO,
+                ROLES.DEPENDIENTE,
+                ROLES.IMPAGADO,
+              ]}
+            />
+          }
+        >
           <Route path="print/:id" element={<OrdersPrint />} />
           <Route path="print-simple/:id" element={<OrdersPrintSmall />} />
         </Route>
@@ -117,7 +151,12 @@ const App = () => {
 
         {/* Rutas Super protegidas */}
         <Route
-          element={<ProtectedRoute allowedRoles={[1, 4]} redirect={"/"} />}
+          element={
+            <ProtectedRoute
+              allowedRoles={[ROLES.PROPIETARIO, ROLES.IMPAGADO, ROLES.ADMIN]}
+              redirect={"/"}
+            />
+          }
         >
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Negocio />} />
