@@ -9,4 +9,4 @@ const createHeaders = (token) => {
 };
 
 export const generateStats = (rangeDates, token) =>
-  statsApi.post("/stats", rangeDates, createHeaders(token));
+  statsApi.post("/stats", ...rangeDates, createHeaders(token));

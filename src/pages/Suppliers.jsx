@@ -38,7 +38,6 @@ export default function Suppliers() {
   const query = useQuery({
     queryKey: ["suppliers"],
     queryFn: () => getSuppliers(user.token),
-
     onSuccess: (data) => setRows(data.data),
     onError: (error) => {
       enqueueSnackbar(error.message, {

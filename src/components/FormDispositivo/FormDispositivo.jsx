@@ -16,7 +16,8 @@ import { FormDispositivoSchema } from "./FormDispositivoSchema";
 import { initialValues } from "./utils/initialValues";
 import { useUserContext } from "../../contexts/UserContext";
 import { useQuery } from "@tanstack/react-query";
-import { findBrandModels, getBrands } from "../../api/brands";
+import { getBrands } from "../../api/brands";
+import { findBrandModels } from "../../api/models";
 
 const FormDispositivo = ({ createDeviceMutation }) => {
   const [marcas, setMarcas] = useState([]);
@@ -42,7 +43,9 @@ const FormDispositivo = ({ createDeviceMutation }) => {
   useQuery({
     queryKey: ["brands"],
     queryFn: () => getBrands(user.token),
-    onSuccess: (data) => setMarcas(data.data),
+    onSuccess: (data) => {
+      setMarcas(data.data);
+    },
     onError: (error) => console.error(error.message),
   });
 
@@ -53,7 +56,9 @@ const FormDispositivo = ({ createDeviceMutation }) => {
         return findBrandModels(values.marca, user.token);
       }
     },
-    onSuccess: (data) => setModelos(data.data),
+    onSuccess: (data) => {
+      setModelos(data.data);
+    },
     onError: (error) => console.error(error.message),
     enabled: Boolean(values.marca),
   });

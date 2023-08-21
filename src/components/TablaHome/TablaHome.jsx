@@ -34,7 +34,7 @@ export default function TablaHome({
 
   const handleContextMenu = (event) => {
     event.preventDefault();
-    setSelectedRow(Number(event.currentTarget.getAttribute("data-id")));
+    setSelectedRow(event.currentTarget.getAttribute("data-id"));
     setContextMenu(
       contextMenu === null
         ? { mouseX: event.clientX - 2, mouseY: event.clientY - 4 }

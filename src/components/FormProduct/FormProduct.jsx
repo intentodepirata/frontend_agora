@@ -15,8 +15,9 @@ import {
 } from "@mui/material";
 import { useUserContext } from "../../contexts/UserContext";
 import { initialValues } from "./utils/initialValues";
-import { findBrandModels, getBrands } from "../../api/brands";
+import { getBrands } from "../../api/brands";
 import { useQuery } from "@tanstack/react-query";
+import { findBrandModels } from "../../api/models";
 
 const FormProduct = ({ producto, createMutation, updateMutation }) => {
   const [marcas, setMarcas] = useState([]);

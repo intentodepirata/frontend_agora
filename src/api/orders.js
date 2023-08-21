@@ -27,8 +27,10 @@ export const findOrderStatus = (id) => ordersApi.get(`/status/${id}`);
 export const findOrderPrice = (id, token) =>
   ordersApi.get(`/price/${id}`, createHeaders(token));
 
-export const addOrder = (order, token) =>
-  ordersApi.post("/create", order, createHeaders(token));
+export const addOrder = (order, token) => {
+  console.log(order);
+  return ordersApi.post("/create", order, createHeaders(token));
+};
 
 export const updateOrder = (id, order, token) =>
   ordersApi.put(`/edit/${id}`, order, createHeaders(token));

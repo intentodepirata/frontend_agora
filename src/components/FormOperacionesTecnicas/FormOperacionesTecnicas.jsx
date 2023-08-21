@@ -36,9 +36,7 @@ const FormOperacionesTecnicas = ({
   useQuery({
     queryKey: ["states"],
     queryFn: () => getStates(user.token),
-    onSuccess: (data) => {
-      setEstados(data.data);
-    },
+    onSuccess: (data) => setEstados(data.data),
     onError: (error) => {
       console.log(error);
     },
@@ -91,7 +89,7 @@ const FormOperacionesTecnicas = ({
               <Typography ml={2} variant="h6" color="primary">
                 {estados &&
                   estados.find((estado) => estado.id === values.estado_id)
-                    ?.nombre}
+                    ?.estado}
               </Typography>
             )}
           </Box>
@@ -235,7 +233,7 @@ const FormOperacionesTecnicas = ({
                 </MenuItem>
                 {estados?.map((estado) => (
                   <MenuItem key={estado.id} value={estado.id}>
-                    {estado.nombre}
+                    {estado.estado}
                   </MenuItem>
                 ))}
               </Select>

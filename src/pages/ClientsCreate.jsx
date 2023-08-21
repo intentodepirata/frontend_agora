@@ -4,7 +4,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FormClientes from "../components/FormClientes/FormClientes";
 import useScrollUp from "../hooks/useScrollUp";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addCustomer } from "../api/clientes";
+import { addCustomer } from "../api/customers";
 import { useUserContext } from "../contexts/UserContext";
 import { enqueueSnackbar } from "notistack";
 

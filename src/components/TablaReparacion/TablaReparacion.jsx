@@ -17,7 +17,7 @@ import { columns } from "./utils/columnsValues";
 import { useUserContext } from "../../contexts/UserContext";
 import CustomNoRowsOverlay from "../CustomNoRowsOverlay/CustomNoRowsOverlay";
 import { enqueueSnackbar } from "notistack";
-import { findProductsModel } from "../../api/products";
+import { findProductsModel } from "../../api/components";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import {
   addOperation,

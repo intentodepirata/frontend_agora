@@ -30,22 +30,15 @@ const FormRegister = ({ createUserMutation }) => {
     event.preventDefault();
   };
 
-  const {
-    isSubmitting,
-    values,
-    touched,
-    errors,
-    handleChange,
-    handleSubmit,
-    handleBlur,
-  } = useFormik({
-    initialValues,
-    validationSchema: FormRegisterSchema,
-    onSubmit: async function (values, actions) {
-      createUserMutation.mutate(values);
-      actions.resetForm();
-    },
-  });
+  const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
+    useFormik({
+      initialValues,
+      validationSchema: FormRegisterSchema,
+      onSubmit: async function (values, actions) {
+        createUserMutation.mutate(values);
+        actions.resetForm();
+      },
+    });
 
   return (
     <Paper sx={{ px: 2, py: 4, margin: "3rem auto", maxWidth: "662px" }}>
@@ -271,14 +264,14 @@ const FormRegister = ({ createUserMutation }) => {
             />
           </FormGroup>
           <Button
-            disabled={isSubmitting}
+            disabled={createUserMutation.isLoading}
             type="submit"
             variant="contained"
             color="primary"
             size="large"
             sx={{ textTransform: "none", fontSize: "14px", py: "14", mb: 4 }}
           >
-            {isSubmitting ? (
+            {createUserMutation.isLoading ? (
               <>
                 Creando cuenta
                 <CircularProgress size="1rem" color="grey" sx={{ ml: 2 }} />

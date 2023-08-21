@@ -11,7 +11,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import MenuClickDerechoGenerico from "../components/MenuClickDerechoGenerico/MenuClickDerechoGenerico";
 import HandleConfirmNotification from "../ui/HandleConfirmNotification";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteCustomer, getCustomers } from "../api/clientes";
+import { deleteCustomer, getCustomers } from "../api/customers";
 const Clientes = () => {
   const [selectionModel, setSelectionModel] = useState(null);
   const [rows, setRows] = useState([]);
@@ -37,8 +37,8 @@ const Clientes = () => {
   const query = useQuery({
     queryKey: ["customers"],
     queryFn: () => getCustomers(user.token),
-
     onSuccess: (data) => setRows(data.data),
+
     onError: (error) => {
       enqueueSnackbar(error.message, {
         variant: "error",

@@ -14,7 +14,7 @@ import TablaGenerica from "../components/TablaGenerica/TablaGenerica";
 import Carrito from "../components/Carrito/Carrito";
 import MenuClickDerechoProductos from "../components/MenuClickDerechoProductos/MenuClickDerechoProductos";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteProduct, getProducts } from "../api/products";
+import { deleteProduct, getProducts } from "../api/components";
 import HandleConfirmNotification from "../ui/HandleConfirmNotification";
 
 const Products = () => {
@@ -89,7 +89,25 @@ const Products = () => {
   const query = useQuery({
     queryKey: ["products"],
     queryFn: () => getProducts(user.token),
-    onSuccess: (data) => setRows(data.data),
+    onSuccess: (data) => {
+      setRows(
+        data.data.map((item) => ({
+          id: item.id,
+          existencias: item.cantidad,
+          precio: item.precio,
+          nombre: item.nombre,
+          modelo: item.models.nombre,
+          marca: item.models.brands.nombre,
+          fechaEntrada: new Date(item.createdAt).toLocaleString("es-ES", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          }),
+        }))
+      );
+    },
     onError: (error) => {
       enqueueSnackbar(error.message, {
         variant: "error",

@@ -14,7 +14,7 @@ export const findModels = (id, token) =>
   modelsApi.get(`/${id}`, createHeaders(token));
 
 export const findBrandModels = (id, token) =>
-  modelsApi.get(`/models/brands/${id}`, createHeaders(token));
+  modelsApi.get(`/brand/${id}`, createHeaders(token));
 
 export const addModels = (brand, token) =>
   modelsApi.post("/create", brand, createHeaders(token));

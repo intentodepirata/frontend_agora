@@ -1,12 +1,12 @@
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, IconButton, Typography } from "@mui/material";
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useUserContext } from "../contexts/UserContext";
 import FormClientes from "../components/FormClientes/FormClientes";
 import useScrollUp from "../hooks/useScrollUp";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { findCustomer, updateCustomer } from "../api/clientes";
+import { findCustomer, updateCustomer } from "../api/customers";
 import { enqueueSnackbar } from "notistack";
 
 const ClientesEdit = () => {

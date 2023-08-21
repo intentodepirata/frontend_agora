@@ -14,4 +14,4 @@ export const findDeviceByOrderId = (orderId, token) =>
   devicesApi.get(`/ot/${orderId}`, createHeaders(token));
 
 export const addDevice = (values, token) =>
-  devicesApi.post("/create", values, createHeaders(token));
+  devicesApi.post(`/create/${values.modelos_id}`, values, createHeaders(token));

@@ -8,7 +8,7 @@ import FormOperacionesTecnicas from "../components/FormOperacionesTecnicas/FormO
 import OrderStatusBar from "../components/OrderStatusBar/OrderStatusBar";
 import useScrollUp from "../hooks/useScrollUp";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addCustomer } from "../api/clientes";
+import { addCustomer } from "../api/customers";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import { addDevice } from "../api/devices";

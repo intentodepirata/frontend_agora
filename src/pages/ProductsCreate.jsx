@@ -5,7 +5,7 @@ import FormProduct from "../components/FormProduct/FormProduct";
 import useScrollUp from "../hooks/useScrollUp";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserContext } from "../contexts/UserContext";
-import { addProduct } from "../api/products";
+import { addProduct } from "../api/components";
 import { enqueueSnackbar } from "notistack";
 
 const ProductsCreate = () => {

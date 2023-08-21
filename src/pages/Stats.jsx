@@ -10,7 +10,7 @@ import GraficaGastosMaxMin from "../components/GraficaGastosMaxMin/GraficaGastos
 import GraficaTat from "../components/GraficaTat/GraficaTat";
 import { enqueueSnackbar } from "notistack";
 import { generateStats } from "../api/stats";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Stats() {
   const [gastosIngresos, setGastosIngresos] = useState(null);
@@ -28,7 +28,6 @@ export default function Stats() {
         new Date(new Date().getFullYear(), new Date().getMonth() - 1, 0),
         30
       ),
-      key: "selection",
     },
   ]);
   const { user } = useUserContext();
@@ -38,6 +37,7 @@ export default function Stats() {
   const statsMutation = useMutation({
     mutationFn: (rangeDates) => generateStats(rangeDates, user.token),
     onSuccess: (data) => {
+      console.log(data.data);
       setGastosIngresos(data.data.gastosIngresos);
       setAverias(data.data.averias);
       setTat(data.data.tatFinalizadas);

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const servicesApi = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}servicios`,
+  baseURL: `${import.meta.env.VITE_API_URL}services`,
 });
 
 const createHeaders = (token) => {
@@ -15,10 +15,10 @@ export const findService = (id, token) =>
   servicesApi.get(`/${id}`, createHeaders(token));
 
 export const addService = (supplier, token) =>
-  servicesApi.post("/", supplier, createHeaders(token));
+  servicesApi.post("/create", supplier, createHeaders(token));
 
 export const updateService = (id, supplier, token) =>
-  servicesApi.put(`/${id}`, supplier, createHeaders(token));
+  servicesApi.put(`/edit/${id}`, supplier, createHeaders(token));
 
 export const deleteService = (id, token) =>
   servicesApi.delete(`/${id}`, createHeaders(token));
