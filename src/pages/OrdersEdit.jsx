@@ -58,17 +58,17 @@ const OrdersEdit = () => {
 
   useQuery({
     queryKey: ["order"],
-    queryFn: () => findOrder(id, user.token),
+    queryFn: () => findOrderToPrint(id, user.token),
 
     onSuccess: (data) => {
       setOrder(data.data);
-      data.data.order.entregada === 1 && setEntregada(true);
+      data.data.entregada && setEntregada(true);
     },
     onError: (error) => {
       console.error(error.message);
     },
   });
-
+  console.log(order);
   const updateOrderMutation = useMutation({
     mutationFn: (order) => updateOrder(id, order, user.token),
     onSuccess: () => {
@@ -98,7 +98,7 @@ const OrdersEdit = () => {
   });
   const updateChecklistMutation = useMutation({
     mutationFn: (values) =>
-      updateChecklist(order?.order.checklist_id, values, user.token),
+      updateChecklist(order?.checklist?.id, values, user.token),
     onSuccess: () => {
       queryClient.invalidateQueries(["order"]);
     },

@@ -44,7 +44,15 @@ const FormOperacionesTecnicas = ({
   const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
     useFormik({
       enableReinitialize: true,
-      initialValues: order ? order.order : initialValues,
+      initialValues: order
+        ? {
+            averia: order?.averia,
+            descripcion: order?.descripcion,
+            observaciones: order?.observaciones,
+            tipoGarantia: order?.tipoGarantia,
+            state: order?.state?.id,
+          }
+        : initialValues,
       validationSchema: FormOrderSchema,
       onSubmit: async function (values) {
         try {
@@ -52,9 +60,13 @@ const FormOperacionesTecnicas = ({
             updateChecklistMutation.mutate(stateChecklist);
             updateOrderMutation.mutate(values);
           } else {
-            const { data: checklist_id } =
-              await createChecklistMutation.mutateAsync({ stateChecklist });
-            await createOrderMutation.mutateAsync({ ...values, checklist_id });
+            const { data: checklist } =
+              await createChecklistMutation.mutateAsync(stateChecklist);
+
+            await createOrderMutation.mutateAsync({
+              ...values,
+              checklist: checklist?.id,
+            });
           }
         } catch (error) {
           console.error(error.message);
@@ -79,7 +91,7 @@ const FormOperacionesTecnicas = ({
         >
           <Box sx={{ display: "flex", alignItems: "end" }}>
             <Typography variant="h4" color="primary" fontWeight={"bold"}>
-              {order ? `OT000${order?.order?.id}` : "Nueva Orden"}
+              {order ? `OT000${order?.otNumber}` : "Nueva Orden"}
             </Typography>
             {entregada ? (
               <Typography ml={2} variant="h6" color="primary">
@@ -88,8 +100,7 @@ const FormOperacionesTecnicas = ({
             ) : (
               <Typography ml={2} variant="h6" color="primary">
                 {estados &&
-                  estados.find((estado) => estado.id === values.estado_id)
-                    ?.estado}
+                  estados.find((estado) => estado.id === values.state)?.estado}
               </Typography>
             )}
           </Box>
@@ -199,7 +210,7 @@ const FormOperacionesTecnicas = ({
               Total a Facturar
             </Typography>
             <Typography variant="h6" color="initial">
-              {order ? `${order?.order.precio}€` : "0€"}
+              {order ? `${order?.precio}€` : "0€"}
             </Typography>
           </Box>
         </Paper>
@@ -214,18 +225,18 @@ const FormOperacionesTecnicas = ({
             }}
           >
             <FormControl
-              error={touched.estado_id && Boolean(errors.estado_id)}
+              error={touched.state && Boolean(errors.state)}
               sx={{ m: 1, width: 220 }}
             >
               <InputLabel id="estado">Estado</InputLabel>
               <Select
                 labelId="estado"
-                value={getSelectedValue(estados, values.estado_id, "id")}
+                value={getSelectedValue(estados, values.state, "id")}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 autoWidth
                 label="Estado"
-                name="estado_id"
+                name="state"
                 disabled={entregada}
               >
                 <MenuItem value={""}>
@@ -237,8 +248,8 @@ const FormOperacionesTecnicas = ({
                   </MenuItem>
                 ))}
               </Select>
-              {touched.estado_id && errors.estado_id && (
-                <FormHelperText>{errors.estado_id}</FormHelperText>
+              {touched.state && errors.state && (
+                <FormHelperText>{errors.state}</FormHelperText>
               )}
             </FormControl>
             <FormControl

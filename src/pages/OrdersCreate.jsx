@@ -12,7 +12,12 @@ import { addCustomer } from "../api/customers";
 import { enqueueSnackbar } from "notistack";
 import { useUserContext } from "../contexts/UserContext";
 import { addDevice } from "../api/devices";
-import { addOrder, findOrder, updateOrder } from "../api/orders";
+import {
+  addOrder,
+  findOrder,
+  findOrderToPrint,
+  updateOrder,
+} from "../api/orders";
 import { addChecklist, updateChecklist } from "../api/checklist";
 const OrdersCreate = () => {
   const [step, setStep] = useState(-1);
@@ -32,8 +37,8 @@ const OrdersCreate = () => {
   }, [dispositivo_id, cliente_id]);
 
   const queryOrder = useQuery({
-    queryKey: ["order", order?.order.id],
-    queryFn: () => findOrder(order?.order.id, user.token),
+    queryKey: ["order", order?.id],
+    queryFn: () => findOrderToPrint(order?.id, user.token),
 
     onSuccess: (data) => {
       setOrder(data.data);
@@ -41,14 +46,14 @@ const OrdersCreate = () => {
     onError: (error) => {
       console.error(error.message);
     },
-    enabled: Boolean(order?.order),
+    enabled: Boolean(order?.id),
   });
 
   const createCustomerMutation = useMutation({
     mutationFn: (values) => addCustomer(values, user.token),
     onSuccess: (data) => {
       setStep(0);
-      setCliente_id(data.data);
+      setCliente_id(data.data.id);
       enqueueSnackbar("Cliente agregado correctamente", {
         variant: "success",
       });
@@ -62,7 +67,7 @@ const OrdersCreate = () => {
     mutationFn: (values) => addDevice(values, user.token),
     onSuccess: (data) => {
       setStep(1);
-      setDispositivo_id(data.data);
+      setDispositivo_id(data.data.id);
       enqueueSnackbar("Dispositivo agregado correctamente", {
         variant: "success",
       });
@@ -71,7 +76,7 @@ const OrdersCreate = () => {
   });
 
   const updateOrderMutation = useMutation({
-    mutationFn: (values) => updateOrder(order?.order.id, values, user.token),
+    mutationFn: (values) => updateOrder(order?.id, values, user.token),
     onSuccess: () => {
       enqueueSnackbar("Orden actualizada correctamente", {
         variant: "success",
@@ -88,12 +93,15 @@ const OrdersCreate = () => {
 
   const updateChecklistMutation = useMutation({
     mutationFn: (values) =>
-      updateChecklist(order?.order.checklist_id, values, user.token),
+      updateChecklist(order?.checklist?.id, values, user.token),
   });
 
   const createOrderMutation = useMutation({
     mutationFn: (values) =>
-      addOrder({ ...values, cliente_id, dispositivo_id }, user.token),
+      addOrder(
+        { ...values, customer: cliente_id, device: dispositivo_id },
+        user.token
+      ),
     onSuccess: (data) => {
       setOrder(data.data);
       enqueueSnackbar("Orden creada correctamente", {
