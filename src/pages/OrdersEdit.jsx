@@ -68,7 +68,7 @@ const OrdersEdit = () => {
       console.error(error.message);
     },
   });
-  console.log(order);
+
   const updateOrderMutation = useMutation({
     mutationFn: (order) => updateOrder(id, order, user.token),
     onSuccess: () => {

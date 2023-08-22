@@ -11,8 +11,10 @@ export const columns = [
     width: 200,
   },
   {
-    field: "stockDisponible",
+    field: "stock",
     headerName: "En Stock",
+    valueGetter: (params) => (params.value ? "Sí" : "No"),
+
     width: 150,
   },
   {

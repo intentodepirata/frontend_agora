@@ -38,35 +38,49 @@ const TablaReparacion = ({ order, entregada }) => {
 
   useQuery({
     queryKey: ["model-products"],
-    queryFn: () => findProductsModel(order?.order.dispositivo_id, user.token),
-    onSuccess: (data) => setComponentes(data.data),
+    queryFn: () => findProductsModel(order?.device?.models?.id, user.token),
+    onSuccess: (data) => {
+      setComponentes(data.data);
+    },
     onError: (error) => {
       console.error(error.message);
     },
-    enabled: Boolean(order?.order),
+    enabled: Boolean(order?.id),
   });
 
-  const queryOperations = useQuery({
-    queryKey: ["operaciones"],
-    queryFn: () => findOperations(order?.order.id, user.token),
-    onSuccess: (data) => {
-      setRows(data.data);
-    },
-    onError: (error) => {
-      console.error(error.message);
-    },
-    enabled: Boolean(order?.order),
-  });
+  // const queryOperations = useQuery({
+  //   queryKey: ["operaciones"],
+  //   queryFn: () => findOperations(order?.id, user.token),
+  //   onSuccess: (data) => {
+  //     console.log(data.data);
+  //     setRows(data.data);
+  //   },
+  //   onError: (error) => {
+  //     console.error(error.message);
+  //   },
+  //   enabled: Boolean(order?.id),
+  // });
 
   const createMutation = useMutation({
     mutationFn: (values) =>
-      addOperation({ ...values, ots_id: order?.order.id }, user.token),
+      addOperation({ ...values, order: order?.id }, user.token),
     onSuccess: () => {
+      setRows(
+        order?.operations?.map((operation) => ({
+          id: operation?.id,
+          operacion: operation?.operacion,
+          componente: operation?.component?.nombre,
+          precio: operation?.precio,
+          tiempo: operation?.tiempo,
+          stock: operation?.stockDisponible,
+          fechaRegistro: new Date(operation?.createdAt).toLocaleString(),
+        }))
+      );
       enqueueSnackbar("Operacion agregada correctamente", {
         variant: "success",
       });
 
-      queryClient.invalidateQueries(["operaciones"]);
+      // queryClient.invalidateQueries(["operaciones"]);
       queryClient.invalidateQueries(["order"]);
     },
   });
@@ -77,7 +91,7 @@ const TablaReparacion = ({ order, entregada }) => {
       enqueueSnackbar("Operacion eliminada correctamente", {
         variant: "success",
       });
-      queryClient.invalidateQueries(["operaciones"]);
+      // queryClient.invalidateQueries(["operaciones"]);
       queryClient.invalidateQueries(["order"]);
     },
   });
@@ -124,7 +138,7 @@ const TablaReparacion = ({ order, entregada }) => {
       ),
     });
   };
-
+  console.log(order);
   const getSelectedValue = (array, value, property) => {
     return array.find((item) => item.id === value)?.[property] || "";
   };
@@ -160,14 +174,14 @@ const TablaReparacion = ({ order, entregada }) => {
         </FormControl>
 
         <FormControl
-          error={touched.componentes_id && Boolean(errors.componentes_id)}
+          error={touched.componente && Boolean(errors.componente)}
           fullWidth
         >
           <InputLabel size="small">Agregar Componente</InputLabel>
           <Select
-            name="componentes_id"
+            name="componente"
             size="small"
-            value={getSelectedValue(componentes, values.componentes_id, "id")}
+            value={getSelectedValue(componentes, values.componente, "id")}
             label="Agregar Componente"
             onChange={handleChange}
             onBlur={handleBlur}
@@ -251,7 +265,7 @@ const TablaReparacion = ({ order, entregada }) => {
             noRowsOverlay: CustomNoRowsOverlay,
             loadingOverlay: LinearProgress,
           }}
-          loading={Boolean(queryOperations.isFetching)}
+          // loading={Boolean(queryOperations.isFetching)}
         />
       </Box>
 

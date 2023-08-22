@@ -277,9 +277,11 @@ const HeaderBar = ({ handleOpenCloseDrawer }) => {
                   {searchResults.length > 0 &&
                     searchResults.map((item) => (
                       <Box key={item.ot_id}>
-                        <ListItemButton onClick={() => handleClick(item.ot_id)}>
+                        <ListItemButton
+                          onClick={() => handleClick(item.orders_id)}
+                        >
                           <ListItemText
-                            primary={`OT${item.ot_id} - ${item.nombre_cliente} -  ${item.nombre_modelo} - IMEI: ${item.imei}`}
+                            primary={`OT000${item.ot_id} - ${item.nombre_cliente} -  ${item.nombre_modelo} - IMEI: ${item.device_imei}`}
                           />
                         </ListItemButton>
                         <Divider />

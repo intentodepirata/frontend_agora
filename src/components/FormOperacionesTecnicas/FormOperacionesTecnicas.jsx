@@ -41,6 +41,7 @@ const FormOperacionesTecnicas = ({
       console.log(error);
     },
   });
+
   const { values, touched, errors, handleChange, handleSubmit, handleBlur } =
     useFormik({
       enableReinitialize: true,
