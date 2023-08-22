@@ -41,7 +41,7 @@ const FormProduct = ({ producto, createMutation, updateMutation }) => {
       actions.resetForm();
     },
   });
-
+  console.log(values);
   useQuery({
     queryKey: ["brands"],
     queryFn: () => getBrands(user.token),

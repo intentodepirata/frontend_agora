@@ -48,25 +48,12 @@ const TablaReparacion = ({ order, entregada }) => {
     enabled: Boolean(order?.id),
   });
 
-  // const queryOperations = useQuery({
-  //   queryKey: ["operaciones"],
-  //   queryFn: () => findOperations(order?.id, user.token),
-  //   onSuccess: (data) => {
-  //     console.log(data.data);
-  //     setRows(data.data);
-  //   },
-  //   onError: (error) => {
-  //     console.error(error.message);
-  //   },
-  //   enabled: Boolean(order?.id),
-  // });
-
-  const createMutation = useMutation({
-    mutationFn: (values) =>
-      addOperation({ ...values, order: order?.id }, user.token),
-    onSuccess: () => {
+  const queryOperations = useQuery({
+    queryKey: ["operaciones"],
+    queryFn: () => findOperations(order?.id, user.token),
+    onSuccess: (data) => {
       setRows(
-        order?.operations?.map((operation) => ({
+        data.data?.map((operation) => ({
           id: operation?.id,
           operacion: operation?.operacion,
           componente: operation?.component?.nombre,
@@ -76,11 +63,22 @@ const TablaReparacion = ({ order, entregada }) => {
           fechaRegistro: new Date(operation?.createdAt).toLocaleString(),
         }))
       );
+    },
+    onError: (error) => {
+      console.error(error.message);
+    },
+    enabled: Boolean(order?.id),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (values) =>
+      addOperation({ ...values, order: order?.id }, user.token),
+    onSuccess: () => {
       enqueueSnackbar("Operacion agregada correctamente", {
         variant: "success",
       });
 
-      // queryClient.invalidateQueries(["operaciones"]);
+      queryClient.invalidateQueries(["operaciones"]);
       queryClient.invalidateQueries(["order"]);
     },
   });
@@ -91,7 +89,7 @@ const TablaReparacion = ({ order, entregada }) => {
       enqueueSnackbar("Operacion eliminada correctamente", {
         variant: "success",
       });
-      // queryClient.invalidateQueries(["operaciones"]);
+      queryClient.invalidateQueries(["operaciones"]);
       queryClient.invalidateQueries(["order"]);
     },
   });
@@ -138,7 +136,7 @@ const TablaReparacion = ({ order, entregada }) => {
       ),
     });
   };
-  console.log(order);
+
   const getSelectedValue = (array, value, property) => {
     return array.find((item) => item.id === value)?.[property] || "";
   };
@@ -213,11 +211,11 @@ const TablaReparacion = ({ order, entregada }) => {
             <MenuItem value={""}>
               <em>Seleccione</em>
             </MenuItem>
-            <MenuItem value={"0"}>0</MenuItem>
-            <MenuItem value={"0.25"}>0.25</MenuItem>
-            <MenuItem value={"0.5"}>0.50</MenuItem>
-            <MenuItem value={"0.75"}>0.75</MenuItem>
-            <MenuItem value={"1"}>1</MenuItem>
+            <MenuItem value={0}>0</MenuItem>
+            <MenuItem value={0.25}>0.25</MenuItem>
+            <MenuItem value={0.5}>0.50</MenuItem>
+            <MenuItem value={0.75}>0.75</MenuItem>
+            <MenuItem value={1}>1</MenuItem>
           </Select>
         </FormControl>
         <Button
@@ -265,7 +263,7 @@ const TablaReparacion = ({ order, entregada }) => {
             noRowsOverlay: CustomNoRowsOverlay,
             loadingOverlay: LinearProgress,
           }}
-          // loading={Boolean(queryOperations.isFetching)}
+          loading={Boolean(queryOperations.isFetching)}
         />
       </Box>
 

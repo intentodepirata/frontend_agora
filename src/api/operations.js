@@ -11,8 +11,10 @@ const createHeaders = (token) => {
 export const findOperations = (orderId, token) =>
   operationsApi.get(`/order/${orderId}`, createHeaders(token));
 
-export const addOperation = (operation, token) =>
-  operationsApi.post("/create", operation, createHeaders(token));
+export const addOperation = (operation, token) => {
+  console.log(operation);
+  return operationsApi.post("/create", operation, createHeaders(token));
+};
 
 export const deleteOperation = (id, token) =>
   operationsApi.delete(`/${id}`, createHeaders(token));
