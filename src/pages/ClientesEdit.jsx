@@ -21,7 +21,11 @@ const ClientesEdit = () => {
     queryKey: ["customer"],
     queryFn: () => findCustomer(id, user.token),
 
-    onSuccess: (data) => setCliente(...data.data),
+    onSuccess: (data) => {
+      console.log(data);
+
+      setCliente(data.data);
+    },
     onError: (error) => {
       enqueueSnackbar(error.message, {
         variant: "error",
