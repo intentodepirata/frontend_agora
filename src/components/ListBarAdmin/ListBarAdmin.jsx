@@ -15,6 +15,7 @@ import StorageIcon from "@mui/icons-material/Storage";
 import SecurityIcon from "@mui/icons-material/Security";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useUserContext } from "../../contexts/UserContext";
+import { ROLES } from "../../constants/ROLES";
 
 export default function ListBarAdmin({ showDrawer }) {
   const [selectedIndex, setSelectedIndex] = useState(1);
@@ -50,7 +51,7 @@ export default function ListBarAdmin({ showDrawer }) {
           {showDrawer && "ADMINISTRAR MI NEGOCIO"}
         </Typography>
 
-        {user.role !== 4 && (
+        {user.role !== ROLES.IMPAGADO && (
           <ListItemButton
             selected={selectedIndex === 1}
             onClick={(event) => {
@@ -78,7 +79,7 @@ export default function ListBarAdmin({ showDrawer }) {
           <ListItemText primary={showDrawer ? "Mi suscripcion" : ""} />
         </ListItemButton>
 
-        {user.role !== 4 && (
+        {user.role !== ROLES.IMPAGADO && (
           <>
             <ListItemButton
               selected={selectedIndex === 3}

@@ -23,8 +23,8 @@ export const forgotPassword = (email) => usersApi.post("/forgot", email);
 export const resetPassword = (resetToken, password) =>
   usersApi.post(`/reset/${resetToken}`, password);
 
-export const updateSubscription = (values, token) =>
-  usersApi.post("/payments/update", values, createHeaders(token));
+export const updateSubscription = (plan, token) =>
+  usersApi.put("/expiration-date/update", plan, createHeaders(token));
 
 export const getExpirationDate = (id) => usersApi.get(`/expiration-date/${id}`);
 

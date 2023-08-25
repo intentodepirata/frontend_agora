@@ -33,6 +33,7 @@ import {
   usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
 import { useMutation } from "@tanstack/react-query";
+import { updateSubscription } from "../../api/users";
 
 const SuscripcionModal = ({ modalAbierto, closeModal }) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -84,28 +85,21 @@ const SuscripcionModal = ({ modalAbierto, closeModal }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}user/payments/update`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + user.token,
-          },
-          body: JSON.stringify({
-            plan: userPlan,
-            card: cardData,
-            coupon: couponData,
-          }),
-        }
+      const data = await updateSubscription(
+        { plan: userPlan.value },
+        user.token
       );
-      const data = await response.json();
-      if (!response.ok) {
+
+      if (data.status !== 200) {
         setLoading(false);
         throw new Error(data.error);
       }
 
-      login({ ...user, role: data });
+      login({
+        ...user,
+        role: data.data.role,
+        fechaFinActivacion: data.data.fechaFinActivacion,
+      });
       setLoading(false);
       setPaymentComplete(true);
       enqueueSnackbar("Pago Realizado, Muchas Gracias", { variant: "success" });

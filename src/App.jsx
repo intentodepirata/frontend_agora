@@ -67,7 +67,6 @@ const App = () => {
                 ROLES.PROPIETARIO,
                 ROLES.TECNICO,
                 ROLES.DEPENDIENTE,
-                ROLES.IMPAGADO,
               ]}
               redirect={"/"}
             />
