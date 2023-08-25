@@ -23,6 +23,7 @@ const GraficaReparaciones = ({ data }) => {
     name: `${item.modelo} - ${item.averia}`,
     data: [item.total_reparaciones],
   }));
+  console.log(series);
 
   const options = {
     chart: {

@@ -28,6 +28,7 @@ export default function Stats() {
         new Date(new Date().getFullYear(), new Date().getMonth() - 1, 0),
         30
       ),
+      key: "selection",
     },
   ]);
   const { user } = useUserContext();
