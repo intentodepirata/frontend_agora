@@ -38,10 +38,10 @@ export default function Stats() {
   const statsMutation = useMutation({
     mutationFn: (rangeDates) => generateStats(rangeDates, user.token),
     onSuccess: (data) => {
-      console.log(data.data);
       setGastosIngresos(data.data.gastosIngresos);
       setAverias(data.data.averias);
       setTat(data.data.tatFinalizadas);
+      // console.log(data.data);
     },
 
     onError: (error) => {
@@ -51,7 +51,6 @@ export default function Stats() {
       });
     },
   });
-
   const handleShowStats = () => {
     setShowStats(true);
     statsMutation.mutate(rangeDates);

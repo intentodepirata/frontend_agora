@@ -26,7 +26,7 @@ export const resetPassword = (resetToken, password) =>
 export const updateSubscription = (values, token) =>
   usersApi.post("/payments/update", values, createHeaders(token));
 
-export const getExpirationDate = (id) => usersApi.get(`/fecha/${id}`);
+export const getExpirationDate = (id) => usersApi.get(`/expiration-date/${id}`);
 
 export const getEmployees = (id) => usersApi.get(`/employees/${id}`);
 

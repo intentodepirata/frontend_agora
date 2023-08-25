@@ -17,8 +17,8 @@ const GraficaReparaciones = ({ data }) => {
     return <Typography>No hay datos</Typography>;
   }
 
-  const otIds = data.map((item) => `OT${item.id}`);
-  const tiempoTranscurrido = data.map((item) => item.Tats);
+  const otIds = data.map((item) => `OT${item.orders_ot_number}`);
+  const tiempoTranscurrido = data.map((item) => parseInt(item.tats));
 
   const options = {
     chart: {

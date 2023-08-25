@@ -55,7 +55,7 @@ const OrdersEdit = () => {
       });
     },
   });
-
+  console.log(order);
   useQuery({
     queryKey: ["order"],
     queryFn: () => findOrderToPrint(id, user.token),

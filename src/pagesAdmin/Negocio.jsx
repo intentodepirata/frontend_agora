@@ -105,7 +105,7 @@ const Negocio = () => {
   };
 
   const deleteImageMutation = useMutation({
-    mutationFn: () => deleteImage(negocioId, user.token),
+    mutationFn: () => updateBusiness(negocioId, { logo: null }, user.token),
     onSuccess: () => {
       enqueueSnackbar("Logo eliminado correctamente", {
         variant: "success",

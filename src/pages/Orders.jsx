@@ -37,7 +37,6 @@ const Orders = () => {
     queryKey: ["orders"],
     queryFn: () => getOrders(user.token),
     onSuccess: (data) => {
-      console.log(data.data);
       setRows(
         data.data.map((order) => ({
           id: order.id,

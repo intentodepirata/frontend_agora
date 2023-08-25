@@ -29,10 +29,12 @@ export default function FormSuscripcion() {
     queryKey: ["expirationDate"],
     queryFn: () => getExpirationDate(user.id),
     onSuccess: (data) => {
-      setFecha(data.data);
+      setFecha(
+        new Date(data.data.fechaFinActivacion).toLocaleDateString("es-ES")
+      );
     },
   });
-
+  console.log(fecha);
   return (
     <>
       <Paper

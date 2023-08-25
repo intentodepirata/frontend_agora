@@ -20,7 +20,7 @@ export default function Treasury() {
   const [totalIngresos, setTotalIngresos] = useState(
     JSON.parse(localStorage.getItem("totalIngresos")) || []
   );
-  const [estadoCaja, setEstadoCaja] = useState(null);
+  const [estadoCaja, setEstadoCaja] = useState(false);
   const queryClient = useQueryClient();
   useEffect(() => {
     localStorage.setItem("totalIngresos", JSON.stringify(totalIngresos));
@@ -44,7 +44,6 @@ export default function Treasury() {
       });
     },
   });
-
   const createMutation = useMutation({
     mutationFn: () =>
       postStatus(
