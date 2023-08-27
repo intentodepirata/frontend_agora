@@ -114,7 +114,7 @@ const MainWidget = ({
               sx={{ fontSize: "1.8rem", mr: 1 }}
               color="primary"
             />
-            {` ${getTotalByEstado("Reparacion Finalizada", rows)}  Finalizada`}
+            {` ${getTotalByEstado("Reparacion Finalizada", rows)}  Finalizadas`}
           </Button>
         </Box>
         <Box
