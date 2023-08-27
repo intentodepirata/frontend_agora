@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const ComenzarGratis = () => {
   return (
     <>
-      <Box component="section">
+      <Box component="section" mt={10}>
         <Box
           sx={{
             display: "flex",

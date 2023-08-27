@@ -1,8 +1,15 @@
 import { Box, Button } from "@mui/material";
 import logo from "../../assets/img/logo-trans.png";
-import { Link } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 const Header = () => {
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <Box
       component="header"
@@ -17,7 +24,6 @@ const Header = () => {
           xxxl: "2560px",
         },
         margin: "0 auto",
-
         p: 2,
         display: "flex",
         flexDirection: { xs: "column", md: "row" },
@@ -25,7 +31,7 @@ const Header = () => {
         justifyContent: "space-between",
       }}
     >
-      <Link to="/" underline="none">
+      <RouterLink to="/" underline="none">
         <Box
           component={"img"}
           src={logo}
@@ -33,7 +39,7 @@ const Header = () => {
           width={"160px"}
           height={"59px"}
         />
-      </Link>
+      </RouterLink>
 
       <Box
         component="nav"
@@ -43,15 +49,25 @@ const Header = () => {
           alignItems: "center",
         }}
       >
-        <a href="/#caracteristicas">Caracteristicas</a>
-        <a href="/#planes">Precios</a>
-        <Link to="/login" underline="none">
+        <a
+          onClick={() => scrollToSection("caracteristicas")}
+          style={{ cursor: "pointer" }}
+        >
+          Caracteristicas
+        </a>
+        <a
+          onClick={() => scrollToSection("planes")}
+          style={{ cursor: "pointer" }}
+        >
+          Precios
+        </a>
+        <RouterLink to="/login" underline="none">
           Iniciar Sesion
-        </Link>
+        </RouterLink>
         <Button
           variant="contained"
           color="primary"
-          component={Link}
+          component={RouterLink}
           to="/register"
           sx={{ textTransform: "none", fontSize: "16px" }}
         >

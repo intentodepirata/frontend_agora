@@ -86,7 +86,7 @@ const Caracteristicas = () => {
     },
   ];
   return (
-    <Box id="caracteristicas" component="section" sx={{ py: 8 }}>
+    <Box id="caracteristicas" component="section" sx={{ py: 12 }}>
       <Typography
         variant="h3"
         component="h1"
