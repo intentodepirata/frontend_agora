@@ -52,7 +52,7 @@ export default function OrdersPrint() {
   function calculateTotalPriceWithIVA(precio) {
     return calculateIVA(precio) + precio;
   }
-
+  console.log(user?.negocio?.logo);
   return (
     <Paper
       sx={{
@@ -111,9 +111,14 @@ export default function OrdersPrint() {
             {fecha}
           </Typography>
         </Box>
-        <Box to={`/order-status/${order?.uuid}`} component={Link}>
+        <Box
+          to={`/order-status/${order?.uuid}?logo=${user?.negocio?.logo}`}
+          component={Link}
+        >
           <QRCode
-            value={`${import.meta.env.VITE_URL}order-status/${order?.uuid}`}
+            value={`${import.meta.env.VITE_URL}order-status/${
+              order?.uuid
+            }?logo=${user?.negocio?.logo}`}
             size={100}
           />
         </Box>

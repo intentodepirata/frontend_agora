@@ -1,6 +1,6 @@
 import { Box, Divider, Paper, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
-import logo from "../assets/img/logo-trans.png";
+
 import Footer from "../components/Footer/Footer";
 import useScrollUp from "../hooks/useScrollUp";
 import { useUserContext } from "../contexts/UserContext";
@@ -12,6 +12,10 @@ export default function OrdersStatus() {
   const { id } = useParams();
   useScrollUp();
 
+  const queryParams = new URLSearchParams(location.search);
+  const logo = queryParams.get("logo");
+
+  // console.log(logo);
   const { data: order } = useQuery({
     queryKey: ["status-order", id],
     queryFn: () => findOrderStatus(id),
