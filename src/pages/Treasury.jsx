@@ -20,7 +20,7 @@ export default function Treasury() {
   const [totalIngresos, setTotalIngresos] = useState(
     JSON.parse(localStorage.getItem("totalIngresos")) || []
   );
-  const [estadoCaja, setEstadoCaja] = useState(false);
+  const [cajaCerrada, setCajaCerrada] = useState(false);
   const queryClient = useQueryClient();
   useEffect(() => {
     localStorage.setItem("totalIngresos", JSON.stringify(totalIngresos));
@@ -37,13 +37,14 @@ export default function Treasury() {
   const queryTreasuryStatus = useQuery({
     queryKey: ["queryTreasuryStatus"],
     queryFn: () => getStatus(user.token),
-    onSuccess: (data) => setEstadoCaja(data.data),
+    onSuccess: (data) => setCajaCerrada(data.data),
     onError: (error) => {
       enqueueSnackbar(error.message, {
         variant: "error",
       });
     },
   });
+  console.log(cajaCerrada);
   const createMutation = useMutation({
     mutationFn: () =>
       postStatus(
@@ -129,9 +130,9 @@ export default function Treasury() {
           sx={{ textTransform: "none", fontSize: "16px" }}
           endIcon={<LockOpenIcon />}
           onClick={handleModal}
-          disabled={!estadoCaja}
+          disabled={cajaCerrada}
         >
-          {estadoCaja ? "Abrir caja" : "Caja Cerrada"}
+          {cajaCerrada ? "Caja Cerrada" : "Abrir caja"}
         </Button>
       </Box>
 
@@ -139,7 +140,7 @@ export default function Treasury() {
         <FormTesoreria
           setTotalGastos={setTotalGastos}
           setTotalIngresos={setTotalIngresos}
-          estadoCaja={estadoCaja}
+          cajaCerrada={cajaCerrada}
         />
       </Box>
       <ModalCierreCaja
@@ -150,7 +151,7 @@ export default function Treasury() {
         registroDiario={registroDiario}
         setRegistroDiario={setRegistroDiario}
         handleConfirmarCaja={handleConfirmarCaja}
-        estadoCaja={estadoCaja}
+        cajaCerrada={cajaCerrada}
       />
     </Box>
   );

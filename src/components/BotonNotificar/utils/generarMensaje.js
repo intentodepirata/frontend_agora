@@ -61,16 +61,17 @@ export const generarMensaje = (cliente, user, email) => {
 };
 
 export const notificarPorWhatsApp = (cliente, user) => {
-  const telefono = encodeURIComponent(`+34${cliente.telefono}`);
+  const telefono = encodeURIComponent(`+34${cliente.customer.telefono}`);
   const mensaje = encodeURIComponent(generarMensaje(cliente, user));
   const enlace = `https://web.whatsapp.com/send?phone=${telefono}&text=${mensaje}`;
   window.open(enlace);
 };
 
 export const notificarPorEmail = (cliente, user) => {
-  const email = encodeURIComponent(cliente.email);
+  console.log(cliente);
+  const email = encodeURIComponent(cliente.customer.email);
   const asunto = encodeURIComponent(
-    `${user.negocio.nombre} - ${cliente.estado}`
+    `${user.negocio.nombre} - ${cliente.state.estado}`
   );
   const cuerpo = encodeURIComponent(generarMensaje(cliente, user, true));
   const url = `mailto:${email}?subject=${asunto}&body=${cuerpo}&content-type=text/html`;

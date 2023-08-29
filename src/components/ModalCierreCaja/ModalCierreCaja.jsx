@@ -13,7 +13,7 @@ export default function ModalCierreCaja({
   registroDiario,
   setRegistroDiario,
   handleConfirmarCaja,
-  estadoCaja,
+  cajaCerrada,
 }) {
   const handleChange = (e) => {
     setRegistroDiario({
@@ -156,7 +156,7 @@ export default function ModalCierreCaja({
             sx={{ textTransform: "none", fontSize: "16px" }}
             endIcon={<LockOpenIcon />}
             onClick={handleConfirmarCaja}
-            disabled={!estadoCaja}
+            disabled={cajaCerrada}
             fullWidth
           >
             Realizar el cierre de caja

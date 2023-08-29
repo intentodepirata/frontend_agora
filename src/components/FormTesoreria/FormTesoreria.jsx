@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function FormTesoreria({
   setTotalGastos,
   setTotalIngresos,
-  estadoCaja,
+  cajaCerrada,
 }) {
   const [gasto, setGasto] = useState(0);
   const [ingreso, setIngreso] = useState(0);
@@ -59,13 +59,13 @@ export default function FormTesoreria({
           onChange={(e) => setGasto(e.target.value)}
           size="small"
           sx={{ mb: 2 }}
-          disabled={!estadoCaja}
+          disabled={cajaCerrada}
         />
         <Button
           variant="contained"
           color="primary"
           type="submit"
-          disabled={!estadoCaja}
+          disabled={cajaCerrada}
         >
           Agregar
         </Button>
@@ -95,13 +95,13 @@ export default function FormTesoreria({
           onChange={(e) => setIngreso(e.target.value)}
           size="small"
           sx={{ mb: 2 }}
-          disabled={!estadoCaja}
+          disabled={cajaCerrada}
         />
         <Button
           variant="contained"
           color="primary"
           type="submit"
-          disabled={!estadoCaja}
+          disabled={cajaCerrada}
         >
           Agregar
         </Button>
