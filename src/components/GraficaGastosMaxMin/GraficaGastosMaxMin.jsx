@@ -19,11 +19,17 @@ const GraficaGastos = ({ data }) => {
   accessibility(Highcharts);
   const totalGastos = data
     .filter((item) => item.tipo === "Gasto")
-    .reduce((total, item) => total + parseFloat(item.cantidad).toFixed(2), 0);
+    .reduce(
+      (total, item) => total + Number(parseFloat(item.cantidad).toFixed(2)),
+      0
+    );
 
   const totalIngresos = data
     .filter((item) => item.tipo === "Ingreso")
-    .reduce((total, item) => total + parseFloat(item.cantidad).toFixed(2), 0);
+    .reduce(
+      (total, item) => total + Number(parseFloat(item.cantidad).toFixed(2)),
+      0
+    );
 
   const diferencia = totalIngresos - totalGastos;
   const diferenciaLabel = diferencia >= 0 ? "Ganancias" : "Pérdidas";
