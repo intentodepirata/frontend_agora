@@ -19,19 +19,15 @@ const GraficaGastos = ({ data }) => {
   accessibility(Highcharts);
   const totalGastos = data
     .filter((item) => item.tipo === "Gasto")
-    .reduce(
-      (total, item) => total + Number(parseFloat(item.cantidad).toFixed(2)),
-      0
-    );
+    .reduce((total, item) => total + parseFloat(item.cantidad), 0)
+    .toFixed(2);
 
   const totalIngresos = data
     .filter((item) => item.tipo === "Ingreso")
-    .reduce(
-      (total, item) => total + Number(parseFloat(item.cantidad).toFixed(2)),
-      0
-    );
+    .reduce((total, item) => total + parseFloat(item.cantidad), 0)
+    .toFixed(2);
 
-  const diferencia = totalIngresos - totalGastos;
+  const diferencia = +totalIngresos - +totalGastos;
   const diferenciaLabel = diferencia >= 0 ? "Ganancias" : "Pérdidas";
 
   const options = {
@@ -44,7 +40,7 @@ const GraficaGastos = ({ data }) => {
     xAxis: {
       categories: [diferenciaLabel],
       title: {
-        text: `Total ${diferencia}€`,
+        text: `Total ${diferencia.toFixed(2)}€`,
       },
     },
     yAxis: {
@@ -63,7 +59,7 @@ const GraficaGastos = ({ data }) => {
         name: "Gastos",
         data: [
           {
-            y: totalGastos,
+            y: Number(totalGastos),
             dataLabels: {
               enabled: true,
             },
@@ -75,7 +71,7 @@ const GraficaGastos = ({ data }) => {
         name: "Ingresos",
         data: [
           {
-            y: totalIngresos,
+            y: Number(totalIngresos),
             dataLabels: {
               enabled: true,
             },

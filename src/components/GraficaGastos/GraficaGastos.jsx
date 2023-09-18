@@ -29,11 +29,11 @@ const GraficaGastos = ({ data }) => {
 
   const gastos = data
     .filter((item) => item.tipo === "Gasto")
-    .map((item) => parseFloat(item.cantidad).toFixed(2));
+    .map((item) => parseFloat(item.cantidad));
 
   const ingresos = data
     .filter((item) => item.tipo === "Ingreso")
-    .map((item) => parseFloat(item.cantidad).toFixed(2));
+    .map((item) => parseFloat(item.cantidad));
 
   const options = {
     chart: {
