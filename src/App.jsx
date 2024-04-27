@@ -42,7 +42,7 @@ import Seguridad from "./pagesAdmin/Seguridad";
 const App = () => {
   const location = useLocation();
 
-  // No renderizar chatbox si estamos imprimiendo
+  // No renderizar chatbox si estamos imprimiend o
   const shouldRenderChatBox = !location.pathname.includes("print");
   return (
     <UserContextProvider>
